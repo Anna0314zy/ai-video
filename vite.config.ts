@@ -25,17 +25,12 @@ export default defineConfig({
   },
   server: {
     strictPort: true,
-    port: 5176,
+    port: 5155,
     proxy: {
       "/api": {
         target: "https://test-class-api-online.saasp.vdyoo.com",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
-      },
-      "/test": {
-        target: "http://10.254.54.229:20092",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/test/, ""),
       },
     },
   },
