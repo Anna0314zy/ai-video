@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-04-09 10:41:35
- * @LastEditors: wangpeng
- * @LastEditTime: 2024-07-24 14:30:43
+ * @LastEditors: 周东晨 p_zhoudongchen@ledupeiyou.com
+ * @LastEditTime: 2024-07-26 17:48:05
  * @FilePath: /ai-content-platform/vite.config.ts
  */
 import { defineConfig } from 'vite'

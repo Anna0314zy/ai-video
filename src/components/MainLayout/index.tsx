@@ -1,5 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { Layout, Dropdown, Breadcrumb, MenuProps } from 'antd'
+import Enter from '@/router/useAuth'
+
 import './style.less'
 
 export default function MainLayout() {
@@ -13,7 +15,8 @@ export default function MainLayout() {
     },
   ]
   return (
-    <Layout className='main-layout'>
+    <Enter>
+         <Layout className='main-layout'>
       <Layout.Header className='main-layout-header'>
         <div className='header-wrapper'>
           <div className='header-logo'>
@@ -33,5 +36,7 @@ export default function MainLayout() {
         <Outlet />
       </Layout.Content>
     </Layout>
+    </Enter>
+ 
   )
 }
