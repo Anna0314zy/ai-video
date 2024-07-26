@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-24 18:53:06
  * @LastEditors: 周东晨 p_zhoudongchen@ledupeiyou.com
- * @LastEditTime: 2024-07-26 18:27:46
+ * @LastEditTime: 2024-07-26 18:47:11
  * @FilePath: /ai-content-platform/src/router/index.tsx
  */
 import { createHashRouter } from 'react-router-dom'
@@ -34,11 +34,6 @@ const router = createHashRouter([
       {
         path: 'image',
         element: <Image />,
-      },{
-        path: 'video',
-        element: <Video />,
-      },{
-        path: 'home',
       }]
     }],
   },
