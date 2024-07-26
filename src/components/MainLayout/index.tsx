@@ -1,8 +1,13 @@
+/*
+ * @Date: 2024-07-24 18:53:06
+ * @LastEditors: 周东晨 p_zhoudongchen@ledupeiyou.com
+ * @LastEditTime: 2024-07-26 18:28:32
+ * @FilePath: /ai-content-platform/src/components/MainLayout/index.tsx
+ */
 import { Outlet } from 'react-router-dom'
 import { Layout, Dropdown, Breadcrumb, MenuProps } from 'antd'
 import Enter from '@/router/useAuth'
-
-import './style.less'
+import './index.less'
 
 export default function MainLayout() {
   const useInfo = {
@@ -30,7 +35,7 @@ export default function MainLayout() {
             </div>
           </Dropdown>
         </div>
-        <Breadcrumb className='header-breadcrumb' items={[{ title: 'Home' }, { title: 'List' }]}></Breadcrumb>
+        {/* <Breadcrumb className='header-breadcrumb' items={[{ title: 'Home' }, { title: 'List' }]}></Breadcrumb> */}
       </Layout.Header>
       <Layout.Content className='main-layout-context'>
         <Outlet />
