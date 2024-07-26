@@ -15,6 +15,7 @@ class StompSocket extends EventEmitter {
         this.connect()
     }
 
+
     private initParam: SocketParam
     private stompClient!: Client
 
@@ -26,6 +27,7 @@ class StompSocket extends EventEmitter {
         const ws = new window.SockJS(this.initParam.baseUrl);
         this.stompClient = Stomp.over(ws);
         this.stompClient.connect({}, () => {
+            console.log('connect--')
             this.stompClient.subscribe(this.initParam.subscribeThorough,  (message: any) => {
                 console.log('onSubscribe', message)
                 this.emit('onSubscribe', message)
