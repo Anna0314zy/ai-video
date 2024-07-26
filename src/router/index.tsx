@@ -10,9 +10,14 @@ import MainLayout from '../components/MainLayout'
 import NotFound from '../pages/NotFound'
 import Home from '../pages/Home'
 import Edit from '../pages/Edit'
+<<<<<<< HEAD
 import Image from '@/pages/Edit/components/Image'
 import Video from '@/pages/Edit/components/Video'
 import HmePage  from '@/pages/HmePage'
+=======
+import HomePage from '../pages/HmePage'
+import Chat from '../pages/Chat'
+>>>>>>> 5e94626 (feat: 新增流式文本的获取和展示)
 
 
 const router = createHashRouter([
@@ -32,10 +37,25 @@ const router = createHashRouter([
         element: <HmePage />
       },
       {
+<<<<<<< HEAD
         path: 'image',
         element: <Image />,
       }]
     }],
+=======
+        path: '/home',
+        element: <HomePage />
+      },
+      {
+        path: '/edit/:id',
+        element: <Edit />,
+      },
+      {
+        path: '/chat',
+        element: <Chat />,
+      }
+    ],
+>>>>>>> 5e94626 (feat: 新增流式文本的获取和展示)
   },
   {
     path: '*',
