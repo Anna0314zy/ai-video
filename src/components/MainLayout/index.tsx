@@ -1,6 +1,13 @@
+/*
+ * @Date: 2024-07-24 18:53:06
+ * @LastEditors: wangpeng
+ * @LastEditTime: 2024-07-26 15:02:36
+ * @FilePath: /ai-content-platform/src/components/MainLayout/index.tsx
+ */
 import { Outlet } from 'react-router-dom'
 import { Layout, Dropdown, Breadcrumb, MenuProps } from 'antd'
-import './style.less'
+import './index.less'
+import React from 'react'
 
 export default function MainLayout() {
   const useInfo = {
@@ -27,7 +34,7 @@ export default function MainLayout() {
             </div>
           </Dropdown>
         </div>
-        <Breadcrumb className='header-breadcrumb' items={[{ title: 'Home' }, { title: 'List' }]}></Breadcrumb>
+        {/* <Breadcrumb className='header-breadcrumb' items={[{ title: 'Home' }, { title: 'List' }]}></Breadcrumb> */}
       </Layout.Header>
       <Layout.Content className='main-layout-context'>
         <Outlet />
