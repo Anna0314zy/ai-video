@@ -1,24 +1,28 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "jsx": "react-jsx",
-    "module": "commonjs",
-    "target": "es5",
-    "lib": ["dom", "esnext"],
-    "allowJs": true,
-    "noUnusedLocals": true,
-    "preserveConstEnums": true,
-    "sourceMap": true,
-    "declaration": true,
-    "skipLibCheck": true,
-    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "typeRoots": ["node_modules/@types", "./typings"],
     "baseUrl": "src",
     "paths": {
       "@/*": ["./*"]
     }
-  }
+  },
+  "include": ["src", "typings"]
 }

@@ -3,7 +3,9 @@ import { RootModel } from '.'
 
 interface PageState {
     token: boolean
-  }
+}
+
+
 
 export default createModel<RootModel>()({
   state: {

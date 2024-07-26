@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux'
 import { Dispatch } from '@/store'
-
+import { getToken } from '@/utils/auth';
 
 
 const useAuth = () => {
@@ -42,13 +42,6 @@ const useAuth = () => {
       return true; // 假设用户未登录
     };
 
-    /**
-     * @description: 获取localStorage 的token
-     * @return {*}
-     */
-    const getToken = () => {
-      return localStorage.getItem('systemToken')
-    }
   };
   
   export default useAuth;
