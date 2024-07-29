@@ -1,5 +1,8 @@
-import { Button, Tag, Layout } from 'antd';
+import { Button, Tag, Layout, Col, Row, Flex } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
+import iconExcel from '@/assets/images/icon_excel.png'
+import confirm from '@/assets/images/img_confirm.png'
+import './index.modlue.less'
 
 const { Header } = Layout;
 const headerStyle: React.CSSProperties = {
@@ -30,13 +33,27 @@ const scriptStyle: React.CSSProperties = {
     textAlign: 'center',
     color: 'red'
 }
-const HomeHeader: React.FC = (props) => { 
+const HomeHeader: React.FC = (props) => {
     return (
         <Header style={headerStyle}>
-            <LeftOutlined style={{ fontSize: 16, color: 'rgba(87, 87, 102, 1)'}}/>
-            <Tag style={homeTagStyle}>首页</Tag>
-            <Tag style={scriptStyle}>剧本</Tag>
-            <Button type="primary">生成脚本</Button>
+
+            <Flex style={{ height: '100%', width: '100%' }} align='center' justify='space-between'>
+                <Flex align='center' >
+                    <LeftOutlined style={{ fontSize: 16, color: 'rgba(87, 87, 102, 1)' }} />
+                    <img style={{ width: 22, marginLeft: 12 }} src={iconExcel} ></img>
+                    <span style={{ fontWeight: 500, fontSize: 20, color: '#292933' }}>《高尔基的童年》</span>
+                    <span className='tip-shu'> | </span>
+                    <span className='tip-text'> 剧本设计</span>
+                    <img src={confirm} style={{ width: 68, marginLeft: 12}}></img>
+                </Flex>
+                <Flex align='center'>
+                    <Button>跳过</Button>
+                    <Button>下一步</Button>
+                </Flex>
+            </Flex>
+
+
+
         </Header>
     )
 }
