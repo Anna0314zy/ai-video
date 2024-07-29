@@ -6,51 +6,86 @@ import localforage from 'localforage'
 import { v4 as uuidv4 } from 'uuid'
 import MessageItem from './components/MessageItem'
 import './style.less'
-import md from 'markdown-it'
 
-const CHAT_URL = "https://ai-tool-test.ledupeiyou.com/api/text/v1/ai/stream/chat"
-const config = {
-  headers: {
-    'Authorization':'eyJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50X2lkIjoiYTI3NGM1NDktYWIwMy1jZDZhLWNlYTctMWNkMDBmMmYwNmUxIiwid29ya2NvZGUiOiJQMTA2NTYwIiwibmFtZSI6Iui9pumSsOiVviIsImlzcyI6IllhY2giLCJpYXQiOjE3MjE5ODg2Mjg5Mjh9.ER4u8HETVDGORhYW48uTF8zzeZPEAHTFVIgUXe83ExM',
-    'Content-Type': 'application/json',
-    'Accept': 'text/event-stream'
-  },
-  responseType: 'stream'
+import { fetchEventSource } from '@microsoft/fetch-event-source'
+import MarkdownIt from 'markdown-it'
+
+interface IMessage {
+  type: string
+  userId: string
+  content: string
+  sessionId?: string
+  timestamp?: string
+  id: string
 }
 
+const CHAT_URL = 'https://ai-tool-test.ledupeiyou.com/api/text/v1/ai/stream/chat'
+const config = {
+  headers: {
+    Authorization:
+      'eyJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50X2lkIjoiYTI3NGM1NDktYWIwMy1jZDZhLWNlYTctMWNkMDBmMmYwNmUxIiwid29ya2NvZGUiOiJQMTA2NTYwIiwibmFtZSI6Iui9pumSsOiVviIsImlzcyI6IllhY2giLCJpYXQiOjE3MjE5ODg2Mjg5Mjh9.ER4u8HETVDGORhYW48uTF8zzeZPEAHTFVIgUXe83ExM',
+    'Content-Type': 'application/json',
+    Accept: 'text/event-stream',
+  },
+  responseType: 'stream',
+}
+
+
 export default () => {
+  let md: MarkdownIt = new MarkdownIt()
   const [inputValue, setInputValue] = useState('')
   const [messageList, setMessageList] = useState([]) as unknown as any[]
   const [currentAnswer, setCurrentAnswer] = useState('')
   const msgStore = localforage.createInstance({
     name: 'message',
   })
-  const el = useRef(null);
-  const typed = useRef<Typed>();
+  const el = useRef(null)
+  const typed = useRef<Typed>()
+  const chatString = useRef("")
+  // 聊天框内容列表
+  const [chatList, setChatList] = useState<string[]>([])
   useEffect(() => {
     getAllMessage().then(res => {
       setMessageList(res)
     })
-    // typed.current = new Typed(el.current, {
-    //   strings: [currentAnswer],
-    //   typeSpeed: 50,
-    // });
-    // console.log(typed, el.current)
-
-    // return () => {
-    //   // Destroy Typed instance during cleanup to stop animation
-    //   typed.current?.destroy();
-    // };
   }, [])
-  const formatMessage = (message: string) => {
+
+  // 解码包含Unicode转义序列的字符串
+  function decodeUnicode(str: string): string {
+    return str.replace(/\\u[\dA-Fa-f]{4}/g, function (match) {
+      return String.fromCharCode(parseInt(match.substr(2), 16))
+    })
+  }
+
+  const formatMessage = (message: IMessage) => {
     return {
-      type: 'send',
-      userId: "test-user",
+      type: message.type,
+      userId: message.userId,
       timestamp: Date.now().toString(),
-      content: message,
+      content: message.content,
       sessionId: uuidv4(),
       id: Date.now().toString(),
     }
+  }
+
+  const formatReceiveMessage = (content: string) => {
+    return formatMessage({
+      type: "receive",
+      userId: "chat-robot",
+      content: content,
+      sessionId: uuidv4(),
+      id: Date.now().toString(),
+    })
+  }
+
+  const formatSendMessage = (content: string) => {
+    return formatMessage({
+      type: "send",
+      userId: "user-test",
+      content: content,
+      sessionId: uuidv4(),
+      id: Date.now().toString(),
+    })
   }
 
   // 处理输入框值改变的事件
@@ -68,40 +103,54 @@ export default () => {
     }
     return allValues
   }
+
   const sendMessage = async () => {
-    try {
-      let result = ""
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', CHAT_URL, true);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.setRequestHeader('Authorization', 'eyJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50X2lkIjoiYTI3NGM1NDktYWIwMy1jZDZhLWNlYTctMWNkMDBmMmYwNmUxIiwid29ya2NvZGUiOiJQMTA2NTYwIiwibmFtZSI6Iui9pumSsOiVviIsImlzcyI6IllhY2giLCJpYXQiOjE3MjE5ODg2Mjg5Mjh9.ER4u8HETVDGORhYW48uTF8zzeZPEAHTFVIgUXe83ExM');
-
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 3 && xhr.status === 200) {
-          const eventData = xhr.responseText.split('\n');
-          eventData.forEach(event => {
-            console.log("file: index.tsx:80 ~ useEffect ~ typed:", typed)
-            result += event.replace("data:","")
-            console.log("file: index.tsx:79 ~ sendMessage ~ result:", result)
-            setCurrentAnswer(result)
-            if(typed.current) {
-              typed.current.destroy();
-            }
-            typed.current = new Typed(el.current, {
-              strings: [result],
-              typeSpeed: 50,
-            })
-          });
+     let result = ""
+    // 请求数据，流式输出
+    await fetchEventSource(CHAT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+        Authorization:
+          'eyJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50X2lkIjoiYTI3NGM1NDktYWIwMy1jZDZhLWNlYTctMWNkMDBmMmYwNmUxIiwid29ya2NvZGUiOiJQMTA2NTYwIiwibmFtZSI6Iui9pumSsOiVviIsImlzcyI6IllhY2giLCJpYXQiOjE3MjIyMjIyMjY1NTd9.KiD5ci0LRFx66SUARYGi0MkRVhpd0nVm7kgkgUld3Js',
+      },
+      body: JSON.stringify({
+        text: inputValue,
+      }),
+      async onmessage(ev) {
+        result += ev.data
+        setCurrentAnswer(result)
+        const ans= decodeUnicode(result)
+        const html = md.render(ans)
+        if(typed.current) {
+          typed.current.destroy();
         }
-      };
-
-      xhr.send(JSON.stringify({ text:inputValue }));
-    } catch (error) {
-      console.log("file: index.tsx:53 ~ sendMessage ~ error:", error)
-    }
+        typed.current = new Typed(el.current, {
+          strings: [html],
+          typeSpeed: 50,
+        })
+      },
+      //会话发送完毕时触发
+      onclose() {
+        const ans= decodeUnicode(result)
+        const formatMessage = formatReceiveMessage(ans)
+        handleReceiveMessage(formatMessage)
+      },
+    })
   }
-  const handleMessage = async () => {
-    const formatMsg = formatMessage(inputValue)
+
+  const handleReceiveMessage = (formatMessage: IMessage) => {
+    msgStore.setItem(formatMessage.id, formatMessage).then(async () => {
+      const res = await getAllMessage()
+      setMessageList(res)
+    })
+  }
+
+  const handleSendMessage = async () => {
+    if(inputValue === '') {
+      return
+    }
+    const formatMsg = formatSendMessage(inputValue)
     msgStore.setItem(formatMsg.id, formatMsg).then(async () => {
       const res = await getAllMessage()
       setMessageList(res)
@@ -116,19 +165,19 @@ export default () => {
           {messageList.map((item: any) => {
             return <MessageItem key={item.id} messageInfo={item}></MessageItem>
           })}
-            <div>
-              <span ref={el} />
-            </div>
+          <div>
+            <span ref={el}></span>
+          </div>
         </div>
-      </div>
-      <div className='input-container'>
-        <Input value={inputValue} onChange={handleInputChange} />
-        <button
-          onClick={() => {
-            handleMessage()
-          }}>
-          发送
-        </button>
+        <div className='input-container'>
+          <Input value={inputValue} onChange={handleInputChange} />
+          <button
+            onClick={() => {
+              handleSendMessage()
+            }}>
+            发送
+          </button>
+        </div>
       </div>
     </>
   )
