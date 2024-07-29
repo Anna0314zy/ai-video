@@ -2,6 +2,7 @@
 import HomeHeader from '@/components/HomePage/header';
 import StompSocket from '@/utils/stompSocket'
 import ChatContainer from '@/components/HomePage/chatContainer';
+import ChatEnter from '@/components/HomePage/chatEnter';
 import { Layout } from 'antd';
 import { createContext } from 'react'
 import { SEND_THOROUGH, SUBSCRIBE_THOROUGH} from '@/const/socket'
@@ -20,13 +21,13 @@ const contentStyle: React.CSSProperties = {
 const sliderStyle: React.CSSProperties = {
     textAlign: 'center',
     lineHeight: '120px',
-    color: '#fff',
-    backgroundColor: '#1677ff',
+    backgroundColor: '#fff',
 };
 
 const layoutStyle: React.CSSProperties = {
     height: 'calc(100vh - 60px)'
 };
+
 
 export default () => {
     const contextValue = {}
@@ -46,6 +47,7 @@ export default () => {
                 <Layout>
                     <Content style={contentStyle}>
                         <ChatContainer />
+                        <ChatEnter/>
                     </Content>
                     <Sider width="30%" style={sliderStyle}>
                         配置区
