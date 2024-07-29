@@ -1,7 +1,8 @@
-import { Flex,Space, Table, Tag,Button } from 'antd'
-import type { TableProps } from 'antd'
-import ModalCreare from './modules/ModalCreate'
 import { useState } from 'react'
+import { Flex, Space, Table, Tag, Result } from 'antd'
+import type { TableProps } from 'antd'
+import CreateProject from '@/components/CreateProject'
+import Styles from './index.module.less'
 
 interface DataType {
   key: string
@@ -84,16 +85,26 @@ const data: DataType[] = [
 ]
 
 export default () => {
-	const [visibleModal,setVisibleModal] =useState(false)
+  const [tableData, setTableData] = useState([])
   return (
     <>
-      <Flex justify='flex-end' align='center' style={{marginBottom:"10px"}}>
-        <Button type="primary" onClick={()=>{setVisibleModal(true)}}>新建项目工程</Button>
-      </Flex>
-      <Table columns={columns} dataSource={data} pagination={{hideOnSinglePage:true}}/>
-	  { visibleModal && <ModalCreare visible={visibleModal} close={()=>{
-		setVisibleModal(false)
-	  }}/>}
+      {tableData.length ? (
+        <div className={Styles['home-layout']}>
+          <Flex className='home-header' justify='space-between' align='center' style={{ marginBottom: '10px' }}>
+            <div className='home-title'>我的项目</div>
+            <CreateProject />
+          </Flex>
+          <Table columns={columns} dataSource={data} pagination={{ hideOnSinglePage: true }} />
+        </div>
+      ) : (
+        <div className={Styles['result-empty']}>
+          <div className='result-empty-content'>
+            <img className='empty-img' src={require("@/assets/images/empty.png")}/>
+            <div className='empty-text'>空空如也，什么也没有，快去创建吧～</div>
+            <CreateProject />
+          </div>
+        </div>
+      )}
     </>
   )
 }

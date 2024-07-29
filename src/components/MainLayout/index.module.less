@@ -1,0 +1,77 @@
+.main-layout{
+    height:100vh;
+    :global{
+        .main-layout-header{
+            padding:0;
+            height: auto;
+            line-height: 1;
+            background: none;
+            .header-wrapper{
+                padding:0 24px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height:56px;
+                font-size: 16px;
+                background: #FFFFFF;
+            }
+            .header-left,.header-right,.header-useInfo{
+                display: flex;
+                align-items: center;
+                color:#fff;
+            }
+            .icon-logo{
+                margin-right:8px;
+                width:32px;
+                height:32px;
+            }
+            .header-title{
+                color: #292933;
+                font-size: 18px;
+                font-weight: 600;
+                line-height: 15px;
+            }
+            .header-useInfo{
+                cursor: pointer;
+            }
+            .header-avatar{
+                margin-left:24px;
+                border-radius: 50%;
+                background: #1975ff;
+                width: 32px;
+                height: 32px;
+                line-height: 32px;
+                text-align: center;
+            }
+            .header-username{
+                margin-left:8px;
+                color:#292933;
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 20px;
+                letter-spacing: -0.009em;
+
+            }
+            .icon-settings,.icon-notify,.icon-arrow-bottom{
+                width:24px;
+                height:24px;
+                cursor: pointer;
+            }
+            .icon-settings,.icon-notify{
+                margin-left:24px;
+            }
+            
+            .header-breadcrumb{
+                padding:0 16px;
+                height:30px;
+                line-height: 30px;
+                background: #eee;
+            }
+        }
+        .main-layout-context{
+            padding:5px;
+            overflow-y: auto;
+        }
+    }
+  
+}

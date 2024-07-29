@@ -6,9 +6,10 @@
  */
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from "path";
+import path from 'path'
 import basicSsl from '@vitejs/plugin-basic-ssl'
-import packageJson from './package.json';
+import packageJson from './package.json'
+import requireTransform from 'vite-plugin-require-transform'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -16,21 +17,23 @@ export default defineConfig({
   build: {
     outDir: 'dist/' + packageJson.version,
   },
-  plugins: [react(),basicSsl()],
-  envDir:"env",
+  plugins: [react(), basicSsl(), requireTransform({
+    fileRegex:/.ts$|.tsx$/
+  })],
+  envDir: 'env',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, "src")
-    }
+      '@': path.resolve(__dirname, 'src'),
+    },
   },
   server: {
     strictPort: true,
     port: 5155,
     proxy: {
-      "/api": {
-        target: "https://test-class-api-online.saasp.vdyoo.com",
+      '/api': {
+        target: 'https://test-class-api-online.saasp.vdyoo.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        rewrite: path => path.replace(/^\/api/, ''),
       },
     },
   },

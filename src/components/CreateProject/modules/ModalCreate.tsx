@@ -9,7 +9,9 @@ interface IProps {
 
 export default ({ visible, close }: IProps) => {
   const [form] = Form.useForm() // 使用 Form.useForm() 创建表单实例
-  const [formData, setFormData] = useState({})
+  const [formData, setFormData] = useState({
+    num:1
+  })
   const navigate = useNavigate();
 
   // 保存配置
@@ -18,7 +20,7 @@ export default ({ visible, close }: IProps) => {
       console.log('save', data)
       message.success('新建成功！')
       typeof close === 'function' && close()
-      navigate('/edit?id=124124242')
+      navigate('/edit/124124242')
     })
   }
 
@@ -50,7 +52,7 @@ export default ({ visible, close }: IProps) => {
           name={['num']}
           tooltip="最多99镜头"
           rules={[{ required: true }]}>
-          <InputNumber defaultValue={1} min={1} max={99} precision={0} changeOnWheel={false} />
+          <InputNumber min={1} max={99} precision={0} changeOnWheel={false} />
         </Form.Item>
       </Form>
     </Modal>
