@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Modal, Form, Select, InputNumber, message } from 'antd'
-import { useNavigate } from "react-router-dom";
+import { Modal, Form, Select, Input, InputNumber, message, Row, Col } from 'antd'
+import { useNavigate } from 'react-router-dom'
 
 interface IProps {
   visible: boolean
@@ -10,9 +10,9 @@ interface IProps {
 export default ({ visible, close }: IProps) => {
   const [form] = Form.useForm() // 使用 Form.useForm() 创建表单实例
   const [formData, setFormData] = useState({
-    num:1
+    num: 1,
   })
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   // 保存配置
   const save = async () => {
@@ -24,10 +24,9 @@ export default ({ visible, close }: IProps) => {
     })
   }
 
-
   return (
     <Modal
-      title='新建项目工程'
+      title='新建项目'
       open={visible}
       width='500px'
       destroyOnClose={true}
@@ -37,22 +36,41 @@ export default ({ visible, close }: IProps) => {
       onCancel={close}>
       <Form
         form={form}
+        layout='vertical'
         style={{ width: '100%', marginTop: '40px' }}
         autoComplete='off'
         validateMessages={{ required: '${label}是必填项' }}
         initialValues={formData}>
-        <Form.Item
-          label='剧本类型'
-          name={['type']}
-          rules={[{ required: true }]}>
-          <Select placeholder='剧本类型' options={[{label:'古诗',value:1}]} allowClear></Select>
+        <Form.Item label='项目名称' name={['name']} rules={[{ required: true }]}>
+          <Input placeholder='请输入项目名称' allowClear></Input>
         </Form.Item>
-        <Form.Item
-          label='镜头数量'
-          name={['num']}
-          tooltip="最多99镜头"
-          rules={[{ required: true }]}>
-          <InputNumber min={1} max={99} precision={0} changeOnWheel={false} />
+        <Row>
+          <Col span={11}>
+            <Form.Item label='学科' name={['subject']} rules={[{ required: true }]}>
+              <Select placeholder='请选择学科' options={[{ label: '古诗', value: 1 }]} allowClear></Select>
+            </Form.Item>
+          </Col>
+          <Col span={11} offset={2}>
+            <Form.Item label='年级' name={['grade']} rules={[{ required: true }]}>
+              <Select placeholder='请选择年级' options={[{ label: '古诗', value: 1 }]} allowClear></Select>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={11}>
+            <Form.Item label='季度' name={['stem']} rules={[{ required: true }]}>
+              <Select placeholder='请选择季度' options={[{ label: '古诗', value: 1 }]} allowClear></Select>
+            </Form.Item>
+          </Col>
+          <Col span={11} offset={2}>
+            <Form.Item label='讲次' name={['serialNumber']} rules={[{ required: true }]}>
+              <Select placeholder='请选择讲次' options={[{ label: '古诗', value: 1 }]} allowClear></Select>
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item label='项目类型' name={['type']} rules={[{ required: true }]}>
+          <Select placeholder='请选择项目类型' options={[{ label: '古诗', value: 1 }]} allowClear></Select>
         </Form.Item>
       </Form>
     </Modal>

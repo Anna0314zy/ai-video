@@ -1,0 +1,23 @@
+{
+  "token": {
+    "colorPrimary": "#14141a",
+    "colorInfo": "#14141a",
+    "colorText": "#292933"
+  },
+  "components": {
+    "Select": {
+      "optionSelectedBg": "rgb(255, 255, 255)",
+      "colorBorder": "none",
+      "colorBgContainer": "rgb(242, 243, 245)",
+      "colorPrimaryHover": "none",
+      "controlOutline": "none"
+    },
+    "Input": {
+      "colorBgContainer": "rgb(242, 243, 245)",
+      "controlOutline": "none",
+      "colorBorder": "transparent",
+      "hoverBorderColor": "transparent",
+      "activeBorderColor": "transparent"
+    }
+  }
+}
