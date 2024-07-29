@@ -1,4 +1,5 @@
-const LoginUrl = `${import.meta.env.VITE_APP_LOGIN}?frontUrl=${location.href}`
+import { LoginUrl } from "@/config/login"
+export const logoutUrl = `https://sso.saash.vdyoo.com/sso/logout?path=${location.href}`
 /**
  * @description: 获取localStorage 的token
  * @return {*}
@@ -14,5 +15,5 @@ export const getToken = () => {
  */
 export const logout = () => {
     localStorage.removeItem('token')
-    location.href = LoginUrl
+    location.href = `https://sso.saash.vdyoo.com/sso/logout?path=${encodeURIComponent(LoginUrl)}`
 }

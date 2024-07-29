@@ -1,0 +1,1 @@
+export const LoginUrl = `${import.meta.env.VITE_APP_LOGIN}?frontUrl=${location.href}`

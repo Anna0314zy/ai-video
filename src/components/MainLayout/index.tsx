@@ -8,6 +8,7 @@ import { Outlet } from 'react-router-dom'
 import { Layout, Dropdown, Breadcrumb,Badge, MenuProps } from 'antd'
 import Enter from '@/router/useAuth'
 import Styles from './index.module.less'
+import { logout } from '@/utils/auth'
 
 
 export default function MainLayout() {
@@ -17,7 +18,7 @@ export default function MainLayout() {
   const items: MenuProps['items'] = [
     {
       key: '1',
-      label: <div className='logOut'>退出登录</div>,
+      label: <div className='logOut' onClick={logout}>退出登录</div>,
     },
   ]
   return (
