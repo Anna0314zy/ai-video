@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Flex, Space, Table, Tag, Result } from 'antd'
 import type { TableProps } from 'antd'
 import CreateProject from '@/components/CreateProject'
@@ -14,42 +14,52 @@ interface DataType {
 
 const columns: TableProps<DataType>['columns'] = [
   {
-    title: 'Name',
+    title: '项目名称',
     dataIndex: 'name',
     key: 'name',
+    align:"center",
+    render(text){
+      return text
+    }
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
+    title: 'ID编号',
+    dataIndex: 'id',
+    key: 'id',
+    align:"center",
   },
   {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
+    title: '学科',
+    dataIndex: 'subject',
+    key: 'subject',
+    align:"center",
   },
   {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: (_, { tags }) => (
-      <>
-        {tags.map(tag => {
-          let color = tag.length > 5 ? 'geekblue' : 'green'
-          if (tag === 'loser') {
-            color = 'volcano'
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          )
-        })}
-      </>
-    ),
+    title: '年级',
+    dataIndex: 'grade',
+    key: 'grade',
+    align:"center",
   },
   {
-    title: 'Action',
+    title: '季度',
+    dataIndex: 'stem',
+    key: 'stem',
+    align:"center",
+  },
+  {
+    title: '创建人',
+    dataIndex: 'creator',
+    key: 'creator',
+    align:"center",
+  },
+  {
+    title: '修改时间',
+    dataIndex: 'modefiy_time',
+    key: 'modefiy_time',
+    align:"center",
+  },
+  {
+    title: '操作',
     key: 'action',
     render: (_, record) => (
       <Space size='middle'>
@@ -86,6 +96,10 @@ const data: DataType[] = [
 
 export default () => {
   const [tableData, setTableData] = useState([])
+  useEffect(()=>{
+
+  },[])
+
   return (
     <>
       {tableData.length ? (
