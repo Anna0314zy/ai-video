@@ -34,7 +34,7 @@ request.interceptors.response.use(
           return data
         } else if(Number(code) === 30001) {
           message.error('登录过期，请重新登录')
-          localStorage.removeItem('systemToken')
+          localStorage.removeItem('token')
           window.location.href = LoginUrl
         } else {
           console.log('%c msg', 'color: #00b33c;', msg)

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux'
 import { Dispatch } from '@/store'
-import { getToken } from '@/utils/auth';
+import { getToken, logout } from '@/utils/auth';
 
 
 const useAuth = ({children}) => {
@@ -14,26 +14,24 @@ const useAuth = ({children}) => {
     const  initAuth = async () => {
       console.log('触发次数')
       const url = new URL(window.location.href)
-      const sysToken = url.searchParams.get('sysToken')
+      const sysToken = url.searchParams.get('token')
       // 如果刚从登录页过来的时候
       if(sysToken) {
         // 存储token 刷新页面
-        localStorage.setItem('systemToken', sysToken)
-        url.searchParams.delete('sysToken')
+        localStorage.setItem('token', sysToken)
+        url.searchParams.delete('token')
         window.history.replaceState(null, '', url.toString())
         return
       }
-
-      const isLoggedIn = await checkUserLoggedIn();
-      if(isLoggedIn) {
-        dispatch.auth.updateToken('xxxxx')
-      }
+      // 校验是否有token
+      checkUserLoggedIn();
+    
     }
     
     const checkUserLoggedIn = () => {
       const token = getToken()
       if(!token) {
-        console.log('跳转到登录页')
+        logout()
         return
       }
       // 这里调用接口 校验token

@@ -1,7 +1,9 @@
-import { Layout } from 'antd';
+
 import HomeHeader from '@/components/HomePage/header';
-import { createContext } from 'react'
 import StompSocket from '@/utils/stompSocket'
+import ChatContainer from '@/components/HomePage/chatContainer';
+import { Layout } from 'antd';
+import { createContext } from 'react'
 import { SEND_THOROUGH, SUBSCRIBE_THOROUGH} from '@/const/socket'
 const MyContext = createContext({});
 
@@ -12,10 +14,10 @@ const contentStyle: React.CSSProperties = {
     height: '100%',
     lineHeight: '120px',
     color: '#fff',
-    backgroundColor: '#0958d9',
+    backgroundColor: '#FFF'
 };
 
-const siderStyle: React.CSSProperties = {
+const sliderStyle: React.CSSProperties = {
     textAlign: 'center',
     lineHeight: '120px',
     color: '#fff',
@@ -23,7 +25,7 @@ const siderStyle: React.CSSProperties = {
 };
 
 const layoutStyle: React.CSSProperties = {
-    height: 'calc(100vh - 100px)'
+    height: 'calc(100vh - 60px)'
 };
 
 export default () => {
@@ -42,8 +44,10 @@ export default () => {
             <Layout style={layoutStyle}>
                 <HomeHeader />
                 <Layout>
-                    <Content style={contentStyle}>聊天区</Content>
-                    <Sider width="25%" style={siderStyle}>
+                    <Content style={contentStyle}>
+                        <ChatContainer />
+                    </Content>
+                    <Sider width="30%" style={sliderStyle}>
                         配置区
                     </Sider>
                 </Layout>

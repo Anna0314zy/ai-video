@@ -1,12 +1,10 @@
-const LoginUrl = `${import.meta.env.VITE_APP_LOGIN}?xes-origin=classroom-slides&callback=${
-    window.location.origin + window.location.pathname 
-  }`
+const LoginUrl = `${import.meta.env.VITE_APP_LOGIN}?frontUrl=${location.href}`
 /**
  * @description: 获取localStorage 的token
  * @return {*}
  */
 export const getToken = () => {
-    return localStorage.getItem('systemToken')
+    return localStorage.getItem('token')
 }
 
 
@@ -15,6 +13,6 @@ export const getToken = () => {
  * @return {*}
  */
 export const logout = () => {
-    localStorage.removeItem('systemToken')
+    localStorage.removeItem('token')
     location.href = LoginUrl
 }

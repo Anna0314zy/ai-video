@@ -12,9 +12,6 @@ export default createModel<RootModel>()({
     token: false
   } as PageState,
   reducers: {
-    updateToken(state, payload) {
-        state.token = payload
-    }
   },
   effects: dispatch => ({
    

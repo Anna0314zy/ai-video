@@ -18,6 +18,18 @@
       "colorBorder": "transparent",
       "hoverBorderColor": "transparent",
       "activeBorderColor": "transparent"
+    },
+    "Button": {
+      "colorBgContainer": "#14141A",
+      "controlOutline": "none",
+      "colorBorder": "transparent",
+      "hoverBorderColor": "transparent",
+      "activeBorderColor": "transparent",
+      "colorText": "#fff",
+      "defaultHoverColor": "#fff",
+      "colorSkep": "red",
+      "colorBgContainercolorSkep": "green"
+
     }
   }
 }
