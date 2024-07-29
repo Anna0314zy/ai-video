@@ -1,11 +1,13 @@
 import { Button, Tag, Layout } from 'antd';
+import { LeftOutlined } from '@ant-design/icons';
+
 const { Header } = Layout;
 const headerStyle: React.CSSProperties = {
     color: '#fff',
     height: 64,
-    paddingInline: 48,
+    padding: '0 24px',
     lineHeight: '64px',
-    backgroundColor: 'rgba(255,255,255,0)',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
     width: '100%',
     display: 'flex',
     justifyContent: 'space-between'
@@ -31,6 +33,7 @@ const scriptStyle: React.CSSProperties = {
 const HomeHeader: React.FC = (props) => { 
     return (
         <Header style={headerStyle}>
+            <LeftOutlined style={{ fontSize: 16, color: 'rgba(87, 87, 102, 1)'}}/>
             <Tag style={homeTagStyle}>首页</Tag>
             <Tag style={scriptStyle}>剧本</Tag>
             <Button type="primary">生成脚本</Button>

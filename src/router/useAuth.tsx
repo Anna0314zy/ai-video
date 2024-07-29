@@ -27,9 +27,7 @@ const useAuth = ({children}) => {
       const isLoggedIn = await checkUserLoggedIn();
       if(isLoggedIn) {
         dispatch.auth.updateToken('xxxxx')
-        return children
       }
-      return children
     }
     
     const checkUserLoggedIn = () => {

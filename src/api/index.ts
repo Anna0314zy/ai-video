@@ -1,6 +1,7 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios'
 import { message } from 'antd'
 import { LoginUrl } from '@/config/login'
+import { getToken } from '@/utils/auth'
 
 const request = axios.create({
   timeout: 60000,
@@ -10,7 +11,7 @@ const request = axios.create({
 })
 request.interceptors.request.use(
   config => {
-    
+    config.headers.Authorization = getToken()
     return config
   },
   err => {
@@ -31,7 +32,7 @@ request.interceptors.response.use(
         const { data, message: msg, code } = res.data
         if (code === 200) {
           return data
-        } else if(Number(code) === 1001001) {
+        } else if(Number(code) === 30001) {
           message.error('登录过期，请重新登录')
           localStorage.removeItem('systemToken')
           window.location.href = LoginUrl
