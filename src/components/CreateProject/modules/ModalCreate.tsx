@@ -20,7 +20,7 @@ export default ({ visible, close }: IProps) => {
       console.log('save', data)
       message.success('新建成功！')
       typeof close === 'function' && close()
-      navigate('/edit/124124242')
+      navigate('/edit/124124242/home')
     })
   }
 
