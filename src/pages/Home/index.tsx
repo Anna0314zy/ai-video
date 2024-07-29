@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
-import { Flex, Space, Table, Tag, Result } from 'antd'
+  import { useEffect, useState } from 'react'
+import { Flex, Table, Button,Divider,Dropdown } from 'antd'
 import type { TableProps } from 'antd'
+import { EllipsisOutlined } from '@ant-design/icons'
 import CreateProject from '@/components/CreateProject'
 import Styles from './index.module.less'
 
@@ -18,8 +19,12 @@ const columns: TableProps<DataType>['columns'] = [
     dataIndex: 'name',
     key: 'name',
     align:"center",
+    width:300,
     render(text){
-      return text
+      return <Flex>
+        <img src={require("@/assets/images/icon_file.png")} style={{marginLeft:'5px'}} width={24} height={24}/>
+        <div>{text}</div>
+      </Flex>
     }
   },
   {
@@ -61,54 +66,62 @@ const columns: TableProps<DataType>['columns'] = [
   {
     title: '操作',
     key: 'action',
+    align:"center",
     render: (_, record) => (
-      <Space size='middle'>
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
+      <Flex justify='center' align="center">
+        <Button type="link">预览</Button>
+        <Divider type="vertical"></Divider>
+        <Button type="link" >编辑</Button>
+        <Divider type="vertical"></Divider>
+        <Dropdown menu={{ items:[{key: '1',
+    label: '1st item',}] }} placement='bottomRight' trigger={['click']}><EllipsisOutlined /></Dropdown>
+      </Flex>
     ),
   },
 ]
 
-const data: DataType[] = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sydney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-]
 
 export default () => {
-  const [tableData, setTableData] = useState([])
+  const [tableData, setTableData] = useState<any[]>([])
   useEffect(()=>{
-
+    setTableData([
+      {
+        name:"高尔基的童年",
+        id:32,
+        subject:'语文',
+        grade:'三年级',
+        季度:'夏季',
+        creator:'Admin',
+        modefiy_time:'2024.07.29 15:18'
+      },
+      {
+        name:"高尔基的童年",
+        id:33,
+        subject:'语文',
+        grade:'三年级',
+        季度:'夏季',
+        creator:'Admin',
+        modefiy_time:'2024.07.29 15:18'
+      }
+    ])
   },[])
 
   return (
     <>
       {tableData.length ? (
         <div className={Styles['home-layout']}>
-          <Flex className='home-header' justify='space-between' align='center' style={{ marginBottom: '10px' }}>
+          <Flex className='home-header' justify='space-between' align='center'>
             <div className='home-title'>我的项目</div>
             <CreateProject />
           </Flex>
-          <Table columns={columns} dataSource={data} pagination={{ hideOnSinglePage: true }} />
+          <Table columns={columns} dataSource={tableData} pagination={{ 
+            total:85,
+            position:["bottomCenter"],
+            hideOnSinglePage: true,
+            showSizeChanger:true,
+            showQuickJumper:true,
+            showTotal(total){return `共 ${total} 条记录`}
+          }} />
         </div>
       ) : (
         <div className={Styles['result-empty']}>

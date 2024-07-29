@@ -2,34 +2,48 @@
   "token": {
     "colorPrimary": "#14141a",
     "colorInfo": "#14141a",
-    "colorText": "#292933"
-  },
+    "colorLink": "#165dff",
+    "colorBorder":"#d9d9d9"
+},
   "components": {
     "Select": {
       "optionSelectedBg": "rgb(255, 255, 255)",
-      "colorBorder": "none",
+      "colorBorder": "rgba(217, 217, 217,0.5)",
       "colorBgContainer": "rgb(242, 243, 245)",
-      "colorPrimaryHover": "none",
-      "controlOutline": "none"
+      "controlOutline": "rgba(0, 1, 7, 0)",
+      "controlOutlineWidth": 1
     },
     "Input": {
+      "colorPrimaryActive": "rgba(0, 0, 0, 0)",
+      "colorPrimaryHover": "#14141a",
+      "colorPrimary": "rgba(245, 34, 45, 0)",
+      "colorIconHover": "rgba(0, 0, 0, 0)",
+      "activeBorderColor": "#14141a",
+      "activeBg": "rgb(242, 243, 247)",
+      "hoverBg": "rgb(242, 243, 247)",
       "colorBgContainer": "rgb(242, 243, 245)",
       "controlOutline": "none",
       "colorBorder": "transparent",
-      "hoverBorderColor": "transparent",
-      "activeBorderColor": "transparent"
+      "hoverBorderColor": "#14141a"
     },
     "Button": {
-      "colorBgContainer": "#14141A",
-      "controlOutline": "none",
-      "colorBorder": "transparent",
-      "hoverBorderColor": "transparent",
-      "activeBorderColor": "transparent",
-      "colorText": "#fff",
-      "defaultHoverColor": "#fff",
-      "colorSkep": "red",
-      "colorBgContainercolorSkep": "green"
-
+      "colorLink": "rgb(22, 93, 255)",
+      "colorLinkActive": "rgb(22, 93, 255)",
+      "colorLinkHover": "rgb(22, 93, 255)"
+    },
+    "Table": {
+      "headerColor": "rgb(135, 135, 153)",
+      "fontWeightStrong": 400,
+      "cellPaddingBlock": "12px",
+      "headerBg": "#fff",
+      "colorBgContainer": "transparent"
+    },
+    "Layout": {
+      "bodyBg": "rgb(242, 243, 247)",
+      "headerBg": "rgb(255, 255, 255)",
+      "headerColor": "rgb(41, 41, 51)",
+      "headerHeight": 0,
+      "headerPadding": "0 0"
     }
   }
 }
