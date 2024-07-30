@@ -4,6 +4,7 @@ import type { TableProps } from 'antd'
 import { EllipsisOutlined } from '@ant-design/icons'
 import CreateProject from '@/components/CreateProject'
 import Styles from './index.module.less'
+import IconWidget from '@/components/IconWidget/index'
 
 interface DataType {
   key: string
@@ -22,7 +23,7 @@ const columns: TableProps<DataType>['columns'] = [
     width:300,
     render(text){
       return <Flex>
-        <img src={require("@/assets/images/icon_file.png")} style={{marginLeft:'5px'}} width={24} height={24}/>
+        <IconWidget name='excel' width={24} height={24} style={{marginLeft:'5px'}}/>
         <div>{text}</div>
       </Flex>
     }
@@ -126,7 +127,7 @@ export default () => {
       ) : (
         <div className={Styles['result-empty']}>
           <div className='result-empty-content'>
-            <img className='empty-img' src={require("@/assets/images/empty.png")}/>
+            <div className='empty-img'></div>
             <div className='empty-text'>空空如也，什么也没有，快去创建吧～</div>
             <CreateProject />
           </div>

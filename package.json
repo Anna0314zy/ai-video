@@ -59,8 +59,7 @@
     "less-loader": "^12.2.0",
     "lint-staged": "^15.2.7",
     "typescript": "^5.2.2",
-    "vite": "^5.3.4",
-    "vite-plugin-require-transform": "^1.0.21"
+    "vite": "^5.3.4"
   },
   "husky": {
     "hooks": {

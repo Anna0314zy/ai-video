@@ -9,6 +9,7 @@ import { Layout, Dropdown, Breadcrumb,Badge, MenuProps } from 'antd'
 import Enter from '@/router/useAuth'
 import Styles from './index.module.less'
 import { logout } from '@/utils/auth'
+import IconWidget from '@/components/IconWidget/index'
 
 
 export default function MainLayout() {
@@ -31,15 +32,15 @@ export default function MainLayout() {
               <span className='header-title'>内容AI工具</span>
             </div>
             <div className='header-right'>
-              <img className='icon-settings' src={require("@/assets/images/icon_settings.png")}/>
+              <IconWidget className='icon-settings' name='settings'/>
               <Badge dot={true}>
-                <img className='icon-notify' src={require("@/assets/images/icon_notify.png")}/>
+                <IconWidget className='icon-notify' name='notify'/>
               </Badge>
               <Dropdown menu={{ items }} placement='bottomLeft'>
                 <div className='header-useInfo'>
                   <div className='header-avatar'>{useInfo.name?.substring(0, 1)}</div>
                   <span className='header-username'>{useInfo.name}</span>
-                  <img className='icon-arrow-bottom' src={require("@/assets/images/icon_arrow_bottom.png")}/>
+                  <IconWidget className='icon-arrow-bottom' name='arrowBottom'/>
                 </div>
               </Dropdown>
             </div>
