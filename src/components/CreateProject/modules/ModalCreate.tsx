@@ -9,9 +9,7 @@ interface IProps {
 
 export default ({ visible, close }: IProps) => {
   const [form] = Form.useForm() // 使用 Form.useForm() 创建表单实例
-  const [formData, setFormData] = useState({
-    num: 1,
-  })
+  const [formData, setFormData] = useState({})
   const navigate = useNavigate()
 
   // 保存配置
@@ -20,7 +18,7 @@ export default ({ visible, close }: IProps) => {
       console.log('save', data)
       message.success('新建成功！')
       typeof close === 'function' && close()
-      navigate('/edit/124124242/home')
+      navigate(`/edit/${124124242}/home?projectName=${data.name}&type=1`)
     })
   }
 

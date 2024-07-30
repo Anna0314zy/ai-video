@@ -12,36 +12,44 @@ import Home from '../pages/Home'
 import Edit from '../pages/Edit'
 import Image from '@/pages/Edit/components/Image'
 import Video from '@/pages/Edit/components/Video'
-import HmePage  from '@/pages/HmePage'
+import HmePage from '@/pages/HmePage'
 import HomePage from '../pages/HmePage'
 import Chat from '../pages/Chat'
-
+import Storyboard from '../pages/Storyboard'
 
 const router = createHashRouter([
   {
     path: '/',
     element: <MainLayout />,
-    children: [{
-      index: true,
-      element: <Home />,
-    },
-    {
-      path: '/chat',
-      element: <Chat />,
-    },
-    {
-      path: 'edit/:id',
-      element: <Edit />,
-      children: [
+    children: [
       {
-        path: 'home',
-        element: <HmePage />
+        index: true,
+        element: <Home />,
       },
       {
-        path: 'image',
-        element: <Image />,
-      }]
-    }],
+        path: '/chat',
+        element: <Chat />,
+      },
+      {
+        path: 'edit/:id',
+        element: <Edit />,
+        children: [
+          {
+            path: 'home',
+            element: <HmePage />,
+          },
+          {
+            // path: 'storyboard',
+            index: true,
+            element: <Storyboard />,
+          },
+          {
+            path: 'image',
+            element: <Image />,
+          },
+        ],
+      },
+    ],
   },
   {
     path: '*',

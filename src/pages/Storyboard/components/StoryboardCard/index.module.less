@@ -1,0 +1,41 @@
+.storyboard-card {
+    padding: 9px; 
+    display: flex;
+    align-items: flex-end;
+    width: 176px;
+    height: 96px;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    // background: #3163F6;
+    :global {
+        .storyboard-card-index{
+            flex:1;
+            padding-right:5px;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 14px;
+            text-align: right;
+            color:#4B5162;
+        }
+        .storyboard-card-img{
+            flex-shrink: 0;
+            width:140px;
+            height:78px;
+            background: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+    }
+    &[data-actived="true"]{
+        background: #3163F6;
+        :global{
+            .storyboard-card-index{
+                color:#fff!important;
+            }
+        }
+        
+    }
+    
+}
