@@ -62,6 +62,7 @@ export default () => {
                     SelectList.map(select => {
                         return (
                             <Select
+                                key={select.placeholder}
                                 style={{ width: 120 }}
                                 placeholder={select.placeholder}
                                 options={select.valueList}
