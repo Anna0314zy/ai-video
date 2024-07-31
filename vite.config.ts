@@ -28,10 +28,11 @@ export default defineConfig({
     port: 5155,
     proxy: {
       '/api': {
-        target: 'https://test-class-api-online.saasp.vdyoo.com',
+        target: 'https://ai-tool-test.ledupeiyou.com',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, ''),
       },
+      
     },
   },
 })

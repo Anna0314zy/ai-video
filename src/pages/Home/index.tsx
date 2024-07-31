@@ -6,6 +6,7 @@ import CreateProject from '@/components/CreateProject'
 import Styles from './index.module.less'
 import IconWidget from '@/components/IconWidget/index'
 import { useNavigate } from 'react-router-dom'
+import {projectList} from '@/api/models/home'
 
 interface DataType {
   key: string
@@ -21,7 +22,21 @@ interface DataType {
 export default () => {
   const [tableData, setTableData] = useState<any[]>([])
   const navigate = useNavigate()
+
+  const getPageList = useCallback(async ()=>{
+    const res = await projectList({
+      current:1,
+      size:20,
+    })
+    console.log('getPageList',res)
+    return {
+      total:80,
+      list:[]
+    }
+  },[])
+
   useEffect(()=>{
+    getPageList()
     setTableData([
       {
         name:"高尔基的童年",
@@ -44,13 +59,7 @@ export default () => {
     ])
   },[])
 
-  const getPageList = useCallback(async ()=>{
-    // await ...
-    return {
-      total:80,
-      list:[]
-    }
-  },[])
+  
 
   const columns: TableProps<DataType>['columns'] = [
     {

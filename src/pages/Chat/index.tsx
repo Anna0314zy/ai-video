@@ -20,15 +20,6 @@ interface IMessage {
 }
 
 const CHAT_URL = 'https://ai-tool-test.ledupeiyou.com/api/text/v1/ai/stream/chat'
-const config = {
-  headers: {
-    Authorization:
-      'eyJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50X2lkIjoiYTI3NGM1NDktYWIwMy1jZDZhLWNlYTctMWNkMDBmMmYwNmUxIiwid29ya2NvZGUiOiJQMTA2NTYwIiwibmFtZSI6Iui9pumSsOiVviIsImlzcyI6IllhY2giLCJpYXQiOjE3MjE5ODg2Mjg5Mjh9.ER4u8HETVDGORhYW48uTF8zzeZPEAHTFVIgUXe83ExM',
-    'Content-Type': 'application/json',
-    Accept: 'text/event-stream',
-  },
-  responseType: 'stream',
-}
 
 
 export default () => {
@@ -111,8 +102,7 @@ export default () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json;charset=utf-8',
-        Authorization:
-          'eyJhbGciOiJIUzI1NiJ9.eyJhY2NvdW50X2lkIjoiYTI3NGM1NDktYWIwMy1jZDZhLWNlYTctMWNkMDBmMmYwNmUxIiwid29ya2NvZGUiOiJQMTA2NTYwIiwibmFtZSI6Iui9pumSsOiVviIsImlzcyI6IllhY2giLCJpYXQiOjE3MjIyMjIyMjY1NTd9.KiD5ci0LRFx66SUARYGi0MkRVhpd0nVm7kgkgUld3Js',
+        Authorization:localStorage.getItem('token')||'',
       },
       body: JSON.stringify({
         text: inputValue,
