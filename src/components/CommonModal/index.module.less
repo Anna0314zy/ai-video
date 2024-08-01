@@ -1,0 +1,13 @@
+.full-screen-modal {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  top: 0;
+  padding-bottom: 0;
+  :global {
+    .ant-modal-content {
+      // 没有页脚
+      height: calc(100vh);
+      overflow: auto;
+    }
+  }
+}

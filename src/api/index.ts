@@ -28,11 +28,11 @@ export interface ResponseData<T = any> {
 request.interceptors.response.use(
   (res: AxiosResponse<ResponseData>) => {
     try {
-      if (res.status === 200 ) {
+      if (res.status === 200) {
         const { data, message: msg, code } = res.data
         if (code === 200) {
           return data
-        } else if(Number(code) === 30001) {
+        } else if (Number(code) === 30001) {
           message.error('登录过期，请重新登录')
           localStorage.removeItem('token')
           window.location.href = LoginUrl
@@ -43,16 +43,24 @@ request.interceptors.response.use(
         }
       }
     } catch (err: any) {
-      console.log('%c err', 'color: #00b33c;', err)
       if (err?.body) {
         const body = JSON.parse(err?.body)
         if (body?.message) message.error(body?.message)
         return body
       }
- 
     }
   },
   err => {
+    const data = err?.response?.data
+    const code = data?.code
+    console.log(err)
+    if (Number(code) === 30001) {
+      message.error('登录过期，请重新登录')
+      localStorage.removeItem('token')
+      console.log('LoginUrl', LoginUrl)
+      window.location.href = LoginUrl
+      return
+    }
     message.error(err?.message)
     return Promise.reject(err?.response?.data || err)
   },

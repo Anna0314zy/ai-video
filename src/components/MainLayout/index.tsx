@@ -5,25 +5,28 @@
  * @FilePath: /ai-content-platform/src/components/MainLayout/index.tsx
  */
 import { Outlet } from 'react-router-dom'
-import { Layout, Dropdown, Breadcrumb,Badge, MenuProps } from 'antd'
-import Enter from '@/router/useAuth'
+import { Layout, Dropdown, Badge, MenuProps, Menu, ConfigProvider } from 'antd'
+import Auth from '@/hooks/useAuth'
 import Styles from './index.module.less'
 import { logout } from '@/utils/auth'
 import IconWidget from '@/components/IconWidget/index'
-
-
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
 export default function MainLayout() {
-  const useInfo = {
-    name: 'admin',
-  }
+  const { userInfo } = useSelector((state: RootState) => state.auth)
   const items: MenuProps['items'] = [
     {
       key: '1',
-      label: <div className='logOut' onClick={logout}>退出登录</div>,
+      label: (
+        <div className='logOut' onClick={logout}>
+          退出登录
+        </div>
+      ),
     },
   ]
+
   return (
-    <Enter>
+    <Auth>
       <Layout className={Styles['main-layout']}>
         <Layout.Header className='main-layout-header'>
           <div className='header-wrapper'>
@@ -32,15 +35,15 @@ export default function MainLayout() {
               <span className='header-title'>内容AI工具</span>
             </div>
             <div className='header-right'>
-              <IconWidget className='icon-settings' name='settings'/>
+              <IconWidget className='icon-settings' name='settings' />
               <Badge dot={true}>
-                <IconWidget className='icon-notify' name='notify'/>
+                <IconWidget className='icon-notify' name='notify' />
               </Badge>
               <Dropdown menu={{ items }} placement='bottomLeft'>
                 <div className='header-useInfo'>
-                  <div className='header-avatar'>{useInfo.name?.substring(0, 1)}</div>
-                  <span className='header-username'>{useInfo.name}</span>
-                  <IconWidget className='icon-arrow-bottom' name='arrowBottom'/>
+                  <div className='header-avatar'>{userInfo.name?.substring(0, 1)}</div>
+                  <span className='header-username'>{userInfo.name}</span>
+                  <IconWidget className='icon-arrow-bottom' name='arrowBottom' />
                 </div>
               </Dropdown>
             </div>
@@ -51,6 +54,6 @@ export default function MainLayout() {
           <Outlet />
         </Layout.Content>
       </Layout>
-    </Enter>
+    </Auth>
   )
 }

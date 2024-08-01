@@ -4,13 +4,14 @@ import excel from './images/icon_excel.png'
 import notify from './images/icon_notify.png'
 import settings from './images/icon_settings.png'
 import badgeTick from './images/icon_badge_tick.png'
-
+import project from './images/icon_menu_project.png'
 
 export default {
-    arrowBottom,
-    docx,
-    excel,
-    notify,
-    settings,
-    badgeTick
+  arrowBottom,
+  docx,
+  excel,
+  notify,
+  settings,
+  badgeTick,
+  project,
 }

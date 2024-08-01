@@ -1,19 +1,55 @@
 import { createModel } from '@rematch/core'
 import { RootModel } from '.'
-
-interface PageState {
-    token: boolean
+import * as api from '@/api/models/auth'
+import { LoginUrl } from '@/config/login'
+import { getToken, setToken } from '@/utils/auth'
+interface AuthState {
+  token: string
+  userInfo: api.LoginResponse | Record<string, any>
 }
-
-
 
 export default createModel<RootModel>()({
   state: {
-    token: false
-  } as PageState,
+    token: '',
+    userInfo: {},
+  } as AuthState,
   reducers: {
+    updateData(state, params: Partial<AuthState>) {
+      return Object.assign(state, params)
+    },
   },
   effects: dispatch => ({
-   
+    async login() {
+      const systemToken = getToken()
+      if (systemToken) {
+        const userInfo = await api.login({ systemToken })
+        dispatch.auth.updateData({
+          token: systemToken,
+          userInfo,
+        })
+      } else {
+        window.location.href = LoginUrl
+      }
+    },
+    async checkLogin() {
+      const systemToken = getToken()
+      if (systemToken) {
+        dispatch.auth.updateData({ token: systemToken })
+        const res = await api.checkLogin({ systemToken })
+        if (res.systemToken) {
+          await dispatch.auth.updateData({ token: res.systemToken })
+          setToken(res.systemToken)
+        }
+      }
+    },
+    async logOut(empNo) {
+      await api.logout({ empNo })
+      localStorage.removeItem('token')
+      dispatch.auth.updateData({
+        token: '',
+        userInfo: {},
+      })
+      window.location.href = LoginUrl
+    },
   }),
 })

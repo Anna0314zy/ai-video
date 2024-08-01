@@ -32,7 +32,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, ''),
       },
-      
+      '/test': {
+        target: 'https://test-class-api-online.saasp.vdyoo.com',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/test/, ''),
+      },
     },
   },
 })
