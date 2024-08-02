@@ -1,8 +1,6 @@
 import { Layout, Menu } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import AIProject from '../AIProject'
-import { useEffect } from 'react'
-import { getToken, setToken } from '@/utils/auth'
 const menuData = [
   {
     key: '1',

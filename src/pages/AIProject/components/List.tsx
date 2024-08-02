@@ -32,22 +32,6 @@ export default ({
 }) => {
   const navigate = useNavigate()
 
-  const getPageList = useCallback(async () => {
-    const res = await projectList({
-      current: 1,
-      size: 20,
-    })
-    console.log('getPageList', res)
-    return {
-      total: 80,
-      list: [],
-    }
-  }, [])
-
-  useEffect(() => {
-    getPageList()
-  }, [])
-
   const columns: TableProps<ProjectList>['columns'] = [
     {
       title: '项目名称',

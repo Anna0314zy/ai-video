@@ -14,6 +14,7 @@ export const theme: ThemeConfig = {
       colorBgContainer: 'rgb(242, 243, 245)',
       controlOutline: 'rgba(0, 1, 7, 0)',
       controlOutlineWidth: 1,
+      selectorBg: 'rgb(242, 243, 245)',
     },
     Input: {
       colorPrimaryActive: 'rgba(0, 0, 0, 0)',
@@ -21,12 +22,18 @@ export const theme: ThemeConfig = {
       colorPrimary: 'rgba(245, 34, 45, 0)',
       colorIconHover: 'rgba(0, 0, 0, 0)',
       activeBorderColor: '#14141a',
-      activeBg: 'rgb(242, 243, 247)',
-      hoverBg: 'rgb(242, 243, 247)',
+      activeBg: 'rgb(242, 243, 245)',
+      hoverBg: 'rgb(242, 243, 245)',
       colorBgContainer: 'rgb(242, 243, 245)',
       controlOutline: 'none',
       colorBorder: 'transparent',
       hoverBorderColor: '#14141a',
+    },
+    InputNumber: {
+      colorBgContainer: 'rgb(242, 243, 245)',
+      activeBg: 'rgb(242, 243, 245)',
+      hoverBg: 'rgb(242, 243, 245)',
+      activeShadow: '0 0 0 0px rgba(0, 1, 7, 0.67)',
     },
     Button: {
       colorLink: 'rgb(22, 93, 255)',
