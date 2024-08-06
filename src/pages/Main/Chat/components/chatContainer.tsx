@@ -8,7 +8,7 @@ const style = {
   padding: 8,
   color: 'red',
 }
-const ChatContainer: React.FC = props => {
+const ChatContainer = (props: { containerRef: any }) => {
   const [state, setState] = useState({
     items: Array.from({ length: 20 }),
   })
@@ -26,12 +26,14 @@ const ChatContainer: React.FC = props => {
     <div style={{ flex: 1, overflow: 'hidden' }} className='chat-content'>
       <div
         id='scrollableDiv'
+        ref={props.containerRef}
         style={{
           overflow: 'auto',
           display: 'flex',
           flexDirection: 'column-reverse',
           backgroundColor: '#F2F3F7',
           height: '100%',
+          color: '#14141A',
         }}>
         {/*Put the scroll bar always on the bottom*/}
         <InfiniteScroll

@@ -1,0 +1,36 @@
+.message-item {
+  margin-bottom: 10px;
+  display: flex;
+
+  &.user {
+    text-align: right;
+  }
+  &.gpt {
+    text-align: left;
+  }
+  .avatar {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    border-radius: 50%;
+
+    color: #fff;
+    &.user {
+      margin-left: 10px;
+      background-color: #1975ff;
+    }
+    &.gpt {
+      margin-right: 10px;
+      background-color: transparent !important;
+    }
+    .ant-image {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .content {
+    padding: 10px;
+    border-radius: 10px;
+  }
+}

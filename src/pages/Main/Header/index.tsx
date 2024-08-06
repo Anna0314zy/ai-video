@@ -4,6 +4,8 @@ import IconWidget from '@/components/IconWidget'
 import { Tag, Button } from 'antd'
 import Styles from '../index.module.less'
 import { DesignType, IData } from '../type'
+import { MyContext } from '../index'
+import { useContext } from 'react'
 // 根据 enum 值获取文本内容的函数
 function getDesignTypeText(value: DesignType): string {
   if (value === 1) return '剧本设计'
@@ -11,15 +13,16 @@ function getDesignTypeText(value: DesignType): string {
 }
 
 const leftChildren = (props: IData) => {
+  const { projectName } = useContext(MyContext)
   return (
     <>
       <IconWidget name='excel' style={{ width: 22, marginLeft: 12 }} />
-      <span style={{ fontWeight: 500, fontSize: 20, color: '#292933' }}>《{props?.name}》</span>
+      <span style={{ fontWeight: 500, fontSize: 20, color: '#292933' }}>《{projectName}》</span>
       <span className={Styles['tip-shu']}> | </span>
       <span className={Styles['tip-text']}> {getDesignTypeText(props?.type)}</span>
-      <Tag style={{ width: 68, marginLeft: 12 }} icon={<CheckCircleOutlined />} color='success'>
+      {/* <Tag style={{ width: 68, marginLeft: 12 }} icon={<CheckCircleOutlined />} color='success'>
         已确认
-      </Tag>
+      </Tag> */}
     </>
   )
 }

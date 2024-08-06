@@ -14,7 +14,7 @@ import Image from '@/pages/Edit/components/Image'
 import Video from '@/pages/Edit/components/Video'
 import HmePage from '@/pages/Main'
 import HomePage from '../pages/Main'
-import Chat from '../pages/Chat'
+// import Chat from '../pages/Chat'
 import Storyboard from '../pages/Storyboard'
 
 const router = createHashRouter([
@@ -26,28 +26,29 @@ const router = createHashRouter([
         index: true,
         element: <Home />,
       },
+      // {
+      //   path: '/chat',
+      //   element: <Chat />,
+      // },
+    ],
+  },
+  {
+    path: '/project/:id',
+    // element: <Edit />,
+    children: [
       {
-        path: '/chat',
-        element: <Chat />,
+        path: 'text',
+        // index: true,
+        element: <HmePage />,
       },
       {
-        path: 'edit/:id',
-        element: <Edit />,
-        children: [
-          {
-            path: 'home',
-            element: <HmePage />,
-          },
-          {
-            // path: 'storyboard',
-            index: true,
-            element: <Storyboard />,
-          },
-          {
-            path: 'image',
-            element: <Image />,
-          },
-        ],
+        // path: 'storyboard',
+        index: true,
+        element: <Storyboard />,
+      },
+      {
+        path: 'image',
+        element: <Image />,
       },
     ],
   },

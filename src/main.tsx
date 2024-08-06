@@ -3,7 +3,6 @@ import { ConfigProvider } from 'antd'
 import App from './App'
 import { Provider } from 'react-redux'
 import { store } from './store'
-import React from 'react'
 import { theme } from './theme'
 import zhCN from 'antd/locale/zh_CN'
 

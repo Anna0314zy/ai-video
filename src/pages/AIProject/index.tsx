@@ -46,11 +46,7 @@ export default () => {
       current: current || searchParams.current.current,
       size: size || searchParams.current.size,
     })
-    const records = (res.records || []).map((v: ProjectList, idx) => ({ ...v, id: String(idx + 1) }))
-    setData({
-      ...res,
-      records,
-    })
+    setData(res)
   }, [])
 
   useEffect(() => {

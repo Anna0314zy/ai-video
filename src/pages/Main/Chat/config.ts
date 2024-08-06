@@ -1,19 +1,12 @@
 import { projectTypes } from '@/pages/AIProject/config'
-export type FieldType = {
-  type?: string
-  style?: string
-  cameraCount?: number
-  scriptLength?: number
-  totalTime?: number
-  hero?: string
-  story?: string
-}
+import { ScriptPrompt } from '@/api/type'
+
 export interface IConfig {
   label: string
   type: WidgetType
   options?: { label: string; value: string }[]
   addonAfter?: any
-  prop: keyof FieldType
+  prop: keyof ScriptPrompt
 }
 
 export type WidgetType = 'input' | 'inputNumber' | 'select'
@@ -22,13 +15,13 @@ export type WidgetType = 'input' | 'inputNumber' | 'select'
 export const ScriptDesign: IConfig[] = [
   {
     label: '类型',
-    prop: 'type',
+    prop: 'scriptType',
     type: 'select',
     options: projectTypes.map(v => ({ label: v, value: v })),
   },
   {
     label: '风格',
-    prop: 'style',
+    prop: 'scriptStyle',
     type: 'select',
     options: [
       {
@@ -39,28 +32,28 @@ export const ScriptDesign: IConfig[] = [
   },
   {
     label: '镜头数量',
-    prop: 'cameraCount',
+    prop: 'shotNum',
     type: 'inputNumber',
   },
   {
     label: '脚本字数',
-    prop: 'scriptLength',
+    prop: 'wordNum',
     type: 'inputNumber',
   },
   {
     label: '总时长',
-    prop: 'totalTime',
+    prop: 'duration',
     type: 'inputNumber',
     addonAfter: '秒',
   },
   {
     label: '主角',
-    prop: 'hero',
+    prop: 'characters',
     type: 'input',
   },
   {
-    label: '故事内容',
-    prop: 'story',
+    label: '剧本主题',
+    prop: 'scriptTitle',
     type: 'input',
   },
 ]

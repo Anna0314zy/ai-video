@@ -1,14 +1,12 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Flex, Table, Button, Divider, Dropdown, Layout, Menu } from 'antd'
+import { useCallback } from 'react'
+import { Flex, Table, Button } from 'antd'
 import type { TableProps } from 'antd'
-import { EllipsisOutlined } from '@ant-design/icons'
 import CreateProjectBtn from './CreateProjectBtn'
 import Styles from '../../Home/index.module.less'
 import IconWidget from '@/components/IconWidget/index'
-import { useNavigate } from 'react-router-dom'
-import { PageList, projectList, ProjectList } from '@/api/models/project'
+import { PageList, ProjectList } from '@/api/models/project'
 import UserOutlined from '@ant-design/icons/lib/icons/UserOutlined'
-
+import { v3 as uuidv3 } from 'uuid'
 interface DataType {
   key: string
   name: string
@@ -30,7 +28,18 @@ export default ({
   data: PageList
   getList: (params?: { current: number; size: number }) => void
 }) => {
-  const navigate = useNavigate()
+  const handleClick = useCallback((record: ProjectList, val: 'edit') => {
+    const MY_NAMESPACE = '123e4567-e89b-12d3-a456-426614174000'
+    const windowName = uuidv3(record.projectName + record.id, MY_NAMESPACE)
+    console.log('%c zy handleClick', 'color:red', windowName, record.sessionList)
+    let sessionId = -1
+    if (record.sessionList?.length) sessionId = record.sessionList[record.sessionList?.length - 1].id
+
+    const url = `${window.location.origin}?projectName=${record.projectName}&subjectName=${record.subjectName}&sessionId=${sessionId}&type=1/#/project/${record.id}/text`
+
+    // 打开或聚焦具有相同名称的窗口
+    window.open(url, '_blank')
+  }, [])
 
   const columns: TableProps<ProjectList>['columns'] = [
     {
@@ -83,11 +92,7 @@ export default ({
       align: 'center',
       render: (_, record) => (
         <Flex justify='center' align='center'>
-          <Button
-            type='link'
-            onClick={() => {
-              navigate(`/edit/${record.id}/home?projectName=${record.projectName}&type=1`)
-            }}>
+          <Button type='link' onClick={() => handleClick(record, 'edit')}>
             编辑
           </Button>
         </Flex>

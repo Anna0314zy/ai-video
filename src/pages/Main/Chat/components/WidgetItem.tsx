@@ -1,8 +1,13 @@
-import { Input, InputNumber, Select, Flex, Form } from 'antd'
-import { IConfig, FieldType } from './config'
-export function WidgetItem({ data, value, disabled }: { data: IConfig; value?: any; disabled?: boolean }) {
+import { Input, InputNumber, Select } from 'antd'
+import { IConfig } from '../config'
+interface IProps {
+  data: IConfig
+  onChange?: (val: any) => void
+  value?: any
+  disabled?: boolean
+}
+export function WidgetItem({ data, onChange, value, disabled }: IProps) {
   const { type, options, addonAfter } = data
-  console.log('type', type)
 
   switch (type) {
     case 'select':

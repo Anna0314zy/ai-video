@@ -5,7 +5,7 @@ import notify from './images/icon_notify.png'
 import settings from './images/icon_settings.png'
 import badgeTick from './images/icon_badge_tick.png'
 import project from './images/icon_menu_project.png'
-
+import chatClear from './images/icon_clear_chat.png'
 export default {
   arrowBottom,
   docx,
@@ -14,4 +14,5 @@ export default {
   settings,
   badgeTick,
   project,
+  chatClear,
 }

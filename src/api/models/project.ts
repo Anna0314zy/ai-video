@@ -14,6 +14,7 @@ export interface ProjectList {
   textbookVersion: string
   username: string
   id: string
+  sessionList?: { id: number }[]
 }
 export interface PageList {
   size: number
