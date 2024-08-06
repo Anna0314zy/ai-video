@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import './index.less' // 用于样式
 import { LinkOutlined, SendOutlined } from '@ant-design/icons'
 import { Input } from 'antd'
+import ChatUpload from './ChatUpload'
 const wrapperStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -9,7 +10,17 @@ const wrapperStyle: React.CSSProperties = {
   borderRadius: '8px',
   padding: '10px',
 }
-const ChatInput = ({ value, onChange, onSend }: any) => {
+const ChatInput = ({
+  value,
+  onChange,
+  onSend,
+  onSuccess,
+}: {
+  value: string
+  onChange: (val: string) => void
+  onSend: (val: string) => void
+  onSuccess: (val: number) => void
+}) => {
   const handleSend = () => {
     if (value.trim()) {
       onSend(value)
@@ -26,21 +37,9 @@ const ChatInput = ({ value, onChange, onSend }: any) => {
       handleSend()
     }
   }
-
-  // const adjustHeight = () => {
-  //   if (textareaRef.current) {
-  //     textareaRef.current.style.height = 'auto'
-  //     textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   adjustHeight()
-  // }, [value])
-
   return (
     <div className='chat-input-container'>
-      <LinkOutlined />
+      <ChatUpload onSuccess={onSuccess}></ChatUpload>
       <Input.TextArea
         value={value}
         onChange={handleChange}

@@ -74,6 +74,8 @@ const http = {
     })
   },
   post: <T>(url: string, data: Record<string, any> = {}, configs?: AxiosRequestConfig): Promise<T> => {
+    console.log('url', url, data, configs)
+
     return request.post(url, data, configs)
   },
   put: <T>(url: string, data: Record<string, any> = {}, configs?: AxiosRequestConfig): Promise<T> => {

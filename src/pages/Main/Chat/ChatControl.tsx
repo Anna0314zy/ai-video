@@ -19,20 +19,23 @@ const ChatControl = (props: any) => {
     console.log('handleInputChange', val)
     setPrompt(val)
   }
-  const handleApply = async () => {
-    console.log('form Success:', chatRef.current?.form.getFieldsValue())
+  const handleApply = async (fileId?: any) => {
     const params = chatRef.current?.form.getFieldsValue()
-    const res = await api.getScriptPrompt({
+    const promptParams = {
       ...params,
       projectId,
       subjectName,
-    })
+    }
+    if (typeof fileId === 'number') promptParams.fileId = fileId
+    console.log('handleApply:', promptParams)
+
+    const res = await api.getScriptPrompt(promptParams)
     setPrompt(res)
     console.log('getScriptPrompt', res)
   }
   const handleSendMessage = () => {
     if (!prompt) return
-    const createTime = Date.now()
+    const created = Date.now()
     const id = uuidv4()
     console.log('%c zy 请求接口', 'color:red', Date.now(), updateMessage)
     updateMessage([
@@ -40,10 +43,10 @@ const ChatControl = (props: any) => {
         messageContent: prompt,
         messageRole: 'user',
       }),
-      formatMessage({ requesting: true, createTime, messageRole: 'gpt', id }),
+      formatMessage({ requesting: true, created, messageRole: 'gpt', id }),
     ])
     //新建对话
-    sendMessage(prompt, sessionId, props.containerRef, createTime, id)
+    sendMessage(prompt, sessionId, props.containerRef, created, id)
     // chatRequest
   }
   // 默认参数
@@ -58,6 +61,10 @@ const ChatControl = (props: any) => {
       wordNum: 100, //剧本字数
     })
   }, [])
+  // 上传文件
+  const handleUploadSuccess = (fileId: number) => {
+    handleApply(fileId)
+  }
   return (
     <div className={Style['chat-control']}>
       <Flex justify='space-between' wrap={false} align='center'>
@@ -76,7 +83,11 @@ const ChatControl = (props: any) => {
           </Button>
         </Flex>
       </Flex>
-      <ChatInput value={prompt} onChange={handleInputChange} onSend={handleSendMessage}></ChatInput>
+      <ChatInput
+        value={prompt}
+        onChange={handleInputChange}
+        onSend={handleSendMessage}
+        onSuccess={handleUploadSuccess}></ChatInput>
     </div>
   )
 }

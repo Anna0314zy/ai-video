@@ -9,6 +9,7 @@ import { MessageList } from '@/api/type'
 import { useParams } from 'react-router-dom'
 import { getQueryParam } from '@/utils'
 import * as api from '@/api/models/main'
+import { setEngine } from 'crypto'
 export const MyContext = createContext<any>({})
 const { Sider, Content } = Layout
 const contentStyle: React.CSSProperties = {
@@ -45,6 +46,12 @@ export default () => {
   const getChatHistories = async () => {
     const res = await api.getChatHistories({ sessionId })
     console.log('getChatHistories res', res)
+    setMessageList(
+      res.records.map(v => ({
+        ...v,
+        messageRole: v.fromUserId === 0 ? 'gpt' : 'user',
+      })),
+    )
   }
   useEffect(() => {
     getChatHistories()
@@ -76,7 +83,7 @@ export default () => {
       console.log('%c 更新信息 newMessages', 'color:red', newMessages)
 
       const finalList = [...updatedList, ...newMessages]
-
+      console.log('%c 更新信息 finalList', 'color:red', finalList)
       // 更新状态
       return finalList
     })
@@ -86,16 +93,18 @@ export default () => {
   }, [messageList])
   // 新建回话
   const handleCreate = async () => {
-    // const data = await api.createChat({
-    //   projectId: Number(id),
-    // })
-    // setSessionId(data)
-    // console.log('handleCreate sessionId', sessionId)
+    if (sessionId) return
+    const data = await api.createChat({
+      projectId: Number(id),
+    })
+    setSessionId(data)
+    console.log('handleCreate sessionId', sessionId)
   }
   useEffect(() => {
     handleCreate()
   }, [])
-  const contextValue = { data, containerRef, updateMessage, projectName, projectId: id, subjectName, sessionId }
+  const contextValue = { data, containerRef, updateMessage, projectName, projectId: Number(id), subjectName, sessionId }
+  console.log('zy 上下文 contextValue', contextValue)
   return (
     <MyContext.Provider value={contextValue}>
       <Layout style={layoutStyle}>

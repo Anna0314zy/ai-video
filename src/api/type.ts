@@ -20,7 +20,7 @@ export interface MessageList {
   fromUser?: string // 如果消息类型是user，员工名称
   userId?: number // 创建会话的员工uid
   createUser?: string // 创建会话的员工名称
-  createTime: number // 创建时间
+  created: number // 创建时间
   requesting?: boolean // 请求中
   sending?: boolean // 发送中
   id: string

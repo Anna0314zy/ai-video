@@ -91,8 +91,8 @@ const ModelCreate = (_: any, ref: any) => {
             </Form.Item>
           </Col>
         </Row>
-        {/* <Row> */}
-        {/* <Col span={11}>
+        <Row>
+          <Col span={11}>
             <Form.Item label='版本' name={['textbookVersion']} rules={[{ required: true }]}>
               <Select
                 placeholder='请选择版本'
@@ -102,19 +102,19 @@ const ModelCreate = (_: any, ref: any) => {
                 }))}
                 allowClear></Select>
             </Form.Item>
-          </Col> */}
-        {/* <Col span={11} offset={2}> */}
-        <Form.Item label='项目类型' name={['projectType']} rules={[{ required: true }]}>
-          <Select
-            placeholder='请选择项目类型'
-            options={projectTypes.map(v => ({
-              label: v,
-              value: v,
-            }))}
-            allowClear></Select>
-        </Form.Item>
-        {/* </Col> */}
-        {/* </Row> */}
+          </Col>
+          <Col span={11} offset={2}>
+            <Form.Item label='项目类型' name={['projectType']} rules={[{ required: true }]}>
+              <Select
+                placeholder='请选择项目类型'
+                options={projectTypes.map(v => ({
+                  label: v,
+                  value: v,
+                }))}
+                allowClear></Select>
+            </Form.Item>
+          </Col>
+        </Row>
       </Form>
     </CommonModal>
   )

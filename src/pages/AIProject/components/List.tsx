@@ -32,7 +32,7 @@ export default ({
     const MY_NAMESPACE = '123e4567-e89b-12d3-a456-426614174000'
     const windowName = uuidv3(record.projectName + record.id, MY_NAMESPACE)
     console.log('%c zy handleClick', 'color:red', windowName, record.sessionList)
-    let sessionId = -1
+    let sessionId = 0
     if (record.sessionList?.length) sessionId = record.sessionList[record.sessionList?.length - 1].id
 
     const url = `${window.location.origin}?projectName=${record.projectName}&subjectName=${record.subjectName}&sessionId=${sessionId}&type=1/#/project/${record.id}/text`

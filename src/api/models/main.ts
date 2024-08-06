@@ -1,9 +1,9 @@
 import api from '../index'
-import { ScriptPrompt } from '../type'
+import { ScriptPrompt, MessageList } from '../type'
 const http = import.meta.env.VITE_API_SERVER
 
 export const chat = (params: { systemToken: string }) => {
-  return api.post(`${http}/api/text/v1/ai/stream/chat`, params)
+  return api.post(`${http}/api/text/v1/ai/stream/sessionChat`, params)
 }
 
 // 新建会话
@@ -14,7 +14,7 @@ export const createChat = (params: { projectId: number }) => {
 // 获取会话的历史记录
 
 export const getChatHistories = (params: { sessionId: number }) => {
-  return api.post(`${http}/api/session/chat/getHistories`, params)
+  return api.post<{ records: MessageList[] }>(`${http}/api/session/chat/getHistories`, params)
 }
 // 剧本Prompt
 export const getScriptPrompt = (params: ScriptPrompt) => {
@@ -27,4 +27,17 @@ export const getListScriptStyle = (params: { subjectName: string; scriptType: st
 // 获取剧本风格列表
 export const getListScripType = (params: { subjectName: string }) => {
   return api.get<string[]>(`${http}/api/text/v1/listScriptType`, params)
+}
+// 文件上传接口
+
+export const fileUpload = (file: any) => {
+  return api.post<number>(
+    `${http}/api/file/v1/upload`,
+    { file },
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    },
+  )
 }

@@ -23,7 +23,9 @@ const ChatContent = (props: { containerRef: any; messageList: MessageList[] }) =
         {props.messageList.slice(0, props.messageList.length - 1).map((item: MessageList) => {
           return <MessageItem md={md} key={item.id} messageInfo={item} containerRef={props.containerRef}></MessageItem>
         })}
-        {lastMessage ? <GptMessage messageInfo={lastMessage} containerRef={props.containerRef}></GptMessage> : null}
+        {lastMessage ? (
+          <GptMessage md={md} messageInfo={lastMessage} containerRef={props.containerRef}></GptMessage>
+        ) : null}
       </div>
     </div>
   )

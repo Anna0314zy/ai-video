@@ -18,7 +18,7 @@ const HeadLayout = ({ messageInfo, children }: { messageInfo: MessageList; child
         {messageInfo.messageRole === 'gpt' ? <Image src={chatGpt} preview={false}></Image> : '我'}
       </div>
       <Flex className={`message-item-content`} vertical={true} flex={1}>
-        <div className='message-time'>{dayjs(messageInfo.createTime).format('YYYY-MM-DD HH:mm')}</div>
+        <div className='message-time'>{dayjs(messageInfo.created).format('YYYY-MM-DD HH:mm')}</div>
         {children}
       </Flex>
     </Flex>
