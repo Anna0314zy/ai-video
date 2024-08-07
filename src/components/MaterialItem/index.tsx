@@ -2,12 +2,13 @@ import Styles from './index.module.less'
 import IconWidget from '@/components/IconWidget'
 import { MoreOutlined, ArrowDownOutlined } from '@ant-design/icons'
 import { ScriptPageList } from '@/api/type'
-import { Flex, Space, Button } from 'antd'
+import { Flex, Space, Button, Dropdown } from 'antd'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useState } from 'react'
 import classNames from 'classnames'
 import * as api from '@/api/models/main'
 import { downloadFromServer } from '@/utils'
+import type { MenuProps } from 'antd'
 interface IMaterialItem {
   data: ScriptPageList // 素材数据
   icon?: string // 素材icon
@@ -16,7 +17,26 @@ interface IMaterialItem {
 }
 export default (props: IMaterialItem) => {
   const { data } = props
-
+  const downItems: MenuProps['items'] = [
+    {
+      key: '1',
+      label: <span>xlsx</span>,
+    },
+    {
+      key: '2',
+      label: <span>md</span>,
+    },
+  ]
+  const items: MenuProps['items'] = [
+    {
+      key: '1',
+      label: <span>预览</span>,
+    },
+    {
+      key: '2',
+      label: <span>删除</span>,
+    },
+  ]
   // 下载
   const handleDownload = useCallback(() => {
     const url = `${import.meta.env.VITE_API_SERVER}/api/text/v1/downloadScript?scriptId=${data.scriptId}&ext=xlsx`
@@ -36,8 +56,17 @@ export default (props: IMaterialItem) => {
       </Flex>
       <div className='material-item-right'>
         <Space>
-          <Button type='link' icon={<ArrowDownOutlined />} className={Styles['btn']} onClick={handleDownload}></Button>
-          <Button type='link' className={Styles.btn} icon={<MoreOutlined className='material-more' />}></Button>
+          <Dropdown menu={{ items: downItems }} placement='bottomLeft' arrow={{ pointAtCenter: true }}>
+            <Button
+              type='link'
+              icon={<ArrowDownOutlined />}
+              className={Styles['btn']}
+              onClick={handleDownload}></Button>
+          </Dropdown>
+
+          <Dropdown menu={{ items }} placement='bottomLeft' arrow={{ pointAtCenter: true }}>
+            <Button type='link' className={Styles.btn} icon={<MoreOutlined className='material-more' />}></Button>
+          </Dropdown>
         </Space>
       </div>
     </Flex>

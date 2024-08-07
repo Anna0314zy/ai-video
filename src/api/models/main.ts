@@ -19,7 +19,10 @@ export const getChatHistories = (params: { sessionId: number }) => {
 }
 // 剧本Prompt
 export const getScriptPrompt = (params: ScriptPrompt) => {
-  return api.post<string>(`${http}/api/prompt/v1/generateShot/parse`, params)
+  return api.post<{
+    prompt: string
+    promptRequestLogId: number
+  }>(`${http}/api/prompt/v1/generateShot/parse`, params)
 }
 // 获取剧本风格列表
 export const getListScriptStyle = (params: { subjectName: string; scriptType: string }) => {
@@ -49,6 +52,7 @@ export const sendChatRequest = async (
   prompt: {
     text: string
     fileId?: number
+    promptRequestLogId?: number
   },
   sessionId: number,
   typedMessage: (result: string) => void,
@@ -56,6 +60,7 @@ export const sendChatRequest = async (
   let result = ''
   const params: any = {
     text: prompt.text,
+    promptRequestLogId: prompt.promptRequestLogId,
     sessionId,
   }
   if (prompt.fileId) params.attachmentFileId = prompt.fileId

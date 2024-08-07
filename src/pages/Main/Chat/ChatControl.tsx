@@ -14,15 +14,17 @@ import Typed from 'typed.js'
 import MarkdownIt from 'markdown-it'
 import { Role } from '@/api/type'
 const ChatControl = (props: any) => {
-  const { updateMessage, sessionId, projectId, subjectName, getChatHistories, handleCreateChat, form } =
+  const { updateMessage, sessionId, containerRef, projectId, subjectName, getChatHistories, handleCreateChat, form } =
     useContext(MyContext)
   const [prompt, setPrompt] = useState<{
     text: string
     fileId?: number
     fileName?: string
+    promptRequestLogId?: number
   }>({
     text: '',
     fileId: 0,
+    promptRequestLogId: 0,
   })
   const typeRef = useRef<any>()
   // const chatRef = useRef<{ form: FormInstance<any> }>(null)
@@ -33,18 +35,22 @@ const ChatControl = (props: any) => {
       text: val,
     })
   }
-  function typedText(text: string, el: any, onComplete: () => void) {
-    console.log('zy typedText', text, el)
+  const handleComplete = async () => {
+    console.log('完成打字')
+    await getChatHistories()
+    typeRef.current?.destroy()
+    console.log('Typing complete!')
+  }
+  function typedText(text: string) {
+    console.log('zy typedText', text, containerRef.current)
     const md = new MarkdownIt()
     const html = md.render(typeof text === 'string' ? text : '')
-    typeRef.current = new Typed(el, {
+    if (typeRef.current) typeRef.current.destroy()
+    typeRef.current = new Typed(containerRef.current, {
       strings: [html],
       typeSpeed: 50,
       // showCursor: false, // 隐藏光标
-      onComplete: function (self) {
-        onComplete()
-        console.log('Typing complete!')
-      },
+      onComplete: handleComplete,
     })
   }
   const handleApply = async (val?: { fileId: number; fileName: string } | any) => {
@@ -57,13 +63,14 @@ const ChatControl = (props: any) => {
     if (typeof val?.fileId === 'number') promptParams.fileId = val?.fileId
     console.log('handleApply:', promptParams)
 
-    const res = await api.getScriptPrompt(promptParams)
+    const { prompt, promptRequestLogId } = await api.getScriptPrompt(promptParams)
     setPrompt({
-      text: res,
+      text: prompt,
       fileId: val?.fileId,
       fileName: val?.fileName,
+      promptRequestLogId,
     })
-    console.log('getScriptPrompt', res)
+    console.log('getScriptPrompt', prompt, promptRequestLogId)
   }
   const handleSendMessage = async () => {
     if (!prompt) return
@@ -81,13 +88,9 @@ const ChatControl = (props: any) => {
       }),
       formatMessage({ requesting: true, created, role: Role.Gpt, id }),
     ])
-    const onComplete = async () => {
-      console.log('完成打字')
-      await getChatHistories()
-      typeRef.current?.destroy()
-    }
+    const onComplete = async () => {}
     await api.sendChatRequest(prompt, sessionId, async val => {
-      await typedText(val, props.containerRef.current, onComplete)
+      typedText(val)
     })
     updateMessage(formatMessage({ sending: true, created, role: Role.Gpt, id }))
     //新建对话
