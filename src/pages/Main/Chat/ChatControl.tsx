@@ -11,7 +11,7 @@ import { MyContext } from '../index'
 import ChatInput from './components/ChatInput'
 import * as api from '@/api/models/main'
 const ChatControl = (props: any) => {
-  const { updateMessage, sessionId, projectId, subjectName } = useContext(MyContext)
+  const { updateMessage, sessionId, projectId, subjectName, handleCreateChat } = useContext(MyContext)
   const [prompt, setPrompt] = useState('')
   const chatRef = useRef<{ form: FormInstance<any> }>(null)
   const { sendMessage, formatMessage } = useSendChat(updateMessage, sessionId, projectId)
@@ -78,7 +78,10 @@ const ChatControl = (props: any) => {
         </Flex>
         <Flex justify='center' wrap={false} align='center' style={{ marginLeft: '10px' }}>
           <IconWidget name='chatClear' />
-          <Button type='link' onClick={handleApply} style={{ paddingRight: 0, paddingLeft: '5px', color: '#14141A' }}>
+          <Button
+            type='link'
+            onClick={handleCreateChat}
+            style={{ paddingRight: 0, paddingLeft: '5px', color: '#14141A' }}>
             新建对话
           </Button>
         </Flex>

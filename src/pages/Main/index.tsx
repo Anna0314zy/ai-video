@@ -92,18 +92,27 @@ export default () => {
     console.log('%c zy messageList', 'color:blue', messageList)
   }, [messageList])
   // 新建回话
-  const handleCreate = async () => {
-    if (sessionId) return
+  const handleCreateChat = async () => {
     const data = await api.createChat({
       projectId: Number(id),
     })
+    // getChatHistories()
     setSessionId(data)
     console.log('handleCreate sessionId', sessionId)
   }
   useEffect(() => {
-    handleCreate()
+    if (!sessionId) handleCreateChat()
   }, [])
-  const contextValue = { data, containerRef, updateMessage, projectName, projectId: Number(id), subjectName, sessionId }
+  const contextValue = {
+    data,
+    containerRef,
+    updateMessage,
+    projectName,
+    projectId: Number(id),
+    subjectName,
+    sessionId,
+    handleCreateChat,
+  }
   console.log('zy 上下文 contextValue', contextValue)
   return (
     <MyContext.Provider value={contextValue}>
