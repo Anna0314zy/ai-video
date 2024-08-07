@@ -15,17 +15,20 @@ const ChatContent = (props: { containerRef: any; messageList: MessageList[] }) =
   if (!md) md = new MarkdownIt()
   const lastMessage = useMemo(() => {
     console.log('zy lastMessage', props.messageList.slice(-1)?.[0])
-    return props.messageList.slice(-1)?.[0]
+    return props.messageList.find(v => v.requesting || v.sending) || {}
   }, [props.messageList])
   return (
     <div style={{ flex: 1, overflow: 'hidden', backgroundColor: '#F2F3F7', color: '#000000' }} className='chat-content'>
       <div className='message-list' style={style}>
-        {props.messageList.slice(0, props.messageList.length - 1).map((item: MessageList) => {
-          return <MessageItem md={md} key={item.id} messageInfo={item} containerRef={props.containerRef}></MessageItem>
+        {props.messageList.map((item: MessageList) => {
+          return (
+            item.messageContent && (
+              <MessageItem md={md} key={item.id} messageInfo={item} containerRef={props.containerRef}></MessageItem>
+            )
+          )
         })}
-        {lastMessage ? (
-          <GptMessage md={md} messageInfo={lastMessage} containerRef={props.containerRef}></GptMessage>
-        ) : null}
+        {/* 最后一个聊天的信息 */}
+        <GptMessage md={md} messageInfo={lastMessage as MessageList} containerRef={props.containerRef}></GptMessage>
       </div>
     </div>
   )

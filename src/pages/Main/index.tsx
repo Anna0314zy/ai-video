@@ -2,7 +2,7 @@ import Header from './Header'
 import StompSocket from '@/utils/stompSocket'
 import ChatContent from './Chat/ChatContent'
 import ChatControl from './Chat/ChatControl'
-import { Layout } from 'antd'
+import { Layout, Form } from 'antd'
 import { createContext, useEffect, useRef, useState } from 'react'
 import { SEND_THOROUGH, SUBSCRIBE_THOROUGH } from '@/const/socket'
 import { MessageList } from '@/api/type'
@@ -11,7 +11,13 @@ import { getQueryParam } from '@/utils'
 import * as api from '@/api/models/main'
 import { setEngine } from 'crypto'
 import { decodeUnicode } from '@/utils'
-export const MyContext = createContext<any>({})
+import RightPanel from './RightPanel'
+interface Context {
+  projectId: number
+  sessionId: number
+  [k: string]: any
+}
+export const MyContext = createContext<Context>({} as Context)
 const { Sider, Content } = Layout
 const contentStyle: React.CSSProperties = {
   textAlign: 'center',
@@ -43,7 +49,7 @@ export default () => {
   const [sessionId, setSessionId] = useState<number>(Number(sessionIdQuery))
   const [messageList, setMessageList] = useState<MessageList[]>([])
   const containerRef = useRef<any>()
-
+  const [form] = Form.useForm()
   const getChatHistories = async () => {
     const res = await api.getChatHistories({ sessionId })
     console.log('getChatHistories res', res)
@@ -52,7 +58,6 @@ export default () => {
         return {
           ...v,
           messageContent: v.messageContent,
-          messageRole: v.fromUserId === 0 ? 'gpt' : 'user',
         }
       }),
     )
@@ -70,21 +75,16 @@ export default () => {
   // })
   // 更新信息
   const updateMessage = (data: MessageList | MessageList[]) => {
-    console.log('%c 更新信息', 'color:red', data)
     setMessageList(messageList => {
       // 将 data 转换成数组形式以统一处理
       const dataArray = Array.isArray(data) ? data : [data]
-      console.log('%c 更新信息 dataArray', 'color:red', dataArray, messageList)
       // 更新消息列表
       const updatedList = messageList.map(v => {
         const updatedMessage = dataArray.find(d => d.id === v.id)
-        console.log('%c 更新信息 updatedMessage', 'color:red', updatedMessage)
         return updatedMessage ? Object.assign(v, updatedMessage) : v
       })
-      console.log('%c 更新信息 updatedList', 'color:red', updatedList)
       // 添加新的消息
       const newMessages = dataArray.filter(d => !messageList.some(v => v.id === d.id))
-      console.log('%c 更新信息 newMessages', 'color:red', newMessages)
 
       const finalList = [...updatedList, ...newMessages]
       console.log('%c 更新信息 finalList', 'color:red', finalList)
@@ -108,13 +108,14 @@ export default () => {
     if (!sessionId) handleCreateChat()
   }, [])
   const contextValue = {
+    form,
     data,
     containerRef,
     updateMessage,
     projectName,
     projectId: Number(id),
     subjectName,
-    sessionId,
+    sessionId: Number(sessionId),
     getChatHistories,
     handleCreateChat,
   }
@@ -129,7 +130,7 @@ export default () => {
             <ChatControl containerRef={containerRef} />
           </Content>
           <Sider width='30%' style={sliderStyle}>
-            配置区
+            <RightPanel></RightPanel>
           </Sider>
         </Layout>
       </Layout>

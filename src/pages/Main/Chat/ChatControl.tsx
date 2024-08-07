@@ -12,15 +12,26 @@ import ChatInput from './components/ChatInput'
 import * as api from '@/api/models/main'
 import Typed from 'typed.js'
 import MarkdownIt from 'markdown-it'
+import { Role } from '@/api/type'
 const ChatControl = (props: any) => {
-  const { updateMessage, sessionId, projectId, subjectName, getChatHistories, handleCreateChat } = useContext(MyContext)
-  const [prompt, setPrompt] = useState('')
+  const { updateMessage, sessionId, projectId, subjectName, getChatHistories, handleCreateChat, form } =
+    useContext(MyContext)
+  const [prompt, setPrompt] = useState<{
+    text: string
+    fileId?: number
+    fileName?: string
+  }>({
+    text: '',
+    fileId: 0,
+  })
   const typeRef = useRef<any>()
-  const chatRef = useRef<{ form: FormInstance<any> }>(null)
+  // const chatRef = useRef<{ form: FormInstance<any> }>(null)
   const { formatMessage } = useSendChat(updateMessage, sessionId, projectId)
   const handleInputChange = (val: string) => {
     console.log('handleInputChange', val)
-    setPrompt(val)
+    setPrompt({
+      text: val,
+    })
   }
   function typedText(text: string, el: any, onComplete: () => void) {
     console.log('zy typedText', text, el)
@@ -36,18 +47,22 @@ const ChatControl = (props: any) => {
       },
     })
   }
-  const handleApply = async (fileId?: any) => {
-    const params = chatRef.current?.form.getFieldsValue()
+  const handleApply = async (val?: { fileId: number; fileName: string } | any) => {
+    const params = form.getFieldsValue()
     const promptParams = {
       ...params,
       projectId,
       subjectName,
     }
-    if (typeof fileId === 'number') promptParams.fileId = fileId
+    if (typeof val?.fileId === 'number') promptParams.fileId = val?.fileId
     console.log('handleApply:', promptParams)
 
     const res = await api.getScriptPrompt(promptParams)
-    setPrompt(res)
+    setPrompt({
+      text: res,
+      fileId: val?.fileId,
+      fileName: val?.fileName,
+    })
     console.log('getScriptPrompt', res)
   }
   const handleSendMessage = async () => {
@@ -57,10 +72,14 @@ const ChatControl = (props: any) => {
     console.log('%c zy 请求接口', 'color:red', Date.now(), updateMessage)
     updateMessage([
       formatMessage({
-        messageContent: prompt,
-        messageRole: 'user',
+        messageContent: prompt.text,
+        role: Role.user,
+        attachmentFileInfo: {
+          fileId: prompt.fileId,
+          fileName: prompt.fileName,
+        },
       }),
-      formatMessage({ requesting: true, created, messageRole: 'gpt', id }),
+      formatMessage({ requesting: true, created, role: Role.Gpt, id }),
     ])
     const onComplete = async () => {
       console.log('完成打字')
@@ -70,12 +89,12 @@ const ChatControl = (props: any) => {
     await api.sendChatRequest(prompt, sessionId, async val => {
       await typedText(val, props.containerRef.current, onComplete)
     })
-    updateMessage(formatMessage({ sending: true, created, messageRole: 'gpt', id }))
+    updateMessage(formatMessage({ sending: true, created, role: Role.Gpt, id }))
     //新建对话
   }
   // 默认参数
   useEffect(() => {
-    chatRef.current?.form.setFieldsValue({
+    form.setFieldsValue({
       scriptType: '启蒙/拼音', // 剧本类型
       scriptStyle: '奇幻冒险', // 剧本风格
       // scriptTitle?: string // 剧本主题
@@ -86,15 +105,15 @@ const ChatControl = (props: any) => {
     })
   }, [])
   // 上传文件
-  const handleUploadSuccess = (fileId: number) => {
-    handleApply(fileId)
+  const handleUploadSuccess = (val: { fileId: number; fileName: string }) => {
+    handleApply(val)
   }
   return (
     <div className={Style['chat-control']}>
       <Flex justify='space-between' wrap={false} align='center'>
         <Flex justify='center' wrap={true} align='center'>
           <Space>
-            <ChatConfig ref={chatRef} />
+            <ChatConfig />
             <Button type='primary' onClick={handleApply}>
               应用
             </Button>
@@ -111,7 +130,7 @@ const ChatControl = (props: any) => {
         </Flex>
       </Flex>
       <ChatInput
-        value={prompt}
+        value={prompt.text}
         onChange={handleInputChange}
         onSend={handleSendMessage}
         onSuccess={handleUploadSuccess}></ChatInput>

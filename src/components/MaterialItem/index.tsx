@@ -1,26 +1,45 @@
 import Styles from './index.module.less'
 import IconWidget from '@/components/IconWidget'
-import { MoreOutlined,CheckOutlined } from '@ant-design/icons'
-
-interface IMaterialItem{
-    data?:any   // 素材数据
-    icon?:string // 素材icon
-    actived?:boolean // 选中状态
+import { MoreOutlined, ArrowDownOutlined } from '@ant-design/icons'
+import { ScriptPageList } from '@/api/type'
+import { Flex, Space, Button } from 'antd'
+import dayjs from 'dayjs'
+import { useCallback, useEffect, useState } from 'react'
+import classNames from 'classnames'
+import * as api from '@/api/models/main'
+import { downloadFromServer } from '@/utils'
+interface IMaterialItem {
+  data: ScriptPageList // 素材数据
+  icon?: string // 素材icon
+  actived?: boolean // 选中状态
+  handleClick: (val: ScriptPageList) => void
 }
-export default (props:IMaterialItem)=>{
-    return <div className={Styles["material-item"]} data-actived={props.actived}>
-        <div className='material-item-left'>
-            <IconWidget className='material-icon' name={props.icon} width={24} height={24}/>
-            <div className='material-type'>【视频脚本】</div>
-            <div className='material-name'>高尔基的童年</div>
-            <div className='material-id'>YW3SL825</div>
-        </div>
-        <div className='material-item-right'>
-            <button className='material-btn' onClick={()=>{}}>{props.actived?'取消':'确定'}</button>
-            <MoreOutlined className='material-more'/>
-        </div>
-        <span className='material-status' hidden={!props.actived}>
-            <IconWidget name='badgeTick' width={24} height={24}/>
-        </span>
-    </div>
+export default (props: IMaterialItem) => {
+  const { data } = props
+
+  // 下载
+  const handleDownload = useCallback(() => {
+    const url = `${import.meta.env.VITE_API_SERVER}/api/text/v1/downloadScript?scriptId=${data.scriptId}&ext=xlsx`
+    downloadFromServer(url)
+  }, [])
+
+  return (
+    <Flex
+      className={classNames(Styles['material-item'], {
+        [Styles.actived]: data.actived,
+      })}
+      onClick={() => props.handleClick(props.data)}>
+      <IconWidget className='material-icon' name={props.icon} width={24} height={24} style={{ marginRight: '10px' }} />
+      <Flex className='material-content' align='flex-start' flex={1} vertical={true}>
+        <span className='material-content'>{data?.scriptStyle}</span>
+        <span>{dayjs(Date.now()).format('YYYY-MM-DD HH:mm')}</span>
+      </Flex>
+      <div className='material-item-right'>
+        <Space>
+          <Button type='link' icon={<ArrowDownOutlined />} className={Styles['btn']} onClick={handleDownload}></Button>
+          <Button type='link' className={Styles.btn} icon={<MoreOutlined className='material-more' />}></Button>
+        </Space>
+      </div>
+    </Flex>
+  )
 }

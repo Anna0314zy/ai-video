@@ -32,7 +32,10 @@ export const getListScripType = (params: { subjectName: string }) => {
 // 文件上传接口
 
 export const fileUpload = (file: any) => {
-  return api.post<number>(
+  return api.post<{
+    fileId: number
+    fileName: string
+  }>(
     `${http}/api/file/v1/upload`,
     { file },
     {
@@ -42,8 +45,20 @@ export const fileUpload = (file: any) => {
     },
   )
 }
-export const sendChatRequest = async (text: string, sessionId: number, typedMessage: (result: string) => void) => {
+export const sendChatRequest = async (
+  prompt: {
+    text: string
+    fileId?: number
+  },
+  sessionId: number,
+  typedMessage: (result: string) => void,
+) => {
   let result = ''
+  const params: any = {
+    text: prompt.text,
+    sessionId,
+  }
+  if (prompt.fileId) params.attachmentFileId = prompt.fileId
   // 请求数据，流式输出
   return new Promise(async (resolve, reject) => {
     await fetchEventSource(CHAT_URL, {
@@ -52,10 +67,7 @@ export const sendChatRequest = async (text: string, sessionId: number, typedMess
         'Content-Type': 'application/json;charset=utf-8',
         Authorization: localStorage.getItem('token') || '',
       },
-      body: JSON.stringify({
-        text,
-        sessionId,
-      }),
+      body: JSON.stringify(params),
       async onmessage(ev: any) {
         console.log('zy 会话onmessage', ev)
         result += ev.data
@@ -70,4 +82,58 @@ export const sendChatRequest = async (text: string, sessionId: number, typedMess
       },
     })
   })
+}
+interface SaveScriptParams {
+  projectId: number
+  sessionId: number
+  sessionChatId: number
+  promptOption: ScriptPrompt
+}
+//将对话内容保存为剧本及镜头
+export const saveScript = (params: SaveScriptParams) => {
+  return api.post<string[]>(`${http}/api/text/v1/saveScript`, params)
+}
+
+//剧本分页查询
+export const getPageScript = (params: { projectId: number }) => {
+  return api.post<{
+    records: any[]
+  }>(`${http}/api/text/v1/pageScript`, params)
+}
+//剧本预览
+export const previewScript = (params: SaveScriptParams) => {
+  return api.get<string[]>(`${http}/api/text/v1/previewScript`, params, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  })
+}
+//下载剧本
+export const downloadScript = (params: { scriptId: number; ext: 'xlsx' | 'md' }) => {
+  return api.get<any>(`${http}/api/text/v1/downloadScript`, params, {
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      responseType: 'blob',
+    },
+  })
+}
+//下载剧本
+export const downloadTemplate = (params: SaveScriptParams) => {
+  return api.get<string[]>(`${http}/api/text/v1/downloadTemplate`, params, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  })
+}
+//导入剧本
+export const uploadScript = (projectId: string) => {
+  return api.post<string[]>(
+    `${http}/api/text/v1/previewScript/${projectId}`,
+    {},
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    },
+  )
 }

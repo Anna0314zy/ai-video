@@ -42,8 +42,8 @@ const router = createHashRouter([
         element: <HmePage />,
       },
       {
-        // path: 'storyboard',
-        index: true,
+        path: 'storyboard',
+
         element: <Storyboard />,
       },
       {

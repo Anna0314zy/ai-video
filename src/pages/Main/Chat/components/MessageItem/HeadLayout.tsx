@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { Flex, Image } from 'antd'
 import chatGpt from './chatGpt.png'
-import { MessageList } from '@/api/type'
+import { MessageList, Role } from '@/api/type'
 import classNames from 'classnames'
 
 const HeadLayout = ({ messageInfo, children }: { messageInfo: MessageList; children: React.ReactNode }) => {
@@ -11,11 +11,11 @@ const HeadLayout = ({ messageInfo, children }: { messageInfo: MessageList; child
   }
   return (
     <Flex
-      className={classNames('message-item', messageInfo.messageRole)}
-      style={messageInfo.messageRole === 'user' ? myStyle : undefined}
-      justify={messageInfo.messageRole === 'user' ? 'flex-start' : 'flex-end'}>
-      <div className={`avatar ${messageInfo.messageRole}`}>
-        {messageInfo.messageRole === 'gpt' ? <Image src={chatGpt} preview={false}></Image> : '我'}
+      className={classNames('message-item', messageInfo.role)}
+      style={messageInfo.role === Role.user ? myStyle : undefined}
+      justify={messageInfo.role === Role.user ? 'flex-start' : 'flex-end'}>
+      <div className={`avatar ${messageInfo.role}`}>
+        {messageInfo.role === Role.Gpt ? <Image src={chatGpt} preview={false}></Image> : '我'}
       </div>
       <Flex className={`message-item-content`} vertical={true} flex={1}>
         <div className='message-time'>{dayjs(messageInfo.created).format('YYYY-MM-DD HH:mm')}</div>

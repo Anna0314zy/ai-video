@@ -2,7 +2,7 @@ import { fetchEventSource } from '@microsoft/fetch-event-source'
 import MarkdownIt from 'markdown-it'
 import { useEffect, useRef } from 'react'
 import Typed from 'typed.js'
-import { MessageList } from '@/api/type'
+import { MessageList, Role } from '@/api/type'
 import { v4 as uuidv4 } from 'uuid'
 const CHAT_URL = `${import.meta.env.VITE_API_SERVER}/api/text/v1/ai/stream/sessionChat`
 export const useSendChat = (
@@ -17,7 +17,7 @@ export const useSendChat = (
     console.log('formatMessage---', {
       created: Date.now(),
       sessionId,
-      messageRole: params.messageRole || 'user',
+      role: params.role || Role.user,
       id: uuidv4(),
       projectId,
       ...params,
@@ -25,7 +25,7 @@ export const useSendChat = (
     return {
       created: Date.now(),
       sessionId,
-      messageRole: params.messageRole || 'user',
+      role: params.role || Role.user,
       id: uuidv4(),
       projectId,
       ...params,
@@ -73,7 +73,7 @@ export const useSendChat = (
             sending: true,
             created,
             messageContent: result,
-            messageRole: 'gpt',
+            role: Role.Gpt,
             id,
           }),
         )

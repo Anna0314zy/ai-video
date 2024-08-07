@@ -29,6 +29,7 @@ request.interceptors.response.use(
   (res: AxiosResponse<ResponseData>) => {
     try {
       if (res.status === 200) {
+        console.log('res', res)
         const { data, message: msg, code } = res.data
         if (code === 200) {
           return data

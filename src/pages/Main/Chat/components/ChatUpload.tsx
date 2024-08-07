@@ -3,7 +3,7 @@ import type { UploadProps } from 'antd'
 import { Button, message, Upload } from 'antd'
 import { LinkOutlined, SendOutlined } from '@ant-design/icons'
 import * as api from '@/api/models/main'
-const ChatUpload = ({ onSuccess }: { onSuccess: (val: number) => void }) => {
+const ChatUpload = ({ onSuccess }: { onSuccess: (val: { fileId: number; fileName: string }) => void }) => {
   const props: UploadProps = {
     name: 'file',
     accept: '.md, .xls, .xlsx',
