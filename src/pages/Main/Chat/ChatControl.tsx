@@ -10,14 +10,31 @@ import { v4 as uuidv4 } from 'uuid'
 import { MyContext } from '../index'
 import ChatInput from './components/ChatInput'
 import * as api from '@/api/models/main'
+import Typed from 'typed.js'
+import MarkdownIt from 'markdown-it'
 const ChatControl = (props: any) => {
-  const { updateMessage, sessionId, projectId, subjectName, handleCreateChat } = useContext(MyContext)
+  const { updateMessage, sessionId, projectId, subjectName, getChatHistories, handleCreateChat } = useContext(MyContext)
   const [prompt, setPrompt] = useState('')
+  const typeRef = useRef<any>()
   const chatRef = useRef<{ form: FormInstance<any> }>(null)
-  const { sendMessage, formatMessage } = useSendChat(updateMessage, sessionId, projectId)
+  const { formatMessage } = useSendChat(updateMessage, sessionId, projectId)
   const handleInputChange = (val: string) => {
     console.log('handleInputChange', val)
     setPrompt(val)
+  }
+  function typedText(text: string, el: any, onComplete: () => void) {
+    console.log('zy typedText', text, el)
+    const md = new MarkdownIt()
+    const html = md.render(typeof text === 'string' ? text : '')
+    typeRef.current = new Typed(el, {
+      strings: [html],
+      typeSpeed: 50,
+      // showCursor: false, // 隐藏光标
+      onComplete: function (self) {
+        onComplete()
+        console.log('Typing complete!')
+      },
+    })
   }
   const handleApply = async (fileId?: any) => {
     const params = chatRef.current?.form.getFieldsValue()
@@ -33,23 +50,28 @@ const ChatControl = (props: any) => {
     setPrompt(res)
     console.log('getScriptPrompt', res)
   }
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!prompt) return
     const created = Date.now()
     const id = uuidv4()
-    const gptID = uuidv4()
-    console.log('%c zy 请求接口', 'color:red', Date.now())
+    console.log('%c zy 请求接口', 'color:red', Date.now(), updateMessage)
     updateMessage([
       formatMessage({
         messageContent: prompt,
         messageRole: 'user',
-        id,
       }),
-      formatMessage({ requesting: true, created, messageRole: 'gpt', id: gptID }),
+      formatMessage({ requesting: true, created, messageRole: 'gpt', id }),
     ])
+    const onComplete = async () => {
+      console.log('完成打字')
+      await getChatHistories()
+      typeRef.current?.destroy()
+    }
+    await api.sendChatRequest(prompt, sessionId, async val => {
+      await typedText(val, props.containerRef.current, onComplete)
+    })
+    updateMessage(formatMessage({ sending: true, created, messageRole: 'gpt', id }))
     //新建对话
-    sendMessage(prompt, sessionId, props.containerRef, created, gptID)
-    // chatRequest
   }
   // 默认参数
   useEffect(() => {

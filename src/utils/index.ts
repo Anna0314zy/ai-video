@@ -8,3 +8,8 @@ export function getQueryParam(key: string) {
   console.log('urlParams', urlParams, urlParams.get(key))
   return urlParams.get(key)
 }
+export function decodeUnicode(str: string): string {
+  return str.replace(/\\u[\dA-Fa-f]{4}/g, function (match) {
+    return String.fromCharCode(parseInt(match.substr(2), 16))
+  })
+}

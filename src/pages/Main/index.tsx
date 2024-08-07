@@ -10,6 +10,7 @@ import { useParams } from 'react-router-dom'
 import { getQueryParam } from '@/utils'
 import * as api from '@/api/models/main'
 import { setEngine } from 'crypto'
+import { decodeUnicode } from '@/utils'
 export const MyContext = createContext<any>({})
 const { Sider, Content } = Layout
 const contentStyle: React.CSSProperties = {
@@ -47,10 +48,13 @@ export default () => {
     const res = await api.getChatHistories({ sessionId })
     console.log('getChatHistories res', res)
     setMessageList(
-      res.records.map(v => ({
-        ...v,
-        messageRole: v.fromUserId === 0 ? 'gpt' : 'user',
-      })),
+      res.records.map(v => {
+        return {
+          ...v,
+          messageContent: v.messageContent,
+          messageRole: v.fromUserId === 0 ? 'gpt' : 'user',
+        }
+      }),
     )
   }
   useEffect(() => {
@@ -111,6 +115,7 @@ export default () => {
     projectId: Number(id),
     subjectName,
     sessionId,
+    getChatHistories,
     handleCreateChat,
   }
   console.log('zy 上下文 contextValue', contextValue)

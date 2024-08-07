@@ -1,9 +1,10 @@
 import api from '../index'
 import { ScriptPrompt, MessageList } from '../type'
+import { fetchEventSource } from '@microsoft/fetch-event-source'
 const http = import.meta.env.VITE_API_SERVER
-
+const CHAT_URL = `${http}/api/text/v1/ai/stream/sessionChat`
 export const chat = (params: { systemToken: string }) => {
-  return api.post(`${http}/api/text/v1/ai/stream/sessionChat`, params)
+  return api.post(CHAT_URL, params)
 }
 
 // 新建会话
@@ -40,4 +41,33 @@ export const fileUpload = (file: any) => {
       },
     },
   )
+}
+export const sendChatRequest = async (text: string, sessionId: number, typedMessage: (result: string) => void) => {
+  let result = ''
+  // 请求数据，流式输出
+  return new Promise(async (resolve, reject) => {
+    await fetchEventSource(CHAT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+        Authorization: localStorage.getItem('token') || '',
+      },
+      body: JSON.stringify({
+        text,
+        sessionId,
+      }),
+      async onmessage(ev: any) {
+        console.log('zy 会话onmessage', ev)
+        result += ev.data
+        typedMessage(result)
+      },
+
+      //会话发送完毕时触发
+      onclose() {
+        // 接口请求成功
+        resolve(result)
+        console.log('zy 会话发送完毕时触发')
+      },
+    })
+  })
 }

@@ -9,7 +9,11 @@ interface IProps {
 export default ({ messageInfo, md, containerRef }: IProps) => {
   return (
     <HeadLayout messageInfo={messageInfo}>
-      <div className='content' dangerouslySetInnerHTML={{ __html: md.render(messageInfo.messageContent) }}></div>
+      <div
+        className='content'
+        dangerouslySetInnerHTML={{
+          __html: md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''),
+        }}></div>
     </HeadLayout>
   )
 }

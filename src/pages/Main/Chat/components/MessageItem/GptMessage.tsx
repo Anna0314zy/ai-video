@@ -12,7 +12,9 @@ export default ({ messageInfo, containerRef, md }: IProps) => {
         <div
           style={{ display: messageInfo.sending ? 'none' : 'block' }}
           className='content'
-          dangerouslySetInnerHTML={{ __html: md.render(messageInfo.messageContent) }}></div>
+          dangerouslySetInnerHTML={{
+            __html: md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''),
+          }}></div>
       )}
       <div ref={containerRef}></div>
     </HeadLayout>
