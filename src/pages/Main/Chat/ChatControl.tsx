@@ -37,16 +37,18 @@ const ChatControl = (props: any) => {
     if (!prompt) return
     const created = Date.now()
     const id = uuidv4()
-    console.log('%c zy 请求接口', 'color:red', Date.now(), updateMessage)
+    const gptID = uuidv4()
+    console.log('%c zy 请求接口', 'color:red', Date.now())
     updateMessage([
       formatMessage({
         messageContent: prompt,
         messageRole: 'user',
+        id,
       }),
-      formatMessage({ requesting: true, created, messageRole: 'gpt', id }),
+      formatMessage({ requesting: true, created, messageRole: 'gpt', id: gptID }),
     ])
     //新建对话
-    sendMessage(prompt, sessionId, props.containerRef, created, id)
+    sendMessage(prompt, sessionId, props.containerRef, created, gptID)
     // chatRequest
   }
   // 默认参数
