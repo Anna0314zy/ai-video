@@ -11,6 +11,7 @@ import { Role } from '@/api/type'
 import useTyped from '../hooks/useTyped'
 import { sendChatRequest } from '@/api/models/chat'
 import { FormInstance } from 'antd'
+import AntdIcon from '@/components/IconWidget/AntdIcon'
 const ChatControl = (props: any) => {
   const { updateMessage, sessionId, containerRef, projectId, subjectName, getChatHistories, handleCreateChat, form } =
     useContext(MyContext)
@@ -120,12 +121,10 @@ const ChatControl = (props: any) => {
             </Button>
           </Space>
         </Flex>
-        <Flex justify='center' wrap={false} align='center' style={{ marginLeft: '10px' }}>
+        <Flex justify='center' wrap={false} align='center' style={{ marginLeft: '10px' }} onClick={handleCreateChat}>
           <IconWidget name='chatClear' />
-          <Button
-            type='link'
-            onClick={handleCreateChat}
-            style={{ paddingRight: 0, paddingLeft: '5px', color: '#14141A' }}>
+          {/* <AntdIcon icon='createIcon' /> */}
+          <Button type='link' className='chat-create'>
             新建对话
           </Button>
         </Flex>

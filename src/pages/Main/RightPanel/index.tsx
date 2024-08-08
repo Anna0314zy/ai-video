@@ -53,10 +53,6 @@ const RightPanel = () => {
     }
   }, [targetScript])
   const handleCustomRequest = async (options: any) => {
-    // handleApply(val)
-    const formData = new FormData()
-    formData.append('file', 'value2')
-    console.log('handleUploadSuccess', options.file)
     await api.uploadScript(projectId, options.file)
     message.success('上传成功')
     getScriptPageList()
@@ -65,13 +61,13 @@ const RightPanel = () => {
     <Flex
       className='script-right-panel'
       vertical={true}
-      style={{ padding: '0 10px 24px 10px', overflow: 'hidden', maxHeight: '100%', userSelect: 'none' }}>
+      style={{ padding: '0 24px 24px 24px', overflow: 'hidden', maxHeight: '100%', userSelect: 'none' }}>
       <Flex className='header' justify='space-between'>
         <Button type='link' style={{ color: '#000', fontSize: '16px', fontWeight: 500 }}>
           剧本资源
         </Button>
         <Dropdown menu={{ items: downItems }} placement='bottomLeft' arrow={{ pointAtCenter: true }}>
-          <Button type='link'>下载模板</Button>
+          <Button type='text'>下载模板</Button>
         </Dropdown>
         <ChatUpload customRequest={handleCustomRequest} accept='.md, .xlsx, .docx'>
           <Button type='link' disabled={disabled}>

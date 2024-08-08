@@ -11,7 +11,7 @@ import { getQueryParam } from '@/utils'
 import * as api from '@/api/models/main'
 import { getProjectDetail } from '@/api/models/project'
 import { setEngine } from 'crypto'
-import { decodeUnicode } from '@/utils'
+import { convertToMarkdown } from '@/utils'
 import RightPanel from './RightPanel'
 interface Context {
   projectId: number
@@ -66,7 +66,7 @@ export default () => {
       res.records.map(v => {
         return {
           ...v,
-          messageContent: v.messageContent,
+          messageContent: convertToMarkdown(v.messageContent || ''),
         }
       }),
     )
@@ -153,7 +153,7 @@ export default () => {
             <ChatContent containerRef={containerRef} messageList={messageList} />
             <ChatControl containerRef={containerRef} />
           </Content>
-          <Sider width='30%' style={sliderStyle}>
+          <Sider width={352} style={sliderStyle}>
             <RightPanel></RightPanel>
           </Sider>
         </Layout>

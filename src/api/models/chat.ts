@@ -39,6 +39,7 @@ export const sendChatRequest = async (
       body: JSON.stringify(chatParams),
       async onmessage(ev: any) {
         result += ev.data
+        console.log('ev', result)
         typedMessage(result)
       },
 

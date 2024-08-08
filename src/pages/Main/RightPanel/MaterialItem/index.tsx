@@ -33,7 +33,7 @@ export default (props: IMaterialItem) => {
   }, [])
 
   const handleDel = useCallback(async () => {
-    console.log('删除')
+    console.log('删除', data)
     if (disabled) return
     await api.deleteScript({
       scriptId: data.scriptId,
@@ -73,7 +73,8 @@ export default (props: IMaterialItem) => {
     },
   ]
   // 下载
-  const handleDownload = useCallback((ext: string) => {
+  const handleDownload = useCallback((ext: string = 'md') => {
+    console.log('删除', data)
     const url = `${import.meta.env.VITE_API_SERVER}/api/text/v1/downloadScript?scriptId=${data.scriptId}&ext=${ext}`
     downloadFromServer(url, `${data.scriptStyle}-${data.scriptId}.${ext}`)
   }, [])
@@ -110,7 +111,7 @@ export default (props: IMaterialItem) => {
           </Space>
         </div>
       </Flex>
-      <ScriptPreview ref={previewRef} />
+      <ScriptPreview ref={previewRef} handleDownload={handleDownload} handleDel={handleDel} disabled={disabled} />
     </>
   )
 }

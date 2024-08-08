@@ -52,3 +52,19 @@ export const downloadFromServer = async (url: string, filename: string) => {
     console.error('Download failed:', error)
   }
 }
+
+export function convertToMarkdown(text: string) {
+  // 处理文本中的特殊字符
+  // 将 \s 替换为普通空格
+  // 将 \t 替换为 Markdown 表格列分隔符
+  // 将 \n 替换为 Markdown 行分隔符
+  const replacedText = text
+    .replace(/\\s/g, '  ') // 替换 \s 为普通空格
+    .replace(/\\t/g, '  ') // 替换 \t 为管道符
+  // .split('\\n') // 按 \n 分隔行
+
+  // 生成 Markdown 表格
+  console.log(replacedText.replace(/(\\S)\\n/g, '$1  \n'))
+
+  return replacedText.replace(/(\S)\\n/g, '$1  \n').replace(/\\n/g, '  \n')
+}

@@ -39,7 +39,7 @@ const ChatInput = ({
   }
   return (
     <div className='chat-input-container'>
-      <ChatUpload onSuccess={onSuccess}></ChatUpload>
+      <ChatUpload onSuccess={onSuccess} accept='.md,.xlsx,.doc,.docx'></ChatUpload>
       <Input.TextArea
         value={value}
         onChange={handleChange}

@@ -1,7 +1,8 @@
-import { useRef, useImperativeHandle, useState, forwardRef } from 'react'
+import { useRef, useImperativeHandle, useState, forwardRef, useCallback } from 'react'
 import MarkdownIt from 'markdown-it'
 import CommonModal, { ModalHandle } from '@/components/CommonModal'
-const ScriptPreview = (_: any, ref: any) => {
+import { Button } from 'antd'
+const ScriptPreview = ({ handleDownload, handleDel, disabled }: any, ref: any) => {
   const modelRef = useRef<ModalHandle>(null)
   const [html, setHtml] = useState('')
   const cancel = () => {}
@@ -16,16 +17,58 @@ const ScriptPreview = (_: any, ref: any) => {
   useImperativeHandle(ref, () => ({
     open,
   }))
+  const btns = [
+    {
+      key: 'cancel',
+      value: '取消',
+    },
+    {
+      key: 'del',
+      value: '删除',
+    },
+    {
+      key: 'download',
+      value: '下载',
+      type: 'primary',
+    },
+  ]
+  const handleClick = useCallback(async (key: string) => {
+    if (key === 'cancel') {
+      modelRef.current?.cancel()
+    } else if (key === 'del') {
+      await handleDel()
+      modelRef.current?.cancel()
+    } else if (key === 'download') {
+      handleDownload()
+    }
+  }, [])
+  const FooterUi = () => {
+    return btns.map(item => {
+      return (
+        <Button
+          disabled={item.key === 'del' ? disabled : false}
+          type={item.type as 'primary'}
+          key={item.key}
+          onClick={() => handleClick(item.key)}>
+          {item.value}
+        </Button>
+      )
+    })
+  }
   return (
     <CommonModal
       ref={modelRef}
-      title='新建项目'
+      width={'80%'}
+      height={'80%'}
+      title='预览'
       destroyOnClose={true}
       okText='确定'
       cancelText='取消'
       onOk={async () => {}}
-      onCancel={cancel}>
+      onCancel={cancel}
+      footer={<FooterUi></FooterUi>}>
       <div
+        style={{ minHeight: '500px' }}
         dangerouslySetInnerHTML={{
           __html: html,
         }}></div>
