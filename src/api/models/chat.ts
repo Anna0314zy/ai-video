@@ -40,7 +40,6 @@ export const sendChatRequest = async (
       },
       body: JSON.stringify(chatParams),
       async onmessage(ev: any) {
-        resolve(true)
         result += ev.data
         console.log('ev', result)
         typedMessage(convertToMarkdown(result))
