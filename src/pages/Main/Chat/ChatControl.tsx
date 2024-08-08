@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState, useRef } from 'react'
+import { useContext, useEffect, useState, useRef, useMemo } from 'react'
 import Style from '../index.module.less'
 import ChatConfig from './components/ChatConfig'
-import { Flex, Button, Space } from 'antd'
+import { Flex, Button, Space, message } from 'antd'
 import IconWidget from '@/components/IconWidget'
 import { v4 as uuidv4 } from 'uuid'
 import { MyContext } from '../index'
@@ -14,8 +14,17 @@ import { FormInstance } from 'antd'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
 import { convertToMarkdown } from '@/utils'
 const ChatControl = (props: any) => {
-  const { updateMessage, sessionId, chatIng, setChatIng, projectId, subjectName, getChatHistories, handleCreateChat } =
-    useContext(MyContext)
+  const {
+    updateMessage,
+    sessionId,
+    chatIng,
+    setChatIng,
+    projectId,
+    subjectName,
+    getChatHistories,
+    handleCreateChat,
+    messageList,
+  } = useContext(MyContext)
   const { typedText, destroy } = useTyped()
   const [prompt, setPrompt] = useState<{
     text: string
@@ -61,12 +70,17 @@ const ChatControl = (props: any) => {
 
     console.log('getScriptPrompt', prompt, promptRequestLogId)
   }
+  const shouldRefresh = useMemo(() => {
+    return messageList?.some((v: any) => v.sending)
+  }, [messageList])
   const handleSendMessage = async (promptInfo?: any) => {
     if (chatIng) return
     setChatIng(true)
     destroy()
     try {
-      await getChatHistories()
+      // 如果当前有正在输出的 还是要刷新
+      console.log(shouldRefresh, 'shouldRefresh')
+      if (shouldRefresh) await getChatHistories()
       const created = Date.now()
       const id = uuidv4()
       console.log('%c zy 请求接口', 'color:red', Date.now(), updateMessage)

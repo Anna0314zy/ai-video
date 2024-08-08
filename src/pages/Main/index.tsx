@@ -145,6 +145,7 @@ export default () => {
     disabled,
     chatIng,
     setChatIng,
+    messageList,
   }
   useEffect(() => {
     containerRef.current?.scrollIntoView({

@@ -10,8 +10,9 @@ interface IProps {
   accept?: string
   children?: React.ReactNode
   customRequest?: (options: any) => void
+  disabled?: boolean
 }
-const ChatUpload = ({ onSuccess, accept = '.md,.xlsx', children, customRequest }: IProps) => {
+const ChatUpload = ({ onSuccess, accept = '.md,.xlsx', children, customRequest, disabled = false }: IProps) => {
   const props: UploadProps = {
     accept,
     maxCount: 1,
@@ -24,6 +25,10 @@ const ChatUpload = ({ onSuccess, accept = '.md,.xlsx', children, customRequest }
       onSuccess?.(fileId)
     },
   }
-  return <Upload {...props}>{children ? children : <LinkOutlined style={{ cursor: 'pointer' }} />}</Upload>
+  return (
+    <Upload disabled={disabled} {...props}>
+      {children ? children : <LinkOutlined style={{ cursor: disabled ? 'not-allowed' : 'pointer' }} />}
+    </Upload>
+  )
 }
 export default ChatUpload
