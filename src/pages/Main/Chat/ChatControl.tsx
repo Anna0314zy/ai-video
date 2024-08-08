@@ -12,10 +12,11 @@ import useTyped from '../hooks/useTyped'
 import { sendChatRequest } from '@/api/models/chat'
 import { FormInstance } from 'antd'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
+import { convertToMarkdown } from '@/utils'
 const ChatControl = (props: any) => {
-  const { updateMessage, sessionId, containerRef, projectId, subjectName, getChatHistories, handleCreateChat, form } =
+  const { updateMessage, sessionId, chatIng, setChatIng, projectId, subjectName, getChatHistories, handleCreateChat } =
     useContext(MyContext)
-  const { typedText } = useTyped()
+  const { typedText, destroy } = useTyped()
   const [prompt, setPrompt] = useState<{
     text: string
     fileId?: number
@@ -61,33 +62,42 @@ const ChatControl = (props: any) => {
     console.log('getScriptPrompt', prompt, promptRequestLogId)
   }
   const handleSendMessage = async (promptInfo?: any) => {
-    const created = Date.now()
-    const id = uuidv4()
-    console.log('%c zy 请求接口', 'color:red', Date.now(), updateMessage)
-    const promptParams = promptInfo || prompt
-    updateMessage([
-      {
-        messageContent: promptParams.text,
-        role: Role.user,
-        attachmentFileInfo: {
-          fileId: promptParams.fileId,
-          fileName: promptParams.fileName,
+    if (chatIng) return
+    setChatIng(true)
+    destroy()
+    try {
+      await getChatHistories()
+      const created = Date.now()
+      const id = uuidv4()
+      console.log('%c zy 请求接口', 'color:red', Date.now(), updateMessage)
+      const promptParams = promptInfo || prompt
+      updateMessage([
+        {
+          messageContent: convertToMarkdown(promptParams.text),
+          role: Role.user,
+          attachmentFileInfo: {
+            fileId: promptParams.fileId,
+            fileName: promptParams.fileName,
+          },
+          id: uuidv4(),
+          created,
         },
-        id: uuidv4(),
-        created,
-      },
-      { requesting: true, created, role: Role.Gpt, id },
-    ])
-    await sendChatRequest(
-      {
-        prompt: promptParams,
-        sessionId,
-      },
-      async val => {
-        typedText(val)
-      },
-    )
-    updateMessage({ sending: true, created, role: Role.Gpt, id })
+        { requesting: true, created, role: Role.Gpt, id },
+      ])
+      await sendChatRequest(
+        {
+          prompt: promptParams,
+          sessionId,
+        },
+        async val => {
+          typedText(val)
+        },
+      )
+      setChatIng(false)
+      updateMessage({ sending: true, created, role: Role.Gpt, id })
+    } finally {
+      setChatIng(false)
+    }
     //新建对话
   }
   // 默认参数
@@ -133,6 +143,7 @@ const ChatControl = (props: any) => {
         value={prompt.text}
         onChange={handleInputChange}
         onSend={handleInputSend}
+        chatIng={chatIng}
         onSuccess={handleUploadSuccess}></ChatInput>
     </div>
   )

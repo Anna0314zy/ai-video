@@ -40,6 +40,7 @@ const ChatConfig = (_: any, ref: any) => {
       subjectName,
     })
     setListScripType(res.map(v => ({ label: v, value: v })))
+    form?.setFieldValue('scriptType', res[0])
     console.log('getListScripType---', res)
   }
   const getListScriptStyle = async () => {

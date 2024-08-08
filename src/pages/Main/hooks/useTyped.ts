@@ -26,6 +26,9 @@ const useTyped = () => {
   }
   return {
     typedText,
+    destroy: () => {
+      typeRef.current?.destroy()
+    },
   }
 }
 export default useTyped

@@ -1,6 +1,6 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { CHAT_URL, CHAT_URL_AGAIN } from '@/api/models/main'
-
+import { convertToMarkdown } from '@/utils'
 //重新生成
 export const sendChatRequest = async (
   params: {
@@ -40,13 +40,13 @@ export const sendChatRequest = async (
       async onmessage(ev: any) {
         result += ev.data
         console.log('ev', result)
-        typedMessage(result)
+        typedMessage(convertToMarkdown(result))
       },
 
       //会话发送完毕时触发
       onclose() {
         // 接口请求成功
-        resolve(result)
+        resolve(convertToMarkdown(result))
         console.log('zy 会话发送完毕时触发')
       },
     })

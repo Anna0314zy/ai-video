@@ -50,6 +50,7 @@ export default () => {
   const [messageList, setMessageList] = useState<MessageList[]>([])
   const containerRef = useRef<any>()
   const [scriptPageList, setScriptPageList] = useState<ScriptPageList[]>([])
+  const [chatIng, setChatIng] = useState(false)
   const disabled = useMemo(() => {
     return scriptPageList.findIndex(v => v.isFinal) > -1
   }, [scriptPageList])
@@ -142,7 +143,15 @@ export default () => {
     scriptPageList,
     state: state as keyof typeof ScriptStatus,
     disabled,
+    chatIng,
+    setChatIng,
   }
+  useEffect(() => {
+    containerRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }, [messageList])
   console.log('zy 上下文 contextValue', contextValue)
   return (
     <MyContext.Provider value={contextValue}>

@@ -15,7 +15,9 @@ const ChatInput = ({
   onChange,
   onSend,
   onSuccess,
+  chatIng,
 }: {
+  chatIng?: boolean
   value: string
   onChange: (val: string) => void
   onSend: (val: string) => void
@@ -39,7 +41,7 @@ const ChatInput = ({
   }
   return (
     <div className='chat-input-container'>
-      <ChatUpload onSuccess={onSuccess} accept='.md,.xlsx,.doc,.docx'></ChatUpload>
+      <ChatUpload onSuccess={onSuccess} accept='.md,.xlsx,.docx'></ChatUpload>
       <Input.TextArea
         value={value}
         onChange={handleChange}
@@ -48,7 +50,7 @@ const ChatInput = ({
         style={{ overflowY: 'auto', backgroundColor: '#fff', borderColor: 'transparent' }}
         autoSize={{ minRows: 1, maxRows: 6 }}
       />
-      <SendOutlined onClick={handleSend} />
+      <SendOutlined onClick={handleSend} style={{ cursor: chatIng ? 'not-allowed' : 'pointer' }} />
     </div>
   )
 }
