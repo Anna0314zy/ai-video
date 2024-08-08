@@ -57,6 +57,7 @@ const ChatConfig = (_: any, ref: any) => {
     console.log('onValuesChange', val, form, Object.keys(val))
     if (Object.keys(val).includes('scriptType')) {
       //请求
+      form.setFieldValue('scriptStyle', undefined)
       getListScriptStyle()
     }
   }

@@ -69,17 +69,13 @@ export const getPageScript = (params: { projectId: number }) => {
   }>(`${http}/api/text/v1/pageScript`, params)
 }
 //剧本预览
-export const previewScript = (params: SaveScriptParams) => {
-  return api.get<string[]>(`${http}/api/text/v1/previewScript`, params, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  })
+export const previewScript = (params: { scriptId: number }) => {
+  return api.get<string>(`${http}/api/text/v1/previewScript`, params)
 }
 //导入剧本
 export const uploadScript = (projectId: number, file: any) => {
   return api.post<string[]>(
-    `${http}/api/text/v1/previewScript/${projectId}`,
+    `${http}/api/text/v1/importScript/${projectId}`,
     { file },
     {
       headers: {

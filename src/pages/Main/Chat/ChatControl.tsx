@@ -92,8 +92,8 @@ const ChatControl = (props: any) => {
   // 默认参数
   useEffect(() => {
     chatRef.current?.form?.setFieldsValue({
-      scriptType: '启蒙/拼音', // 剧本类型
-      scriptStyle: '奇幻冒险', // 剧本风格
+      // scriptType: '启蒙/拼音', // 剧本类型
+      // scriptStyle: '奇幻冒险', // 剧本风格
       // scriptTitle?: string // 剧本主题
       // characters?: string // 主角、配角，用英文逗号分隔
       duration: 120, // 总时长，单位秒

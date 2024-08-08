@@ -7,7 +7,7 @@ import { MyContext } from '../index'
 import { useContext } from 'react'
 
 const leftChildren = () => {
-  const { projectName, state } = useContext(MyContext)
+  const { projectName, state, disabled } = useContext(MyContext)
   return (
     <>
       <IconWidget name='excel' style={{ width: 22, marginLeft: 12 }} />
@@ -22,10 +22,13 @@ const leftChildren = () => {
 }
 
 const rightChildren = () => {
+  const { disabled } = useContext(MyContext)
   return (
     <>
       <Button>跳过</Button>
-      <Button type='primary'>下一步</Button>
+      <Button type='primary' disabled={!disabled}>
+        下一步
+      </Button>
     </>
   )
 }

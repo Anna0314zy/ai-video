@@ -74,7 +74,9 @@ const RightPanel = () => {
           <Button type='link'>下载模板</Button>
         </Dropdown>
         <ChatUpload customRequest={handleCustomRequest} accept='.md, .xlsx, .docx'>
-          <Button type='link'>导入剧本</Button>
+          <Button type='link' disabled={disabled}>
+            导入剧本
+          </Button>
         </ChatUpload>
       </Flex>
       <Flex className='content' vertical={true} wrap={true} gap={10} style={{ overflow: 'hidden' }} flex={1}>
