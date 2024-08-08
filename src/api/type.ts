@@ -32,10 +32,12 @@ export interface MessageList {
     fileId?: number
     fileName?: string
   }
+  scriptId?: number // 对应剧本id
+  loading?: boolean // 标记为剧本中
 }
 export interface ScriptPageList {
   // 都写成可选
-  projectId?: number
+  projectId: number
   scriptId: number
   source?: number
   shotNum?: number
@@ -46,4 +48,18 @@ export interface ScriptPageList {
   scriptStyle?: string
   scriptContent?: string
   actived?: boolean
+  modified: string
+  isFinal?: number // 是否确认剧本
+}
+export enum ScriptStatus {
+  'ScriptProcessing' = '剧本制作中',
+  'VideoProcessing' = '画面制作中',
+  'Completed' = '已完成',
+}
+
+export const getHeaderTips = (state: keyof typeof ScriptStatus) => {
+  if (state === 'ScriptProcessing') {
+    return '剧本设计'
+  }
+  return '镜头设计'
 }

@@ -1,4 +1,5 @@
 import api from '../index'
+import { ScriptStatus } from '../type'
 const http = import.meta.env.VITE_API_SERVER
 export interface ProjectList {
   created: string
@@ -8,7 +9,7 @@ export interface ProjectList {
   projectName: string
   projectType: string
   shotNum: number
-  state: string
+  state: keyof typeof ScriptStatus
   subjectName: string
   termName: string
   textbookVersion: string
@@ -30,4 +31,13 @@ export const projectList = (params: any) => {
 // 新建项目
 export const projectSave = (params: any) => {
   return api.post(`${http}/api/project/save`, params)
+}
+
+interface ProjectDetailRes {
+  latestSessionId?: number
+  project: ProjectList
+}
+// 获取项目详情
+export const getProjectDetail = (projectId: number) => {
+  return api.get<ProjectDetailRes>(`${http}/api/project/detail`, { projectId })
 }

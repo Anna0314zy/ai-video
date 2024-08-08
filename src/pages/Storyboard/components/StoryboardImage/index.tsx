@@ -1,6 +1,8 @@
-import MaterialItem from "@/components/MaterialItem"
-export default ()=>{
-    return <div>
-        <MaterialItem icon='excel' actived={true}/>
+import MaterialItem from '@/pages/Main/RightPanel/MaterialItem'
+export default () => {
+  return (
+    <div>
+      <MaterialItem icon='excel' actived={true} />
     </div>
+  )
 }

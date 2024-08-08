@@ -7,9 +7,10 @@ import type { FormProps } from 'antd'
 import { ScriptPrompt } from '@/api/type'
 import * as api from '@/api/models/main'
 const ChatConfig = (_: any, ref: any) => {
-  const { subjectName, form } = useContext(MyContext)
+  const { subjectName } = useContext(MyContext)
   const [listScripType, setListScripType] = useState<{ label: string; value: string }[]>([])
   const [listScripStyle, setListScripStyle] = useState<{ label: string; value: string }[]>([])
+  const [form] = Form.useForm()
 
   const onFinish: FormProps<ScriptPrompt>['onFinish'] = values => {
     console.log('form Success:', form.getFieldsValue())
@@ -19,9 +20,9 @@ const ChatConfig = (_: any, ref: any) => {
     console.log('Failed:', errorInfo)
   }
   // // 绑定ref对外引用
-  // useImperativeHandle(ref, () => ({
-  //   form,
-  // }))
+  useImperativeHandle(ref, () => ({
+    form,
+  }))
   const config = useMemo(() => {
     return ScriptDesign.map(v => {
       if (v.prop === 'scriptType') {
@@ -84,4 +85,4 @@ const ChatConfig = (_: any, ref: any) => {
     </Form>
   )
 }
-export default ChatConfig
+export default forwardRef(ChatConfig)

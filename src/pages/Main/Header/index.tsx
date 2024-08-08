@@ -1,25 +1,19 @@
 import HeaderLayout from '../HeaderLayout'
-import { CheckCircleOutlined } from '@ant-design/icons'
 import IconWidget from '@/components/IconWidget'
-import { Tag, Button } from 'antd'
+import { Button } from 'antd'
 import Styles from '../index.module.less'
-import { DesignType, IData } from '../type'
+import { getHeaderTips } from '@/api/type'
 import { MyContext } from '../index'
 import { useContext } from 'react'
-// 根据 enum 值获取文本内容的函数
-function getDesignTypeText(value: DesignType): string {
-  if (value === 1) return '剧本设计'
-  else return '镜头设计'
-}
 
-const leftChildren = (props: IData) => {
-  const { projectName } = useContext(MyContext)
+const leftChildren = () => {
+  const { projectName, state } = useContext(MyContext)
   return (
     <>
       <IconWidget name='excel' style={{ width: 22, marginLeft: 12 }} />
       <span style={{ fontWeight: 500, fontSize: 20, color: '#292933' }}>《{projectName}》</span>
       <span className={Styles['tip-shu']}> | </span>
-      <span className={Styles['tip-text']}> {getDesignTypeText(props?.type)}</span>
+      <span className={Styles['tip-text']}> {getHeaderTips(state)}</span>
       {/* <Tag style={{ width: 68, marginLeft: 12 }} icon={<CheckCircleOutlined />} color='success'>
         已确认
       </Tag> */}
@@ -27,7 +21,7 @@ const leftChildren = (props: IData) => {
   )
 }
 
-const rightChildren = (props: IData) => {
+const rightChildren = () => {
   return (
     <>
       <Button>跳过</Button>
@@ -36,6 +30,6 @@ const rightChildren = (props: IData) => {
   )
 }
 
-export default ({ data }: { data: IData }) => {
-  return <HeaderLayout leftChildren={() => leftChildren(data)} rightChildren={() => rightChildren(data)} />
+export default () => {
+  return <HeaderLayout leftChildren={leftChildren} rightChildren={rightChildren} />
 }

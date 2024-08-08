@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { Flex, Table, Button } from 'antd'
+import { Flex, Table, Button, Tag } from 'antd'
 import type { TableProps } from 'antd'
 import CreateProjectBtn from './CreateProjectBtn'
 import Styles from '../../Home/index.module.less'
@@ -7,6 +7,9 @@ import IconWidget from '@/components/IconWidget/index'
 import { PageList, ProjectList } from '@/api/models/project'
 import UserOutlined from '@ant-design/icons/lib/icons/UserOutlined'
 import { v3 as uuidv3 } from 'uuid'
+import { ScriptStatus } from '@/api/type'
+import { EditOutlined, CheckCircleOutlined, CheckCircleTwoTone } from '@ant-design/icons'
+import AntdIcon from '@/components/IconWidget/AntdIcon'
 interface DataType {
   key: string
   name: string
@@ -35,7 +38,7 @@ export default ({
     let sessionId = 0
     if (record.sessionList?.length) sessionId = record.sessionList[record.sessionList?.length - 1].id
 
-    const url = `${window.location.origin}?projectName=${record.projectName}&subjectName=${record.subjectName}&sessionId=${sessionId}&type=1/#/project/${record.id}/text`
+    const url = `${window.location.origin}?projectName=${record.projectName}&subjectName=${record.subjectName}&state=${record.state}/#/project/${record.id}/text`
 
     // 打开或聚焦具有相同名称的窗口
     window.open(url, '_blank')
@@ -80,6 +83,25 @@ export default ({
       title: '创建人',
       dataIndex: 'username',
       align: 'center',
+    },
+    {
+      title: '状态',
+      dataIndex: 'state',
+      align: 'center',
+      render: (_, record: ProjectList) => {
+        if (record.state === 'Completed') {
+          return (
+            <Tag style={{ color: '#24CA49' }} color='rgba(36, 202, 73, 0.1)' icon={<AntdIcon icon='checkCircle' />}>
+              {ScriptStatus[record.state]}{' '}
+            </Tag>
+          )
+        }
+        return (
+          <Tag style={{ color: '#FF7A2F' }} color='rgba(254, 126, 7, 0.1)' icon={<EditOutlined />}>
+            {ScriptStatus[record.state]}{' '}
+          </Tag>
+        )
+      },
     },
     {
       title: '创建时间',

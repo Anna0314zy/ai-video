@@ -5,7 +5,7 @@
   &.user {
     text-align: right;
   }
-  &.gpt {
+  &.assistant {
     text-align: left;
   }
   .avatar {
@@ -14,14 +14,12 @@
     line-height: 24px;
     text-align: center;
     border-radius: 50%;
-
+    box-sizing: border-box;
     color: #fff;
     &.user {
-      margin-left: 10px;
       background-color: #1975ff;
     }
-    &.gpt {
-      margin-right: 10px;
+    &.assistant {
       background-color: transparent !important;
     }
     .ant-image {
@@ -30,11 +28,16 @@
     }
   }
   .content {
-    padding: 10px;
     border-radius: 10px;
   }
   .message-item-content {
     overflow: hidden;
+    &.user {
+      padding-right: 10px;
+    }
+    &.assistant {
+      padding-left: 10px;
+    }
   }
 }
 .file-chat-content {
@@ -47,7 +50,24 @@
   border-radius: 4px;
 }
 .chat-btn {
+  .chat-btn-bg {
+    background-color: #ffff;
+    padding: 0px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    height: 22px;
+    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   &:hover {
     color: #1975ff;
+  }
+  .ant-btn {
+    &:hover {
+      color: #1975ff !important;
+    }
   }
 }

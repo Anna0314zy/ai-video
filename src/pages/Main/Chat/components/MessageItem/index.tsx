@@ -1,6 +1,6 @@
 import { MessageList, Role } from '@/api/type'
 import HeadLayout from './HeadLayout'
-import FileChat from './FileChat'
+import FileChat from '../FileChat'
 import { Flex } from 'antd'
 import ScriptBtn from './ActionBtn/ScriptBtn'
 import './index.less'
@@ -13,11 +13,15 @@ export default ({ messageInfo, md }: IProps) => {
   return (
     <HeadLayout messageInfo={messageInfo}>
       <Flex vertical={true} className='content'>
-        <div
-          dangerouslySetInnerHTML={{
-            __html: md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''),
-          }}></div>
-        <FileChat messageInfo={messageInfo}></FileChat>
+        {messageInfo?.attachmentFileInfo?.fileId ? (
+          <FileChat messageInfo={messageInfo}></FileChat>
+        ) : (
+          <div
+            dangerouslySetInnerHTML={{
+              __html: md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''),
+            }}></div>
+        )}
+
         {messageInfo.role === Role.Gpt && <ScriptBtn messageInfo={messageInfo} />}
       </Flex>
     </HeadLayout>

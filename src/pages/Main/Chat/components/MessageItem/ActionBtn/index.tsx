@@ -1,16 +1,20 @@
 import Icon from '@/components/IconWidget/AntdIcon'
-import { MessageList } from '@/api/type'
+import { Button } from 'antd'
 interface IProps {
   value: string
   onClick: () => void
   icon: string
+  loading?: boolean
+  disabled?: boolean
 }
-const ActionBtn = ({ value = '标记为剧本', onClick, icon }: IProps) => {
+const ActionBtn = ({ value = '标记为剧本', onClick, icon, loading, disabled }: IProps) => {
   return (
     <div onClick={onClick} className='chat-btn'>
-      <span style={{ backgroundColor: '#ffff', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>
+      <span className='chat-btn-bg'>
         <Icon icon={icon} style={{ paddingRight: '5px' }}></Icon>
-        <span>{value}</span>
+        <Button disabled={disabled} loading={loading} type='link' style={{ height: 'auto', padding: 0, color: '#000' }}>
+          {value}
+        </Button>
       </span>
     </div>
   )

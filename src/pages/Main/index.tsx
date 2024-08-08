@@ -3,18 +3,21 @@ import StompSocket from '@/utils/stompSocket'
 import ChatContent from './Chat/ChatContent'
 import ChatControl from './Chat/ChatControl'
 import { Layout, Form } from 'antd'
-import { createContext, useEffect, useRef, useState } from 'react'
+import { createContext, useEffect, useRef, useState, useMemo } from 'react'
 import { SEND_THOROUGH, SUBSCRIBE_THOROUGH } from '@/const/socket'
-import { MessageList } from '@/api/type'
+import { MessageList, ScriptPageList, ScriptStatus } from '@/api/type'
 import { useParams } from 'react-router-dom'
 import { getQueryParam } from '@/utils'
 import * as api from '@/api/models/main'
+import { getProjectDetail } from '@/api/models/project'
 import { setEngine } from 'crypto'
 import { decodeUnicode } from '@/utils'
 import RightPanel from './RightPanel'
 interface Context {
   projectId: number
   sessionId: number
+  scriptPageList: ScriptPageList[]
+  state: keyof typeof ScriptStatus
   [k: string]: any
 }
 export const MyContext = createContext<Context>({} as Context)
@@ -38,19 +41,25 @@ const layoutStyle: React.CSSProperties = {
 }
 
 export default () => {
-  const data = {
-    name: '高尔基的童年',
-    type: 1,
-  }
   const { id } = useParams() // 获取路由参数 userId
   const projectName = getQueryParam('projectName')
   const subjectName = getQueryParam('subjectName')
   const sessionIdQuery = getQueryParam('sessionId')
+  const state = getQueryParam('state')
   const [sessionId, setSessionId] = useState<number>(Number(sessionIdQuery))
   const [messageList, setMessageList] = useState<MessageList[]>([])
   const containerRef = useRef<any>()
-  const [form] = Form.useForm()
+  const [scriptPageList, setScriptPageList] = useState<ScriptPageList[]>([])
+  const disabled = useMemo(() => {
+    return scriptPageList.findIndex(v => v.isFinal) > -1
+  }, [scriptPageList])
+  //剧本列表
+  const getScriptPageList = async () => {
+    const res = await api.getPageScript({ projectId: Number(id) })
+    setScriptPageList(res.records)
+  }
   const getChatHistories = async () => {
+    if (!sessionId) return
     const res = await api.getChatHistories({ sessionId })
     console.log('getChatHistories res', res)
     setMessageList(
@@ -104,12 +113,22 @@ export default () => {
     setSessionId(data)
     console.log('handleCreate sessionId', sessionId)
   }
+  //项目详情
+  const getDetail = async () => {
+    const { latestSessionId, project } = await getProjectDetail(Number(id))
+    console.log('zy getDetail', latestSessionId, project)
+    setSessionId(latestSessionId || 0)
+    if (!latestSessionId) {
+      handleCreateChat()
+    }
+  }
   useEffect(() => {
-    if (!sessionId) handleCreateChat()
+    getDetail()
+    getScriptPageList()
+    // if (!sessionId) handleCreateChat()
   }, [])
   const contextValue = {
-    form,
-    data,
+    // form,
     containerRef,
     updateMessage,
     projectName,
@@ -118,12 +137,17 @@ export default () => {
     sessionId: Number(sessionId),
     getChatHistories,
     handleCreateChat,
+    getScriptPageList,
+    setScriptPageList,
+    scriptPageList,
+    state: state as keyof typeof ScriptStatus,
+    disabled,
   }
   console.log('zy 上下文 contextValue', contextValue)
   return (
     <MyContext.Provider value={contextValue}>
       <Layout style={layoutStyle}>
-        <Header data={data} />
+        <Header />
         <Layout style={{ height: '100%' }}>
           <Content style={contentStyle}>
             <ChatContent containerRef={containerRef} messageList={messageList} />

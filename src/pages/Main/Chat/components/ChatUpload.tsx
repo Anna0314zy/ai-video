@@ -3,31 +3,27 @@ import type { UploadProps } from 'antd'
 import { Button, message, Upload } from 'antd'
 import { LinkOutlined, SendOutlined } from '@ant-design/icons'
 import * as api from '@/api/models/main'
-const ChatUpload = ({ onSuccess }: { onSuccess: (val: { fileId: number; fileName: string }) => void }) => {
+import { Children } from 'react'
+interface IProps {
+  onSuccess?: (val: { fileId: number; fileName: string }) => void
+  apiName?: string
+  accept?: string
+  children?: React.ReactNode
+  customRequest?: (options: any) => void
+}
+const ChatUpload = ({ onSuccess, accept = '.md,.xlsx', children, customRequest }: IProps) => {
   const props: UploadProps = {
-    name: 'file',
-    accept: '.md, .xls, .xlsx',
+    accept,
     maxCount: 1,
     showUploadList: false,
-    // action: '',
-    // headers: {
-    //   authorization: 'authorization-text',
-    // },
     customRequest: async options => {
-      console.log('options', options)
+      if (customRequest) {
+        return customRequest(options)
+      }
       const fileId = await api.fileUpload(options.file)
-      // 请求prompt
-      // const res = await api.getScriptPrompt({
-      //   fileId,
-      // })
-      onSuccess(fileId)
-      console.log('fileId', fileId)
+      onSuccess?.(fileId)
     },
   }
-  return (
-    <Upload {...props}>
-      <LinkOutlined style={{ cursor: 'pointer' }} />
-    </Upload>
-  )
+  return <Upload {...props}>{children ? children : <LinkOutlined style={{ cursor: 'pointer' }} />}</Upload>
 }
 export default ChatUpload

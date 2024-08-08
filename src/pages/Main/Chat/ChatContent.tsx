@@ -23,7 +23,11 @@ const ChatContent = (props: { containerRef: any; messageList: MessageList[] }) =
         {props.messageList.map((item: MessageList) => {
           return (
             item.messageContent && (
-              <MessageItem md={md} key={item.id} messageInfo={item} containerRef={props.containerRef}></MessageItem>
+              <MessageItem
+                md={md}
+                key={String(item.id) + '_' + String(item.scriptId)}
+                messageInfo={item}
+                containerRef={props.containerRef}></MessageItem>
             )
           )
         })}
