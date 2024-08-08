@@ -41,3 +41,11 @@ interface ProjectDetailRes {
 export const getProjectDetail = (projectId: number) => {
   return api.get<ProjectDetailRes>(`${http}/api/project/detail`, { projectId })
 }
+// 获取学科列表
+export const getListSubjectName = () => {
+  return api.get<string[]>(`${http}/api/project/v1/listSubjectName`, {})
+}
+
+export const getListTermName = () => {
+  return api.get<string[]>(`${http}/api/project/v1/listTermName`, {})
+}

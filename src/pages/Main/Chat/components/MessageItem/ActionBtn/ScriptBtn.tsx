@@ -14,13 +14,26 @@ interface IProps {
   onClick: (item: MessageList) => void
 }
 const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
-  const { getScriptPageList, projectId, sessionId, updateMessage, scriptPageList, getChatHistories, disabled } =
-    useContext(MyContext)
-  const { typedText } = useTyped()
+  const {
+    getScriptPageList,
+    chatIng,
+    setChatIng,
+    projectId,
+    sessionId,
+    updateMessage,
+    scriptPageList,
+    getChatHistories,
+    disabled,
+    messageList,
+  } = useContext(MyContext)
+  const { typedText, destroy } = useTyped()
   const [loading, setLoading] = useState({
     add: false,
     refresh: false,
   })
+  const shouldRefresh = useMemo(() => {
+    return messageList?.some((v: any) => v.sending)
+  }, [messageList])
   const config = [
     {
       key: 'add',
@@ -28,6 +41,7 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
       icon: 'add',
       onClick: async () => {
         console.log('点击标记为剧本')
+
         setLoading(prev => ({
           ...prev,
           add: true,
@@ -64,6 +78,11 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
       icon: 'refresh',
       onClick: async () => {
         console.log('重新生成')
+        if (chatIng) return
+        console.log(shouldRefresh, 'shouldRefresh')
+        if (shouldRefresh) await getChatHistories()
+        destroy()
+        setChatIng(true)
         setLoading(prev => ({
           ...prev,
           refresh: true,
@@ -83,6 +102,7 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
             },
           )
         } finally {
+          setChatIng(false)
           setLoading(prev => ({
             ...prev,
             refresh: false,
@@ -105,9 +125,21 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
           </Tag>
         )}
         {hasAdd
-          ? config.slice(1).map(item => <ActionBtn {...item} key={item.key} disabled={disabled}></ActionBtn>)
+          ? config
+              .slice(1)
+              .map(item => (
+                <ActionBtn
+                  {...item}
+                  key={item.key}
+                  loading={loading[item.key as 'add']}
+                  disabled={item.key === 'refresh' ? chatIng : disabled || loading[item.key as 'add']}></ActionBtn>
+              ))
           : config.map(item => (
-              <ActionBtn {...item} key={item.key} loading={loading[item.key as 'add']} disabled={disabled}></ActionBtn>
+              <ActionBtn
+                {...item}
+                key={item.key}
+                loading={loading[item.key as 'add']}
+                disabled={item.key === 'refresh' ? chatIng : disabled || loading[item.key as 'add']}></ActionBtn>
             ))}
       </Space>
     </div>

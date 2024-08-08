@@ -45,13 +45,14 @@ const ChatControl = (props: any) => {
   }
   // 是不是文件
   const handleApply = async (val?: { fileId: number; fileName: string } | any) => {
+    console.log('handleApply', val)
     const params = chatRef.current?.form.getFieldsValue()
     const promptParams = {
       ...params,
       projectId,
       subjectName,
     }
-    if (typeof val?.fileId === 'number') promptParams.fileId = val?.fileId
+    if (val?.fileId) promptParams.fileId = val?.fileId
     console.log('handleApply:', promptParams)
 
     const { prompt, promptRequestLogId } = await api.getScriptPrompt(promptParams)

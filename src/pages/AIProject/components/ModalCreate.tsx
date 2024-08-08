@@ -5,16 +5,22 @@ import CommonModal, { ModalHandle } from '@/components/CommonModal'
 import { projectSave } from '@/api/models/project'
 import { subjects, grades, terms, CurriculumNos, versions, projectTypes } from '../config'
 import MyContext from '../context'
+import * as api from '@/api/models/project'
 const ModelCreate = (_: any, ref: any) => {
   const [form] = Form.useForm() // 使用 Form.useForm() 创建表单实例
   const [formData, setFormData] = useState({})
+  const [subjectNames, setSubjectNames] = useState<{ label: string; value: string }[]>([])
+  const [listTermNames, setListTermNames] = useState<{ label: string; value: string }[]>([])
   const navigate = useNavigate()
   const modelRef = useRef<ModalHandle>(null)
   const { getList } = useContext(MyContext)
   // 保存配置
   const save = async () => {
     const res = await form.validateFields()
-    await projectSave(res)
+    await projectSave({
+      ...res,
+      gradeName: grades[res.grade],
+    })
     message.success('保存成功')
     getList({
       current: 1,
@@ -30,6 +36,29 @@ const ModelCreate = (_: any, ref: any) => {
   useImperativeHandle(ref, () => ({
     open,
   }))
+  const getOptionsList = async () => {
+    const [a, b] = await Promise.all([
+      api.getListSubjectName(), // 注意这里加了()来调用函数
+      api.getListTermName(), // 同样这里也加了()来调用函数
+    ])
+
+    setSubjectNames(
+      a.map(v => ({
+        label: v,
+        value: v,
+      })),
+    )
+    setListTermNames(
+      b.map(v => ({
+        label: v,
+        value: v,
+      })),
+    )
+  }
+  useEffect(() => {
+    console.log('新建')
+    getOptionsList()
+  }, [])
   return (
     <CommonModal
       ref={modelRef}
@@ -52,22 +81,16 @@ const ModelCreate = (_: any, ref: any) => {
         <Row>
           <Col span={11}>
             <Form.Item label='学科' name={['subjectName']} rules={[{ required: true }]}>
-              <Select
-                placeholder='请选择学科'
-                options={subjects.map(v => ({
-                  label: v,
-                  value: v,
-                }))}
-                allowClear></Select>
+              <Select placeholder='请选择学科' options={subjectNames} allowClear></Select>
             </Form.Item>
           </Col>
           <Col span={11} offset={2}>
-            <Form.Item label='年级' name={['gradeName']} rules={[{ required: true }]}>
+            <Form.Item label='年级' name={['grade']} rules={[{ required: true }]}>
               <Select
                 placeholder='请选择年级'
-                options={grades.map(v => ({
+                options={grades.map((v, idx) => ({
                   label: v,
-                  value: v,
+                  value: idx,
                 }))}
                 allowClear></Select>
             </Form.Item>
@@ -76,13 +99,7 @@ const ModelCreate = (_: any, ref: any) => {
         <Row>
           <Col span={11}>
             <Form.Item label='季度' name={['termName']} rules={[{ required: true }]}>
-              <Select
-                placeholder='请选择季度'
-                options={terms.map(v => ({
-                  label: v,
-                  value: v,
-                }))}
-                allowClear></Select>
+              <Select placeholder='请选择季度' options={listTermNames} allowClear></Select>
             </Form.Item>
           </Col>
           <Col span={11} offset={2}>
