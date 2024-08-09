@@ -67,10 +67,11 @@ const ChatControl = (props: any) => {
     }
     if (val?.fileId) {
       // 上传附件 直接请求chat
-      handleSendMessage(promptInfo)
+      // handleSendMessage(promptInfo)
     } else {
-      setPrompt(promptInfo)
+    
     }
+    setPrompt(promptInfo)
 
     console.log('getScriptPrompt', prompt, promptRequestLogId)
   }

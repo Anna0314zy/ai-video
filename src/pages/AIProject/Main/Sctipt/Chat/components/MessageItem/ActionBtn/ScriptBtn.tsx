@@ -120,8 +120,13 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
   ]
   // 查看当前是否已经添加到剧本
   const hasAdd = useMemo(() => {
-    return scriptPageList?.findIndex(v => v.scriptId === messageInfo.scriptId) !== -1
+    const index = scriptPageList?.findIndex(v => v.scriptId === messageInfo.scriptId)
+    return index && index > -1
   }, [scriptPageList])
+
+  const showData = useMemo(() => {
+    return hasAdd ? config.slice(1) : config
+  }, [hasAdd])
   return (
     <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
       <Space>
@@ -130,29 +135,14 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
             剧本
           </Tag>
         )}
-        {hasAdd
-          ? config
-              .slice(1)
-              .map(item => (
-                <ActionBtn
-                  {...item}
-                  onClick={() => handleClick(item.key as 'add')}
-                  key={item.key}
-                  loading={chatContentLoading[messageInfo.id]?.[item.key]}
-                  disabled={
-                    item.key === 'refresh' ? chatIng : chatContentLoading[messageInfo.id]?.[item.key]
-                  }></ActionBtn>
-              ))
-          : config.map(item => (
-              <ActionBtn
-                {...item}
-                onClick={() => handleClick(item.key as 'add')}
-                key={item.key}
-                loading={chatContentLoading[messageInfo.id]?.[item.key]}
-                disabled={
-                  item.key === 'refresh' ? chatIng : chatContentLoading[messageInfo.id]?.[item.key]
-                }></ActionBtn>
-            ))}
+        {showData.map(item => (
+          <ActionBtn
+            {...item}
+            onClick={() => handleClick(item.key as 'add')}
+            key={item.key}
+            loading={chatContentLoading[messageInfo.id]?.[item.key]}
+            disabled={item.key === 'refresh' ? chatIng : chatContentLoading[messageInfo.id]?.[item.key]}></ActionBtn>
+        ))}
       </Space>
     </div>
   )
