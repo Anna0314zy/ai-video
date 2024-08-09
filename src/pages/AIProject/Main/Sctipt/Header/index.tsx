@@ -1,4 +1,4 @@
-import HeaderLayout from '../HeaderLayout'
+import HeaderLayout from '../../../components/HeaderLayout'
 import IconWidget from '@/components/IconWidget'
 import { Button } from 'antd'
 import Styles from '../index.module.less'
@@ -11,7 +11,7 @@ const leftChildren = () => {
   return (
     <>
       <IconWidget name='excel' style={{ width: 22, marginLeft: 12 }} />
-      <span style={{ fontWeight: 500, fontSize: 20, color: '#292933' }}>《{projectName}》</span>
+      <span style={{ fontWeight: 500, fontSize: 20, color: '#292933' }}>{projectName}</span>
       <span className={Styles['tip-shu']}> | </span>
       <span className={Styles['tip-text']}> {getHeaderTips(state)}</span>
       {/* <Tag style={{ width: 68, marginLeft: 12 }} icon={<CheckCircleOutlined />} color='success'>

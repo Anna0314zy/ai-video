@@ -8,7 +8,7 @@ const useTyped = () => {
 
   const handleComplete = async () => {
     console.log('完成打字')
-    // await getChatHistories()
+    await getChatHistories()
     // typeRef.current?.destroy()
     console.log('Typing complete!')
   }

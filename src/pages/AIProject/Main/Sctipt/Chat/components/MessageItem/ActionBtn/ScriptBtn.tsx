@@ -1,5 +1,5 @@
 import { Space, message, Tag } from 'antd'
-import ActionBtn from './index'
+import ActionBtn from '@/pages/AIProject/components/ActionBtn'
 import { MyContext } from '@/pages/AIProject/Main/Sctipt/index'
 import { useContext, useMemo, useState } from 'react'
 import * as api from '@/api/models/main'
