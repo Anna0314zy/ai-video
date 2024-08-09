@@ -42,6 +42,7 @@ export const sendChatRequest = async (
       async onmessage(ev: any) {
         result += ev.data
         console.log('ev', result)
+        resolve(true)
         typedMessage(convertToMarkdown(result))
       },
       onerror: error => {

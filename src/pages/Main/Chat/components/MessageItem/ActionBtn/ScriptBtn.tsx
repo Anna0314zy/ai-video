@@ -101,6 +101,7 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
               typedText(val)
             },
           )
+          updateMessage({ sending: true, created, role: Role.Gpt, id })
         } finally {
           setChatIng(false)
           setLoading(prev => ({
@@ -108,7 +109,6 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
             refresh: false,
           }))
         }
-        updateMessage({ sending: true, created, role: Role.Gpt, id })
       },
     },
   ]
