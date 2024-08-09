@@ -5,10 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite --mode dev",
-    "build": "tsc -b && vite build --mode test",
+    "build:test": "tsc -b && vite build --mode test",
+    "build:prod": "tsc -b && vite build --mode prod",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "hotUpdate:test": "node ./src/script/hotUpdate.cjs --mode test",
+    "hotUpdate:prod": "node ./src/script/hotUpdate.cjs  --mode prod",
+    "release:test": "pnpm install && pnpm run build:test && pnpm run hotUpdate:test",
+    "release:prod": "pnpm install && pnpm run build:prod && pnpm run hotUpdate:prod"
   },
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
@@ -19,11 +24,13 @@
     "antd": "^5.19.3",
     "axios": "^1.7.2",
     "classnames": "^2.5.1",
+    "cos-nodejs-sdk-v5": "^2.14.4",
     "dayjs": "^1.11.12",
     "events": "^3.3.0",
     "immer": "^9.0.6",
     "localforage": "^1.10.0",
     "markdown-it": "^14.1.0",
+    "minimist": "^1.2.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-infinite-scroll-component": "^6.1.0",
@@ -34,7 +41,8 @@
     "sockjs-client": "^1.6.1",
     "stompjs": "^2.3.3",
     "typed.js": "^2.1.0",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "v": "^0.3.0"
   },
   "devDependencies": {
     "@ant-design/icons": "^5.4.0",

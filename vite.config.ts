@@ -14,7 +14,7 @@ import svgr from '@svgr/rollup'
 export default defineConfig({
   base: './',
   build: {
-    outDir: 'dist/' + packageJson.version,
+    outDir: 'dist/',
   },
   plugins: [react(), basicSsl(), svgr()],
   envDir: 'env',

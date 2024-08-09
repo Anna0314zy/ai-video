@@ -1,0 +1,14 @@
+{
+    "test": {
+        "cdn_host": "https://static.xuepeiyou.com",
+        "prefix": "/ai-content-platform/test",
+        "fileNamePrefix": "sdk_test",
+        "updateAPI": "https://retest-course-api-online.saasp.vdyoo.com/course/v1/meta-data/mcc-resource-sdk"
+    },
+    "production": {
+        "cdn_host": "https://static.xuepeiyou.com",
+        "prefix": "/ai-content-platform/prod",
+        "fileNamePrefix": "sdk_production",
+        "updateAPI": "https://retest-course-api-online.saasp.vdyoo.com/course/v1/meta-data/mcc-resource-sdk"
+    }
+}
