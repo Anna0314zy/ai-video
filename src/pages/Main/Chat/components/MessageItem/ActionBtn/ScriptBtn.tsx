@@ -23,7 +23,6 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
     updateMessage,
     scriptPageList,
     getChatHistories,
-    disabled,
     messageList,
   } = useContext(MyContext)
   const { typedText, destroy } = useTyped()
@@ -132,14 +131,14 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
                   {...item}
                   key={item.key}
                   loading={loading[item.key as 'add']}
-                  disabled={item.key === 'refresh' ? chatIng : disabled || loading[item.key as 'add']}></ActionBtn>
+                  disabled={item.key === 'refresh' ? chatIng : loading[item.key as 'add']}></ActionBtn>
               ))
           : config.map(item => (
               <ActionBtn
                 {...item}
                 key={item.key}
                 loading={loading[item.key as 'add']}
-                disabled={item.key === 'refresh' ? chatIng : disabled || loading[item.key as 'add']}></ActionBtn>
+                disabled={item.key === 'refresh' ? chatIng : loading[item.key as 'add']}></ActionBtn>
             ))}
       </Space>
     </div>
