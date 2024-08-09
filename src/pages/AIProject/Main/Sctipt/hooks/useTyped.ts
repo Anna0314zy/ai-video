@@ -7,9 +7,9 @@ const useTyped = () => {
   const { containerRef, getChatHistories, typeRef } = useContext(MyContext)
 
   const handleComplete = async () => {
-    console.log('完成打字')
+    console.log('zy 完成打字')
     await getChatHistories()
-    // typeRef.current?.destroy()
+    typeRef.current?.destroy()
     console.log('Typing complete!')
   }
   function typedText(text: string) {

@@ -95,10 +95,7 @@ export default (props: IMaterialItem) => {
           style={{ marginRight: '10px' }}
         />
         <Flex className={Styles['material-content']} align='flex-start' flex={1} vertical={true}>
-          <div className={Styles['material-content-name']}>
-            {data.name}
-            {data.name}
-          </div>
+          <div className={Styles['material-content-name']}>{data.name}</div>
           <div>{data.modified}</div>
         </Flex>
         <div className='material-item-right'>

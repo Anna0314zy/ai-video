@@ -67,6 +67,7 @@ export default () => {
   }
   const getChatHistories = async () => {
     if (!sessionId) return
+    typeRef.current?.destroy()
     const res = await api.getChatHistories({ sessionId })
     console.log('getChatHistories res', res)
     setMessageList(
