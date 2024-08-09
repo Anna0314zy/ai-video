@@ -38,7 +38,9 @@ export default ({
     let sessionId = 0
     if (record.sessionList?.length) sessionId = record.sessionList[record.sessionList?.length - 1].id
 
-    const url = `${window.location.origin}?projectName=${record.projectName}&subjectName=${record.subjectName}&state=${record.state}/#/project/${record.id}/text`
+    const url = `${window.location.origin + window.location.pathname}?projectName=${record.projectName}&subjectName=${
+      record.subjectName
+    }&state=${record.state}/#/project/${record.id}/text`
 
     // 打开或聚焦具有相同名称的窗口
     window.open(url, '_blank')
