@@ -57,7 +57,12 @@ export default () => {
   //剧本列表
   const getScriptPageList = async () => {
     const res = await api.getPageScript({ projectId: Number(id) })
-    setScriptPageList(res.records)
+    setScriptPageList(
+      res.records.map(v => ({
+        ...v,
+        actived: v.isFinal,
+      })),
+    )
   }
   const getChatHistories = async () => {
     if (!sessionId) return

@@ -11,6 +11,7 @@
   border-radius: 4px;
   border: 1px solid #f2f3f7;
   cursor: pointer;
+  position: relative;
   &:hover {
     border: 1px solid #39c639;
   }
@@ -31,4 +32,25 @@
 }
 .actived {
   border: 1px solid #39c639 !important;
+}
+.material-content {
+  overflow: hidden;
+}
+.material-content-name {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+}
+.space-item {
+  :global {
+    .ant-space-item {
+      width: 100%;
+    }
+  }
+}
+.checkCircle {
+  position: absolute;
+  right: 3px;
+  top: 3px;
 }

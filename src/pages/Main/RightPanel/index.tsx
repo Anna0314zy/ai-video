@@ -8,6 +8,7 @@ import { ScriptPageList } from '@/api/type'
 import { downloadTemplateUrl } from '@/api/models/main'
 import type { MenuProps } from 'antd'
 import ChatUpload from '@/pages/Main/Chat/components/ChatUpload'
+import Styles from './index.module.less'
 const RightPanel = () => {
   const { scriptPageList, disabled, setScriptPageList, projectId, getScriptPageList } = useContext(MyContext)
   const [loading, setLoading] = useState(false)
@@ -48,6 +49,7 @@ const RightPanel = () => {
         scriptId: targetScript?.scriptId!,
       })
       message.success('确认成功')
+      getScriptPageList()
     } finally {
       setLoading(false)
     }
@@ -74,8 +76,8 @@ const RightPanel = () => {
         </ChatUpload>
       </Flex>
       <Flex className='content' vertical={true} wrap={true} gap={10} style={{ overflow: 'hidden' }} flex={1}>
-        <div style={{ overflow: 'auto' }}>
-          <Space style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ overflow: 'auto', width: '100%' }}>
+          <Space style={{ display: 'flex', flexDirection: 'column' }} className={Styles['space-item']}>
             {scriptPageList?.map(v => {
               return <ScriptText key={v.scriptId} data={v} handleChoose={handleChoose}></ScriptText>
             })}

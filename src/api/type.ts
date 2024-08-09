@@ -50,6 +50,7 @@ export interface ScriptPageList {
   actived?: boolean
   modified: string
   isFinal?: number // 是否确认剧本
+  name: string
 }
 export enum ScriptStatus {
   'ScriptProcessing' = '剧本制作中',

@@ -1,4 +1,4 @@
-import Styles from './index.module.less'
+import Styles from '../index.module.less'
 import IconWidget from '@/components/IconWidget'
 import { MoreOutlined, ArrowDownOutlined } from '@ant-design/icons'
 import { ScriptPageList } from '@/api/type'
@@ -11,6 +11,7 @@ import type { MenuProps } from 'antd'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
 import { MyContext } from '@/pages/Main'
 import ScriptPreview from '../ScriptPreview'
+import DownloadScript from './DownloadScript'
 interface IMaterialItem {
   data: ScriptPageList // 素材数据
   icon?: string // 素材icon
@@ -41,16 +42,16 @@ export default (props: IMaterialItem) => {
     message.success('删除成功')
     getScriptPageList()
   }, [])
-  const downItems: MenuProps['items'] = [
-    {
-      key: '1',
-      label: <span onClick={() => handleDownload('xlsx')}>xlsx</span>,
-    },
-    {
-      key: '2',
-      label: <span onClick={() => handleDownload('md')}>md</span>,
-    },
-  ]
+  // const downItems: MenuProps['items'] = [
+  //   {
+  //     key: '1',
+  //     label: <span onClick={() => handleDownload('xlsx')}>xlsx</span>,
+  //   },
+  //   {
+  //     key: '2',
+  //     label: <span onClick={() => handleDownload('md')}>md</span>,
+  //   },
+  // ]
   const items: MenuProps['items'] = [
     {
       key: '1',
@@ -82,9 +83,10 @@ export default (props: IMaterialItem) => {
     <>
       <Flex
         className={classNames(Styles['material-item'], {
-          [Styles.actived]: data.actived || data.isFinal,
+          [Styles.actived]: data.actived,
         })}
         onClick={() => props.handleClick(props.data)}>
+        {data.isFinal ? <AntdIcon icon='checkCircle' classname={Styles['checkCircle']}></AntdIcon> : null}
         <IconWidget
           className='material-icon'
           name={props.icon}
@@ -92,25 +94,23 @@ export default (props: IMaterialItem) => {
           height={24}
           style={{ marginRight: '10px' }}
         />
-        <Flex className='material-content' align='flex-start' flex={1} vertical={true}>
-          <span className='material-content'>
-            {data?.scriptStyle}-{data.scriptId}
-          </span>
-          <span>{data.modified}</span>
+        <Flex className={Styles['material-content']} align='flex-start' flex={1} vertical={true}>
+          <div className={Styles['material-content-name']}>
+            {data.name}
+            {data.name}
+          </div>
+          <div>{data.modified}</div>
         </Flex>
         <div className='material-item-right'>
-          <Space>
-            <Dropdown menu={{ items: downItems }} placement='bottomLeft' arrow={{ pointAtCenter: true }}>
-              <Button type='link' icon={<ArrowDownOutlined />} className={Styles['btn']}></Button>
-            </Dropdown>
-
-            <Dropdown menu={{ items }} placement='bottomLeft' arrow={{ pointAtCenter: true }}>
-              <Button type='link' className={Styles.btn} icon={<MoreOutlined className='material-more' />}></Button>
-            </Dropdown>
-          </Space>
+          {/* <Space> */}
+          <DownloadScript data={data} />
+          <Dropdown menu={{ items }} placement='bottomLeft' arrow={{ pointAtCenter: true }}>
+            <Button type='link' className={Styles.btn} icon={<MoreOutlined className='material-more' />}></Button>
+          </Dropdown>
+          {/* </Space> */}
         </div>
       </Flex>
-      <ScriptPreview ref={previewRef} handleDownload={handleDownload} handleDel={handleDel} />
+      <ScriptPreview ref={previewRef} handleDownload={handleDownload} handleDel={handleDel} data={props.data} />
     </>
   )
 }
