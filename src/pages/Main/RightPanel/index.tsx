@@ -70,9 +70,7 @@ const RightPanel = () => {
           <Button type='text'>下载模板</Button>
         </Dropdown>
         <ChatUpload customRequest={handleCustomRequest} accept='.md, .xlsx, .docx'>
-          <Button type='link' disabled={disabled}>
-            导入剧本
-          </Button>
+          <Button type='link'>导入剧本</Button>
         </ChatUpload>
       </Flex>
       <Flex className='content' vertical={true} wrap={true} gap={10} style={{ overflow: 'hidden' }} flex={1}>
@@ -88,7 +86,7 @@ const RightPanel = () => {
       <Button
         loading={loading}
         onClick={handleConfirm}
-        disabled={disabled ? disabled : targetScript?.scriptId ? false : true}
+        disabled={targetScript?.scriptId ? false : true}
         type='primary'
         style={{ width: '100%', marginTop: '10px' }}>
         确认剧本

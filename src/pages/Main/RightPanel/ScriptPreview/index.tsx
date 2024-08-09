@@ -2,7 +2,7 @@ import { useRef, useImperativeHandle, useState, forwardRef, useCallback } from '
 import MarkdownIt from 'markdown-it'
 import CommonModal, { ModalHandle } from '@/components/CommonModal'
 import { Button } from 'antd'
-const ScriptPreview = ({ handleDownload, handleDel, disabled }: any, ref: any) => {
+const ScriptPreview = ({ handleDownload, handleDel, disabled = false }: any, ref: any) => {
   const modelRef = useRef<ModalHandle>(null)
   const [html, setHtml] = useState('')
   const cancel = () => {}

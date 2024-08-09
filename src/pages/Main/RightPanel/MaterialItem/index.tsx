@@ -18,7 +18,7 @@ interface IMaterialItem {
   handleClick: (val: ScriptPageList) => void
 }
 export default (props: IMaterialItem) => {
-  const { getScriptPageList, disabled } = useContext(MyContext)
+  const { getScriptPageList } = useContext(MyContext)
   const { data } = props
   const previewRef = useRef<{
     open: (val: string) => void
@@ -34,7 +34,6 @@ export default (props: IMaterialItem) => {
 
   const handleDel = useCallback(async () => {
     console.log('删除', data)
-    if (disabled) return
     await api.deleteScript({
       scriptId: data.scriptId,
       projectId: data.projectId,
@@ -67,7 +66,7 @@ export default (props: IMaterialItem) => {
       label: (
         <Flex onClick={handleDel}>
           <AntdIcon style={{ fontSize: '20px' }} icon='delete'></AntdIcon>
-          <span style={{ marginLeft: '8px', cursor: !disabled ? 'pointer' : 'not-allowed' }}>删除</span>
+          <span style={{ marginLeft: '8px' }}>删除</span>
         </Flex>
       ),
     },
@@ -111,7 +110,7 @@ export default (props: IMaterialItem) => {
           </Space>
         </div>
       </Flex>
-      <ScriptPreview ref={previewRef} handleDownload={handleDownload} handleDel={handleDel} disabled={disabled} />
+      <ScriptPreview ref={previewRef} handleDownload={handleDownload} handleDel={handleDel} />
     </>
   )
 }
