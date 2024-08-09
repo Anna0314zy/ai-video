@@ -12,8 +12,9 @@ interface IProps {
 export default ({ messageInfo, md }: IProps) => {
   return (
     <HeadLayout messageInfo={messageInfo}>
-      <Flex vertical={true} className='content'>
+      <Flex vertical={true} className={`content messageInfo-item-cont ${messageInfo.role}`}>
         <div
+          className='message-content-inner'
           dangerouslySetInnerHTML={{
             __html: md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''),
           }}></div>

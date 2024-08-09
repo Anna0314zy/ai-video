@@ -94,7 +94,7 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
         typeRef,
         uuidv4(),
       )
-      updateMessage({ sending: true, created, role: Role.Gpt, id })
+      updateMessage({ sending: true, created, role: Role.Gpt, id, requesting: false })
     } finally {
       setChatIng(false)
     }

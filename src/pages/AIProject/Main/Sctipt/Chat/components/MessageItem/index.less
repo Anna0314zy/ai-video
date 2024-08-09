@@ -37,11 +37,21 @@
   }
   .message-item-content {
     overflow: hidden;
+
     &.user {
       padding-right: 10px;
+      padding-left: 200px;
     }
     &.assistant {
       padding-left: 10px;
+    }
+  }
+}
+.messageInfo-item-cont {
+  &.user {
+    .message-content-inner {
+      display: flex;
+      justify-content: flex-end;
     }
   }
 }

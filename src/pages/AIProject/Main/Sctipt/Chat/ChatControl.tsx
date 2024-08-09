@@ -114,7 +114,7 @@ const ChatControl = (props: any) => {
         uuidv4(),
       )
       setChatIng(false)
-      updateMessage({ sending: true, created, role: Role.Gpt, id })
+      updateMessage({ sending: true, created, role: Role.Gpt, id, requesting: false })
     } finally {
       setChatIng(false)
     }
@@ -159,12 +159,12 @@ const ChatControl = (props: any) => {
           </Button>
         </Flex>
       </Flex>
-      <Button
+      {/* <Button
         onClick={() => {
           typeRef.current?.destroy()
         }}>
         销毁
-      </Button>
+      </Button> */}
       <ChatInput
         value={prompt.text}
         onChange={handleInputChange}
