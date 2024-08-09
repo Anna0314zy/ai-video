@@ -130,9 +130,11 @@ export default ({
           <CreateProjectBtn />
         </Flex>
         <Table
+          size='small'
           columns={columns}
           rowKey='id'
           dataSource={data.records || []}
+          scroll={{ y: `calc(100vh - 260px)` }}
           pagination={{
             total: data.total,
             current: data.current,

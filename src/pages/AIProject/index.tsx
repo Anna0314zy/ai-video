@@ -38,7 +38,7 @@ export default () => {
   const navigate = useNavigate()
   const searchParams = useRef<SearchParams>({
     current: 1,
-    size: 2,
+    size: 10,
   })
   const getList = useCallback(async (params?: { current?: number; size?: number }) => {
     const { current, size } = params || {}
