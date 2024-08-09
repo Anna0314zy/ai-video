@@ -1,6 +1,6 @@
 import { Layout, Menu } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
-import AIProject from '../AIProject'
+import AIProject from '../AIProject/List'
 const menuData = [
   {
     key: '1',

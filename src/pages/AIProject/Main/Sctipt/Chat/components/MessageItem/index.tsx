@@ -13,14 +13,11 @@ export default ({ messageInfo, md }: IProps) => {
   return (
     <HeadLayout messageInfo={messageInfo}>
       <Flex vertical={true} className='content'>
-        {messageInfo?.attachmentFileInfo?.fileId ? (
-          <FileChat messageInfo={messageInfo}></FileChat>
-        ) : (
-          <div
-            dangerouslySetInnerHTML={{
-              __html: md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''),
-            }}></div>
-        )}
+        <div
+          dangerouslySetInnerHTML={{
+            __html: md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''),
+          }}></div>
+        <FileChat messageInfo={messageInfo}></FileChat>
 
         {messageInfo.role === Role.Gpt && <ScriptBtn messageInfo={messageInfo} />}
       </Flex>

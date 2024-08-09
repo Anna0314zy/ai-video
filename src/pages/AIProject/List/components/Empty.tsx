@@ -1,5 +1,5 @@
 import CreateProjectBtn from './CreateProjectBtn'
-import Styles from '../../Home/index.module.less'
+import Styles from '../index.module.less'
 export default () => {
   return (
     <>

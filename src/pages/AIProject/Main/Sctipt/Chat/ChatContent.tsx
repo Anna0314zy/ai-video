@@ -1,7 +1,7 @@
 import { MessageList } from '@/api/type'
 import MarkdownIt from 'markdown-it'
-import MessageItem from '@/pages/Main/Chat/components/MessageItem'
-import GptMessage from '@/pages/Main/Chat/components/MessageItem/GptMessage'
+import MessageItem from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageItem'
+import GptMessage from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageItem/GptMessage'
 
 import { useMemo } from 'react'
 const style = {

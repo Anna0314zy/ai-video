@@ -24,8 +24,9 @@ const ChatControl = (props: any) => {
     getChatHistories,
     handleCreateChat,
     messageList,
+    typeRef,
   } = useContext(MyContext)
-  const { typedText, destroy } = useTyped()
+  const { typedText } = useTyped()
   const [prompt, setPrompt] = useState<{
     text: string
     fileId?: number
@@ -51,6 +52,7 @@ const ChatControl = (props: any) => {
       ...params,
       projectId,
       subjectName,
+      sessionId,
     }
     if (val?.fileId) promptParams.fileId = val?.fileId
     console.log('handleApply:', promptParams)
@@ -61,6 +63,7 @@ const ChatControl = (props: any) => {
       fileId: val?.fileId,
       fileName: val?.fileName,
       promptRequestLogId,
+      sessionId,
     }
     if (val?.fileId) {
       // 上传附件 直接请求chat
@@ -77,7 +80,6 @@ const ChatControl = (props: any) => {
   const handleSendMessage = async (promptInfo?: any) => {
     if (chatIng) return
     setChatIng(true)
-    destroy()
     try {
       // 如果当前有正在输出的 还是要刷新
       console.log(shouldRefresh, 'shouldRefresh')
@@ -99,6 +101,7 @@ const ChatControl = (props: any) => {
         },
         { requesting: true, created, role: Role.Gpt, id },
       ])
+
       await sendChatRequest(
         {
           prompt: promptParams,
@@ -107,6 +110,8 @@ const ChatControl = (props: any) => {
         async val => {
           typedText(val)
         },
+        typeRef,
+        uuidv4(),
       )
       setChatIng(false)
       updateMessage({ sending: true, created, role: Role.Gpt, id })
@@ -120,7 +125,7 @@ const ChatControl = (props: any) => {
     chatRef.current?.form?.setFieldsValue({
       // scriptType: '启蒙/拼音', // 剧本类型
       // scriptStyle: '奇幻冒险', // 剧本风格
-      // scriptTitle?: string // 剧本主题
+      // scriptContent?: string // 剧本主题
       // characters?: string // 主角、配角，用英文逗号分隔
       duration: 120, // 总时长，单位秒
       shotNum: 3, // 镜头数量
@@ -154,6 +159,12 @@ const ChatControl = (props: any) => {
           </Button>
         </Flex>
       </Flex>
+      <Button
+        onClick={() => {
+          typeRef.current?.destroy()
+        }}>
+        销毁
+      </Button>
       <ChatInput
         value={prompt.text}
         onChange={handleInputChange}

@@ -17,7 +17,7 @@ export default ({ messageInfo, containerRef, md }: IProps) => {
               __html: md.render(typeof messageInfo?.messageContent === 'string' ? messageInfo.messageContent : ''),
             }}></div>
         )}
-        <div ref={containerRef}></div>
+        <div ref={containerRef} className='typed-text'></div>
       </HeadLayout>
     </div>
   )

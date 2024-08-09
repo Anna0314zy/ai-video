@@ -1,4 +1,4 @@
-import { projectTypes } from '@/pages/AIProject/config'
+import { projectTypes } from '@/pages/AIProject/List/config'
 import { ScriptPrompt } from '@/api/type'
 
 export interface IConfig {
@@ -7,9 +7,10 @@ export interface IConfig {
   options?: { label: string; value: string }[]
   addonAfter?: any
   prop: keyof ScriptPrompt
+  width?: number
 }
 
-export type WidgetType = 'input' | 'inputNumber' | 'select'
+export type WidgetType = 'input' | 'inputNumber' | 'select' | 'textArea'
 
 //剧本配置
 export const ScriptDesign: IConfig[] = [
@@ -50,10 +51,12 @@ export const ScriptDesign: IConfig[] = [
     label: '主角',
     prop: 'characters',
     type: 'input',
+    width: 200,
   },
   {
-    label: '剧本主题',
-    prop: 'scriptTitle',
-    type: 'input',
+    label: '剧本内容',
+    prop: 'scriptContent',
+    type: 'textArea',
+    width: 300,
   },
 ]

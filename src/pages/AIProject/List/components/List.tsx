@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { Flex, Table, Button, Tag } from 'antd'
 import type { TableProps } from 'antd'
 import CreateProjectBtn from './CreateProjectBtn'
-import Styles from '../../Home/index.module.less'
+import Styles from '../index.module.less'
 import IconWidget from '@/components/IconWidget/index'
 import { PageList, ProjectList } from '@/api/models/project'
 import UserOutlined from '@ant-design/icons/lib/icons/UserOutlined'
@@ -40,7 +40,7 @@ export default ({
 
     const url = `${window.location.origin + window.location.pathname}?projectName=${record.projectName}&subjectName=${
       record.subjectName
-    }&state=${record.state}/#/project/${record.id}/text`
+    }&state=${record.state}#/project/${record.id}/text`
 
     // 打开或聚焦具有相同名称的窗口
     window.open(url, '_blank')
@@ -63,8 +63,9 @@ export default ({
     },
     {
       title: 'ID编号',
-      dataIndex: 'id',
+      dataIndex: 'projectNo',
       align: 'center',
+      width: 160,
     },
     {
       title: '学科',
@@ -104,11 +105,13 @@ export default ({
           </Tag>
         )
       },
+      width: 100,
     },
     {
       title: '创建时间',
       dataIndex: 'created',
       align: 'center',
+      width: 200,
     },
     {
       title: '操作',

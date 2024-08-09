@@ -24,6 +24,7 @@ const ChatInput = ({
   onSuccess: (val: { fileId: number; fileName: string }) => void
 }) => {
   const handleSend = () => {
+    if (chatIng) return
     if (value.trim()) {
       onSend(value)
       onChange('')

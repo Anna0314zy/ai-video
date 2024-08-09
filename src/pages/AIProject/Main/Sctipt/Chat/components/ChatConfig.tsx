@@ -75,7 +75,7 @@ const ChatConfig = (_: any, ref: any) => {
       onValuesChange={onValuesChange}
       autoComplete='off'>
       <Flex wrap={true}>
-        <Space>
+        <Space style={{ display: 'flex', flexWrap: 'wrap' }}>
           {config.map(item => {
             return (
               <Form.Item<ScriptPrompt> label={item.label} name={item.prop} key={item.prop}>

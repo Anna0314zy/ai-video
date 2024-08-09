@@ -2,7 +2,7 @@ import Header from './Header'
 import StompSocket from '@/utils/stompSocket'
 import ChatContent from './Chat/ChatContent'
 import ChatControl from './Chat/ChatControl'
-import { Layout, Form } from 'antd'
+import { Layout, Button } from 'antd'
 import { createContext, useEffect, useRef, useState, useMemo } from 'react'
 import { SEND_THOROUGH, SUBSCRIBE_THOROUGH } from '@/const/socket'
 import { MessageList, ScriptPageList, ScriptStatus } from '@/api/type'
@@ -51,6 +51,7 @@ export default () => {
   const containerRef = useRef<any>()
   const [scriptPageList, setScriptPageList] = useState<ScriptPageList[]>([])
   const [chatIng, setChatIng] = useState(false)
+  const typeRef = useRef<any>()
   const disabled = useMemo(() => {
     return scriptPageList.findIndex(v => v.isFinal) > -1
   }, [scriptPageList])
@@ -151,6 +152,7 @@ export default () => {
     chatIng,
     setChatIng,
     messageList,
+    typeRef,
   }
   useEffect(() => {
     containerRef.current?.scrollIntoView({

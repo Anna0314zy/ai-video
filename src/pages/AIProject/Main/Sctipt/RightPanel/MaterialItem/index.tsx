@@ -9,7 +9,7 @@ import * as api from '@/api/models/main'
 import { downloadFromServer } from '@/utils'
 import type { MenuProps } from 'antd'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
-import { MyContext } from '@/pages/Main'
+import { MyContext } from '@/pages/AIProject/Main/Sctipt'
 import ScriptPreview from '../ScriptPreview'
 import DownloadScript from './DownloadScript'
 interface IMaterialItem {

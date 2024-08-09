@@ -13,7 +13,9 @@ export function WidgetItem({ data, onChange, value, disabled }: IProps) {
     case 'select':
       return <Select style={{ width: 108 }} disabled={disabled} options={options} />
     case 'input':
-      return <Input disabled={disabled} />
+      return <Input style={{ width: data.width }} disabled={disabled} />
+    case 'textArea':
+      return <Input.TextArea disabled={disabled} style={{ width: data.width }} />
     case 'inputNumber':
       return <InputNumber controls={false} disabled={disabled} addonAfter={addonAfter} />
     default:

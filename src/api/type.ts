@@ -2,7 +2,7 @@
 export type ScriptPrompt = {
   scriptType?: string // 剧本类型
   scriptStyle?: string // 剧本风格
-  scriptTitle?: string // 剧本主题
+  scriptContent?: string // 剧本主题
   characters?: string // 主角、配角，用英文逗号分隔
   duration?: number // 总时长，单位秒
   shotNum?: number // 镜头数量
