@@ -74,7 +74,7 @@ export default (props: IMaterialItem) => {
     <>
       <Flex
         className={classNames(Styles['material-item'], {
-          [Styles.actived]: actived,
+          [Styles.actived]: data.actived || actived,
         })}
         onClick={() => onChange(data)}>
         {data.isFinal ? <AntdIcon icon='checkCircle' classname={Styles['checkCircle']}></AntdIcon> : null}
