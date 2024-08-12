@@ -9,6 +9,7 @@ import { downloadTemplateUrl } from '@/api/models/main'
 import type { MenuProps } from 'antd'
 import ChatUpload from '@/pages/AIProject/Main/Sctipt/Chat/components/ChatUpload'
 import Styles from './index.module.less'
+
 const RightPanel = () => {
   const { scriptPageList, disabled, setScriptPageList, projectId, getScriptPageList } = useContext(MyContext)
   const [loading, setLoading] = useState(false)

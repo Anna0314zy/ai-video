@@ -4,7 +4,7 @@ import { MoreOutlined, ArrowDownOutlined } from '@ant-design/icons'
 import { useCallback, useContext, useRef } from 'react'
 import type { MenuProps } from 'antd'
 import { downloadFromServer } from '@/utils'
-import Styles from '../index.module.less'
+import Styles from './index.module.less'
 const DownloadScript = ({ data, children }: { data: ScriptPageList; children?: React.ReactNode }) => {
   const handleDownload = useCallback((ext: string = 'md') => {
     console.log('删除', data)

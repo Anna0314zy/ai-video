@@ -31,16 +31,18 @@ request.interceptors.response.use(
       if (res.status === 200) {
         console.log('res', res)
         const { data, message: msg, code } = res.data
-        if (code === 200) {
-          return data
-        } else if (Number(code) === 30001) {
-          message.error('登录过期，请重新登录')
-          localStorage.removeItem('token')
-          window.location.href = LoginUrl
-        } else {
-          console.log('%c msg', 'color: #00b33c;', msg)
-          if (msg) message.error(msg)
-          return Promise.reject(res.data)
+        const NumCode = Number(code)
+        switch (NumCode) {
+          case 200:
+            return data
+          case 30001:
+            message.error('登录过期，请重新登录')
+            localStorage.removeItem('token')
+            window.location.href = LoginUrl
+            break
+          default:
+            if (msg) message.error(msg)
+            return Promise.reject(res.data)
         }
       }
     } catch (err: any) {

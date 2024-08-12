@@ -1,26 +1,27 @@
-import Styles from '../index.module.less'
-import IconWidget from '@/components/IconWidget'
-import { MoreOutlined, ArrowDownOutlined } from '@ant-design/icons'
-import { ScriptPageList } from '@/api/type'
-import { Flex, Space, Button, Dropdown, message } from 'antd'
 import { useCallback, useContext, useRef } from 'react'
+import { MoreOutlined } from '@ant-design/icons'
+import type { MenuProps } from 'antd'
+import { Flex, Button, Dropdown, message } from 'antd'
 import classNames from 'classnames'
+import IconWidget from '@/components/IconWidget'
+import { ScriptPageList } from '@/api/type'
 import * as api from '@/api/models/main'
 import { downloadFromServer } from '@/utils'
-import type { MenuProps } from 'antd'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
 import { MyContext } from '@/pages/AIProject/Main/Sctipt'
-import ScriptPreview from '../ScriptPreview'
+import ScriptPreview from '../../Main/Sctipt/RightPanel/ScriptPreview'
 import DownloadScript from './DownloadScript'
+import Styles from './index.module.less'
+
 interface IMaterialItem {
   data: ScriptPageList // 素材数据
   icon?: string // 素材icon
   actived?: boolean // 选中状态
-  handleClick: (val: ScriptPageList) => void
+  onChange: (val: ScriptPageList) => void
 }
 export default (props: IMaterialItem) => {
   const { getScriptPageList } = useContext(MyContext)
-  const { data } = props
+  const { data, actived, onChange } = props
   const previewRef = useRef<{
     open: (val: string) => void
   }>(null)
@@ -73,9 +74,9 @@ export default (props: IMaterialItem) => {
     <>
       <Flex
         className={classNames(Styles['material-item'], {
-          [Styles.actived]: data.actived,
+          [Styles.actived]: actived,
         })}
-        onClick={() => props.handleClick(props.data)}>
+        onClick={() => onChange(data)}>
         {data.isFinal ? <AntdIcon icon='checkCircle' classname={Styles['checkCircle']}></AntdIcon> : null}
         <IconWidget
           className='material-icon'
@@ -89,12 +90,10 @@ export default (props: IMaterialItem) => {
           <div>{data.modified}</div>
         </Flex>
         <div className='material-item-right'>
-          {/* <Space> */}
           <DownloadScript data={data} />
           <Dropdown menu={{ items }} placement='bottomLeft' arrow={{ pointAtCenter: true }}>
             <Button type='link' className={Styles.btn} icon={<MoreOutlined className='material-more' />}></Button>
           </Dropdown>
-          {/* </Space> */}
         </div>
       </Flex>
       <ScriptPreview ref={previewRef} handleDownload={handleDownload} handleDel={handleDel} data={props.data} />

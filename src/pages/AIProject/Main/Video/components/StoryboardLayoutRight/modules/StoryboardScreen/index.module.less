@@ -48,6 +48,33 @@
     }
     .storyboard-image-content {
       background: #fff;
+      &__header{
+        width: 352px;
+          height: 48px;
+          display: flex;
+          justify-content: space-between;
+          padding: 22px 24px 4px;
+
+          span {
+            &:nth-child(1) {
+              font-size: 16px;
+              color: #232634;
+            }
+
+            &:nth-child(2) {
+              font-size: 14px;
+              color:#165DFF ;
+              cursor: pointer;
+            }
+          }
+      }
+      &__list{
+          display: flex;
+          flex-direction: column;
+          padding: 0 24px;
+          gap: 12px;
+      }
+
     }
   }
 }
