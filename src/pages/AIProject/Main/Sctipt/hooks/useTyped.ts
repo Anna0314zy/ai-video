@@ -19,7 +19,7 @@ const useTyped = () => {
     if (typeRef.current) typeRef.current.destroy()
     typeRef.current = new Typed(containerRef.current, {
       strings: [html],
-      typeSpeed: 50,
+      typeSpeed: 0,
       onComplete: handleComplete,
       onStop: (arrayPos, self) => {
         console.log('打字被暂停下来了', arrayPos, self)

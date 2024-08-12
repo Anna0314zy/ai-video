@@ -6,12 +6,13 @@ import StoryboardLayoutRight from './components/StoryboardLayoutRight'
 import StoryboardLayoutMain from './components/StoryboardLayoutMain'
 import Styles from './index.module.less'
 import CommonUpload from '@/components/CommonUpload'
-import { createContext, useState } from 'react'
+import { createContext, useEffect, useMemo, useState } from 'react'
 import { ShotList } from '@/api/type'
 interface Context {
   // projectId: number
   // sessionId: number
   list: ShotList[]
+  curShot?: ShotList
   [k: string]: any
 }
 export const MyContext = createContext<Context>({} as Context)
@@ -28,13 +29,19 @@ export default () => {
     console.log('zy onFinish', options)
   }
   // 选中的id
-  const [curId, setCurId] = useState()
+  const [curId, setCurId] = useState(67)
+
+  const curShot = useMemo(() => {
+    return list.find(v => v.shotId === curId)
+  }, [list])
   const contextValue = {
     list,
     setList,
     curId,
     setCurId,
+    curShot,
   }
+
   return (
     <MyContext.Provider value={contextValue}>
       <Layout className={Styles['page-storyboard']}>

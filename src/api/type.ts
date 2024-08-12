@@ -68,6 +68,7 @@ enum ShotStatus {
   completed = '已完成',
   uncompleted = '未完成',
 }
+// enum Status
 export interface ShotList {
   shotId: number
   narration: string

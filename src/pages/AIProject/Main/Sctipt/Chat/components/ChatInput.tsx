@@ -11,22 +11,26 @@ const wrapperStyle: React.CSSProperties = {
   padding: '10px',
 }
 const ChatInput = ({
-  value,
+  prompt,
   onChange,
   onSend,
   onSuccess,
   chatIng,
 }: {
   chatIng?: boolean
-  value: string
+  prompt: {
+    text?: string
+    fileId?: number
+    fileName?: string
+  }
   onChange: (val: string) => void
   onSend: (val: string) => void
   onSuccess: (val: { fileId: number; fileName: string }) => void
 }) => {
   const handleSend = () => {
-    if (chatIng) return
-    if (value.trim()) {
-      onSend(value)
+    if (chatIng || !prompt.text) return
+    if (prompt.text?.trim()) {
+      onSend(prompt.text)
       onChange('')
     }
   }
@@ -43,8 +47,18 @@ const ChatInput = ({
   return (
     <div className='chat-input-container'>
       <ChatUpload onSuccess={onSuccess} accept='.md,.xlsx,.docx' disabled={chatIng}></ChatUpload>
+      <div
+        title={prompt.fileName}
+        style={{
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          maxWidth: '200px',
+          textOverflow: 'ellipsis',
+        }}>
+        {prompt.fileName}
+      </div>
       <Input.TextArea
-        value={value}
+        value={prompt.text}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder='给我发送消息吧'
@@ -53,7 +67,10 @@ const ChatInput = ({
       />
       <SendOutlined
         onClick={handleSend}
-        style={{ cursor: chatIng ? 'not-allowed' : 'pointer', opacity: chatIng ? '0.25' : 1 }}
+        style={{
+          cursor: !prompt.text || chatIng ? 'not-allowed' : 'pointer',
+          opacity: !prompt.text || chatIng ? '0.25' : 1,
+        }}
       />
     </div>
   )

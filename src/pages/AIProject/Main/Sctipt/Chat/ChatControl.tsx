@@ -28,7 +28,7 @@ const ChatControl = (props: any) => {
   } = useContext(MyContext)
   const { typedText } = useTyped()
   const [prompt, setPrompt] = useState<{
-    text: string
+    text?: string
     fileId?: number
     fileName?: string
     promptRequestLogId?: number
@@ -40,13 +40,15 @@ const ChatControl = (props: any) => {
   const chatRef = useRef<{ form: FormInstance<any> }>(null)
   const handleInputChange = (val: string) => {
     console.log('handleInputChange', val)
-    setPrompt({
-      text: val,
+    setPrompt(prev => {
+      return {
+        ...prev,
+        text: val,
+      }
     })
   }
   // 是不是文件
-  const handleApply = async (val?: { fileId: number; fileName: string } | any) => {
-    console.log('handleApply', val)
+  const handleApply = async () => {
     const params = chatRef.current?.form.getFieldsValue()
     const promptParams = {
       ...params,
@@ -54,24 +56,23 @@ const ChatControl = (props: any) => {
       subjectName,
       sessionId,
     }
-    if (val?.fileId) promptParams.fileId = val?.fileId
+    // if (val?.fileId) promptParams.fileId = val?.fileId
     console.log('handleApply:', promptParams)
 
     const { prompt, promptRequestLogId } = await api.getScriptPrompt(promptParams)
     const promptInfo = {
       text: prompt,
-      fileId: val?.fileId,
-      fileName: val?.fileName,
+      // fileId: val?.fileId,
+      // fileName: val?.fileName,
       promptRequestLogId,
       sessionId,
     }
-    if (val?.fileId) {
-      // 上传附件 直接请求chat
-      // handleSendMessage(promptInfo)
-    } else {
-    
-    }
-    setPrompt(promptInfo)
+    setPrompt(prev => {
+      return {
+        ...prev,
+        ...promptInfo,
+      }
+    })
 
     console.log('getScriptPrompt', prompt, promptRequestLogId)
   }
@@ -81,6 +82,13 @@ const ChatControl = (props: any) => {
   const handleSendMessage = async (promptInfo?: any) => {
     if (chatIng) return
     setChatIng(true)
+    setPrompt(prev => {
+      return {
+        ...prev,
+        fileId: 0,
+        fileName: '',
+      }
+    })
     try {
       // 如果当前有正在输出的 还是要刷新
       console.log(shouldRefresh, 'shouldRefresh')
@@ -135,7 +143,14 @@ const ChatControl = (props: any) => {
   }, [])
   // 上传文件
   const handleUploadSuccess = (val: { fileId: number; fileName: string }) => {
-    handleApply(val)
+    // handleApply(val)
+    setPrompt(prev => {
+      return {
+        ...prev,
+        fileId: val.fileId,
+        fileName: val.fileName,
+      }
+    })
   }
   const handleInputSend = () => {
     if (!prompt?.text) return
@@ -167,7 +182,7 @@ const ChatControl = (props: any) => {
         销毁
       </Button> */}
       <ChatInput
-        value={prompt.text}
+        prompt={prompt}
         onChange={handleInputChange}
         onSend={handleInputSend}
         chatIng={chatIng}
