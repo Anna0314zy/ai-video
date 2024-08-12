@@ -11,11 +11,11 @@ import NotFound from '../pages/NotFound'
 import Home from '../pages/Home'
 import Edit from '../pages/Edit'
 import Image from '@/pages/Edit/components/Image'
-import Video from '@/pages/Edit/components/Video'
+// import Video from '@/pages/Edit/components/Video'
 import HmePage from '@/pages/AIProject/Main/Sctipt'
 import HomePage from '../pages/AIProject/Main/Sctipt'
 // import Chat from '../pages/Chat'
-import Storyboard from '../pages/Storyboard'
+import VideoProcess from '../pages/AIProject/Main/Video'
 
 const router = createHashRouter([
   {
@@ -37,14 +37,14 @@ const router = createHashRouter([
     // element: <Edit />,
     children: [
       {
-        path: 'text',
+        path: 'script',
         // index: true,
         element: <HmePage />,
       },
       {
-        path: 'storyboard',
+        path: 'video',
 
-        element: <Storyboard />,
+        element: <VideoProcess />,
       },
       {
         path: 'image',

@@ -42,16 +42,6 @@ export default (props: IMaterialItem) => {
     message.success('删除成功')
     getScriptPageList()
   }, [])
-  // const downItems: MenuProps['items'] = [
-  //   {
-  //     key: '1',
-  //     label: <span onClick={() => handleDownload('xlsx')}>xlsx</span>,
-  //   },
-  //   {
-  //     key: '2',
-  //     label: <span onClick={() => handleDownload('md')}>md</span>,
-  //   },
-  // ]
   const items: MenuProps['items'] = [
     {
       key: '1',

@@ -37,10 +37,10 @@ export default ({
     console.log('%c zy handleClick', 'color:red', windowName, record.sessionList)
     let sessionId = 0
     if (record.sessionList?.length) sessionId = record.sessionList[record.sessionList?.length - 1].id
+    const query = `projectName=${record.projectName}&subjectName=${record.subjectName}&state=${record.state}`
+    const hashBase = `#/project/${record.id}/${record.state === 'ScriptProcessing' ? 'script' : 'video'}`
 
-    const url = `${window.location.origin + window.location.pathname}?projectName=${record.projectName}&subjectName=${
-      record.subjectName
-    }&state=${record.state}#/project/${record.id}/text`
+    const url = `${window.location.origin + window.location.pathname}?${query}${hashBase}`
 
     // 打开或聚焦具有相同名称的窗口
     window.open(url, '_blank')
