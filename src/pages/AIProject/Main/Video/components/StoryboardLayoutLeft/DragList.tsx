@@ -27,7 +27,7 @@ const DragList = () => {
           <Flex className='characters' {...provided.droppableProps} ref={provided.innerRef} vertical={true}>
             {list.map((data, index) => {
               return (
-                <Draggable key={data.id} draggableId={data.id} index={index}>
+                <Draggable key={data.shotId} draggableId={String(data.shotId)} index={index}>
                   {provided => (
                     <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                       <FrameItem
@@ -39,7 +39,7 @@ const DragList = () => {
                         }
                         active={index === currentSelectIndex}
                       />
-                      {data.name}
+                      {/* {data.name} */}
                     </div>
                   )}
                 </Draggable>

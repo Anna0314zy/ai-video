@@ -1,6 +1,5 @@
 import { FC, useState } from 'react'
 import { Layout } from 'antd'
-import StoryboardCard from '../StoryboardCard'
 import ContentMenu from './modules/RightClick'
 import DragList from './DragList'
 export default () => {
