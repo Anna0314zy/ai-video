@@ -64,3 +64,9 @@ export const getHeaderTips = (state: keyof typeof ScriptStatus) => {
   }
   return '镜头设计'
 }
+export interface ShotList {
+  id: string
+  name: string
+  sortIndex: number
+  url: string
+}

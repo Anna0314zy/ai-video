@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { Flex, Table, Button, Tag } from 'antd'
 import type { TableProps } from 'antd'
 import CreateProjectBtn from './CreateProjectBtn'
@@ -31,6 +31,7 @@ export default ({
   data: PageList
   getList: (params?: { current: number; size: number }) => void
 }) => {
+  const windowUrl = useRef<any>(null)
   const handleClick = useCallback((record: ProjectList, val: 'edit') => {
     const MY_NAMESPACE = '123e4567-e89b-12d3-a456-426614174000'
     const windowName = uuidv3(record.projectName + record.id, MY_NAMESPACE)
@@ -38,12 +39,18 @@ export default ({
     let sessionId = 0
     if (record.sessionList?.length) sessionId = record.sessionList[record.sessionList?.length - 1].id
     const query = `projectName=${record.projectName}&subjectName=${record.subjectName}&state=${record.state}`
-    const hashBase = `#/project/${record.id}/${record.state === 'ScriptProcessing' ? 'script' : 'video'}`
+    let hashBase = `#/project/${record.id}/script`
+    console.log('mport.meta.env', import.meta.env)
+    if (import.meta.env.DEV) {
+      hashBase = `#/project/${record.id}/${record.state === 'ScriptProcessing' ? 'script' : 'video'}`
+    }
 
     const url = `${window.location.origin + window.location.pathname}?${query}${hashBase}`
-
+    if (windowUrl.current) {
+      windowUrl.current.close()
+    }
     // 打开或聚焦具有相同名称的窗口
-    window.open(url, '_blank')
+    windowUrl.current = window.open(url, '_blank')
   }, [])
 
   const columns: TableProps<ProjectList>['columns'] = [
