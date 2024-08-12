@@ -39,7 +39,7 @@ export default ({
     let sessionId = 0
     if (record.sessionList?.length) sessionId = record.sessionList[record.sessionList?.length - 1].id
     const query = `projectName=${record.projectName}&subjectName=${record.subjectName}&state=${record.state}`
-    let hashBase = `#/project/${record.id}/script}`
+    let hashBase = `#/project/${record.id}/script`
     console.log('mport.meta.env', import.meta.env)
     if (import.meta.env.DEV) {
       hashBase = `#/project/${record.id}/${record.state === 'ScriptProcessing' ? 'script' : 'video'}`
