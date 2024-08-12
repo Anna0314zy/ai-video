@@ -18,11 +18,7 @@ export default ({ messageInfo, md }: IProps) => {
           dangerouslySetInnerHTML={{
             __html: md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''),
           }}></div>
-          {
-            messageInfo.role === Role.user &&  <FileChat messageInfo={messageInfo}></FileChat>
-          }
-       
-
+        {messageInfo.role === Role.user && <FileChat messageInfo={messageInfo}></FileChat>}
         {messageInfo.role === Role.Gpt && <ScriptBtn messageInfo={messageInfo} />}
       </Flex>
     </HeadLayout>
