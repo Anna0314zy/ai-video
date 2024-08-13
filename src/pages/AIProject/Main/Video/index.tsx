@@ -10,7 +10,6 @@ import { createContext, useEffect, useMemo, useState } from 'react'
 import { ShotList } from '@/api/type'
 import { useDispatch } from 'react-redux'
 import { Dispatch } from '@/store'
-import * as api from '@/api/models/common'
 
 interface Context {
   // projectId: number
@@ -22,6 +21,8 @@ interface Context {
 export const MyContext = createContext<Context>({} as Context)
 export default () => {
   const dispatch = useDispatch<Dispatch>()
+  // 当前选中的是图片 视频 还是音频
+  const [selectedType, setSelectedType] = useState<'pic' | 'video' | 'voice'>('pic')
   const [list, setList] = useState<ShotList[]>([
     {
       shotId: 67,
@@ -49,6 +50,8 @@ export default () => {
     curId,
     setCurId,
     curShot,
+    selectedType,
+    setSelectedType,
   }
   return (
     <MyContext.Provider value={contextValue}>

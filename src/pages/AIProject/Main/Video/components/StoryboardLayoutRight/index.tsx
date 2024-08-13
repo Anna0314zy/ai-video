@@ -2,7 +2,8 @@ import { Divider, Layout, Tabs } from 'antd'
 import Styles from './index.module.less'
 import StoryboardScreen from './modules/StoryboardScreen'
 import StoryboardAudio from './modules/StoryboardAudio'
-
+import { useContext } from 'react'
+import { MyContext } from '../..'
 const data = [
   {
     projectId: 29,
@@ -277,21 +278,25 @@ const data = [
 ]
 
 export default () => {
+  const { setSelectedType } = useContext(MyContext)
   return (
     <Layout.Sider className='page-storyboard-right'>
       <Tabs
+        onTabClick={key => {
+          setSelectedType(key)
+        }}
         className={Styles['storyboard-tab']}
         defaultActiveKey='image'
         centered
         items={[
           {
             label: <div>画面</div>,
-            key: 'image',
+            key: 'pic',
             children: <StoryboardScreen data={data} />,
           },
           {
             label: <div>旁白</div>,
-            key: 'audio',
+            key: 'voice',
             children: <StoryboardAudio />,
           },
         ]}
