@@ -53,6 +53,9 @@ dependencies:
   minimist:
     specifier: ^1.2.8
     version: 1.2.8
+  postcss-px-to-viewport:
+    specifier: ^1.1.1
+    version: 1.1.1
   react:
     specifier: ^18.3.1
     version: 18.3.1
@@ -4821,7 +4824,6 @@ packages:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
-    dev: true
 
   /natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
@@ -5064,6 +5066,13 @@ packages:
       find-up: 3.0.0
     dev: false
 
+  /postcss-px-to-viewport@1.1.1:
+    resolution: {integrity: sha512-2x9oGnBms+e0cYtBJOZdlwrFg/mLR4P1g2IFu7jYKvnqnH/HLhoKyareW2Q/x4sg0BgklHlP1qeWo2oCyPm8FQ==}
+    dependencies:
+      object-assign: 4.1.1
+      postcss: 8.4.41
+    dev: false
+
   /postcss@8.4.41:
     resolution: {integrity: sha512-TesUflQ0WKZqAvg52PWL6kHgLKP6xB6heTOdoYM0Wt2UHyxNa4K25EZZMgKns3BH1RLVbZCREPpLY0rhnNoHVQ==}
     engines: {node: ^10 || ^12 || >=14}
@@ -5071,7 +5080,6 @@ packages:
       nanoid: 3.3.7
       picocolors: 1.0.1
       source-map-js: 1.2.0
-    dev: true
 
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -6639,7 +6647,7 @@ packages:
     dev: true
 
   npm.ledupeiyou.com/@ld/file-upload@1.0.26:
-    resolution: {integrity: sha512-PhtNjUiWDMJDfaxHSIkx2S84Qj1MXM70zGPhzKFKkS/NJcrNReKT+XoMRaaBqDWDGDG6oJTR3p9m4bKi9F3Icg==, tarball: https://npm.ledupeiyou.com/@ld/file-upload/-/file-upload-1.0.26.tgz}
+    resolution: {integrity: sha512-PhtNjUiWDMJDfaxHSIkx2S84Qj1MXM70zGPhzKFKkS/NJcrNReKT+XoMRaaBqDWDGDG6oJTR3p9m4bKi9F3Icg==, registry: https://npm.xuepeiyou.com/, tarball: https://npm.ledupeiyou.com/@ld/file-upload/-/file-upload-1.0.26.tgz}
     name: '@ld/file-upload'
     version: 1.0.26
     dependencies:

@@ -1,8 +1,9 @@
-import { Fragment, useState } from 'react'
-import { Layout } from 'antd'
+import { Fragment, useState, useRef, useEffect } from 'react'
+import { Layout, message } from 'antd'
 import Styles from './index.module.less'
-import StoryboardVideo from '../StoryboardVideo'
 import MaterialItem from '@/pages/AIProject/components/MaterialItem'
+import { useSelector, useDispatch } from 'react-redux'
+
 interface IStoryboardScreen {
   data?: any
   step?: number | string // 显示第几步骤
@@ -11,10 +12,28 @@ interface IStoryboardScreen {
 
 export default (props: IStoryboardScreen) => {
   const { data } = props
-  const [step, setStep] = useState(props.step || 1)
-  const [currentSelected, setCurrentSelected]: any = useState({})
+  const dispatch = useDispatch()
+  const [step, setStep]: any = useState(props.step || 1)
   const [imgData, setImgData] = useState(data)
   const [videoData, setVideoData] = useState(data)
+  const { selectedImage, selectedVideo } = useSelector((state: any) => state.aiVideo)
+  const [isScrollBottom, setIsScrollBottom] = useState(false)
+  const scrollContainerRef = useRef(null)
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollHeight, scrollTop, clientHeight } = scrollContainerRef.current
+      setIsScrollBottom(scrollHeight - scrollTop - clientHeight <= 100)
+    }
+  }
+  useEffect(() => {
+    const container: any = scrollContainerRef.current
+    container.addEventListener('scroll', handleScroll)
+
+    console.log('%c 🚀 ~ [  ]-32', 'font-size:14px; background:green; color:#fff;', isScrollBottom)
+    return () => {
+      container.removeEventListener('scroll', handleScroll)
+    }
+  }, [isScrollBottom])
   const setpData = [
     {
       id: 1,
@@ -25,6 +44,14 @@ export default (props: IStoryboardScreen) => {
       name: '视频',
     },
   ]
+  const onHandleJumpNextStep = () => {
+    if (!Object.keys(step === 1 ? selectedImage : selectedVideo).length) return message.warning('选择一个')
+    if (step === 1) {
+      setStep((preData: any) => {
+        return preData + 1
+      })
+    }
+  }
   return (
     <Layout className={Styles['storyboard-image']}>
       <Layout.Sider className='storyboard-image-step'>
@@ -48,24 +75,20 @@ export default (props: IStoryboardScreen) => {
           <span>{step === 1 ? '图片' : '视频'}资源</span>
           <span>导入{step === 1 ? '图片' : '视频'}</span>
         </div>
-        <div className='storyboard-image-content__list'>
-          {imgData.map((item: any, index: number) => (
+        <div ref={scrollContainerRef} className='storyboard-image-content__list'>
+          {[...(step === 1 ? imgData : videoData)].map((item: any, index: number) => (
             <MaterialItem
               key={index}
               data={item}
               onChange={() => {
-                setCurrentSelected(item)
-
-                console.log(
-                  '%c 🚀 ~ [  ]-59',
-                  'font-size:14px; background:green; color:#fff;',
-                  item,
-                  item.scriptId === currentSelected['scriptId'],
-                )
+                dispatch.aiVideo.updateData({ selectedImage: item })
               }}
-              actived={item.scriptId === currentSelected['scriptId']}
+              actived={item.scriptId === (step === 1 ? selectedImage : selectedVideo)['scriptId']}
             />
           ))}
+        </div>
+        <div className='storyboard-image-content__btn' onClick={() => onHandleJumpNextStep()}>
+          <span>{step === 1 ? '确认并开始视频设计' : '确认视频'}</span>
         </div>
         {/* {step === 1 && <StoryboardImage />} */}
         {/* {step === 2 && <StoryboardVideo />} */}

@@ -49,12 +49,11 @@
     .storyboard-image-content {
       background: #fff;
       &__header{
-        width: 352px;
-          height: 48px;
+          width: 100%;
+          // height: 48px;
           display: flex;
           justify-content: space-between;
-          padding: 22px 24px 4px;
-
+          padding: 22px 24px 16px;
           span {
             &:nth-child(1) {
               font-size: 16px;
@@ -69,12 +68,29 @@
           }
       }
       &__list{
-          display: flex;
-          flex-direction: column;
-          padding: 0 24px;
-          gap: 12px;
+        // border: 1px solid red;
+        height: 520px;
+        display: flex;
+        flex-direction: column;
+        padding: 0 24px;
+        gap: 12px;
+        overflow-y: auto;
+        margin-bottom: 10px;
       }
-
+      &__btn{
+        width: 304px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #14141A;
+        margin: 0 auto;
+        cursor: pointer;
+        span{
+          color: #F5F5FF;
+          font-size: 14px;
+        }
+      }
     }
   }
 }
