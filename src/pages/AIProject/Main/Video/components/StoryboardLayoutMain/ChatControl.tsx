@@ -2,19 +2,19 @@ import { Layout } from 'antd'
 import * as api from '@/api/models/video'
 import { useContext, useEffect } from 'react'
 import { MyContext } from '../..'
+import AudioChatConfig from './AudioChatConfig'
+import VideoChatConfig from './VideoChatConfig'
+import ImageChatConfig from './ImageChatConfig'
 const style: React.CSSProperties = {
   backgroundColor: '#fff',
 }
 const ChatControl = () => {
-  const { curShot } = useContext(MyContext)
-  const getPromptConfig = async () => {
-    if (!curShot) return
-    const res = await api.getPromptConfig(curShot?.shotId!)
-    console.log('res', res)
-  }
-  useEffect(() => {
-    getPromptConfig()
-  }, [curShot])
-  return <span></span>
+  return (
+    <div style={style}>
+      <AudioChatConfig></AudioChatConfig>
+      <VideoChatConfig />
+      <ImageChatConfig />
+    </div>
+  )
 }
 export default ChatControl

@@ -1,4 +1,4 @@
-import { MessageList } from '@/api/type'
+import { MessageList } from '@/api/types/script'
 import MarkdownIt from 'markdown-it'
 import MessageItem from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageItem'
 import GptMessage from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageItem/GptMessage'

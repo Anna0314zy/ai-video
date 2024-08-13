@@ -7,7 +7,7 @@ import IconWidget from '@/components/IconWidget/index'
 import { PageList, ProjectList } from '@/api/models/project'
 import UserOutlined from '@ant-design/icons/lib/icons/UserOutlined'
 import { v3 as uuidv3 } from 'uuid'
-import { ScriptStatus } from '@/api/type'
+import { ScriptStatus } from '@/api/types/script'
 import { EditOutlined, CheckCircleOutlined, CheckCircleTwoTone } from '@ant-design/icons'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
 interface DataType {

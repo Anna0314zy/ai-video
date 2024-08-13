@@ -19,6 +19,11 @@ export default createModel<RootModel>()({
     },
   },
   effects: dispatch => ({
+    async getUserInfo() {
+      const res = await api.getUerInfo()
+      console.log(res, 'res')
+      dispatch.auth.updateData({ userInfo: res })
+    },
     async login() {
       const systemToken = getToken()
       if (systemToken) {

@@ -64,28 +64,3 @@ export const getHeaderTips = (state: keyof typeof ScriptStatus) => {
   }
   return '镜头设计'
 }
-enum ShotStatus {
-  completed = '已完成',
-  uncompleted = '未完成',
-}
-// enum Status
-export interface ShotList {
-  shotId: number
-  narration: string
-  status: keyof typeof ShotStatus
-  sort: number
-  imageStatus?: keyof typeof ShotStatus
-  videoStatus?: keyof typeof ShotStatus
-  voiceStatus?: keyof typeof ShotStatus
-  imageUrl?: string
-}
-
-export type UploadType = 'video' | 'image' | 'audio'
-export interface PathConfigList {
-  cdnPath: string
-  cosPathConfigList: {
-    type: UploadType
-    name: string
-    path: string
-  }[]
-}

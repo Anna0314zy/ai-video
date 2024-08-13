@@ -1,4 +1,4 @@
-import { MessageList } from '@/api/type'
+import { MessageList } from '@/api/types/script'
 import IconWidget from '@/components/IconWidget'
 
 const FileChat = ({ messageInfo }: { messageInfo: MessageList }) => {

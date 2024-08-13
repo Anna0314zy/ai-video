@@ -1,4 +1,4 @@
-import { MessageList } from '@/api/type'
+import { MessageList } from '@/api/types/script'
 import HeadLayout from '../../../../../components/messageHeadLayout'
 import { Spin } from 'antd'
 interface IProps {

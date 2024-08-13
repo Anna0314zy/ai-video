@@ -20,3 +20,8 @@ export const checkLogin = (params: { systemToken: string }): Promise<LoginRespon
 export const logout = (params: { empNo: string }): Promise<any> => {
   return api.post(`${http}/classroom-slides/auth/logout`, params)
 }
+
+// /api/account/userInfo/get
+export const getUerInfo = (): Promise<any> => {
+  return api.get(`${http}/api/account/userInfo/get`)
+}

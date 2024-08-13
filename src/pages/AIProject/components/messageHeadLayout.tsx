@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { Flex, Image } from 'antd'
 import chatGpt from './chatGpt.png'
-import { MessageList, Role } from '@/api/type'
+import { MessageList, Role } from '@/api/types/script'
 import classNames from 'classnames'
 
 const HeadLayout = ({ messageInfo, children }: { messageInfo: MessageList; children: React.ReactNode }) => {

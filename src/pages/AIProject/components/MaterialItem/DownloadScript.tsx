@@ -1,4 +1,4 @@
-import { ScriptPageList } from '@/api/type'
+import { ScriptPageList } from '@/api/types/script'
 import { Flex, Space, Button, Dropdown, message } from 'antd'
 import { MoreOutlined, ArrowDownOutlined } from '@ant-design/icons'
 import { useCallback, useContext, useRef } from 'react'

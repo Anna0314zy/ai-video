@@ -1,10 +1,10 @@
 import { useContext, useImperativeHandle, forwardRef, useEffect, useState, useMemo } from 'react'
 import { MyContext } from '../../index'
-import { ScriptDesign } from '../config'
-import { WidgetItem } from './WidgetItem'
+import { ScriptDesign } from '../../../../components/config'
+import { WidgetItem } from '@/pages/AIProject/components/WidgetInputItem'
 import { Flex, Form, Space } from 'antd'
 import type { FormProps } from 'antd'
-import { ScriptPrompt } from '@/api/type'
+import { ScriptPrompt } from '@/api/types/script'
 import * as api from '@/api/models/main'
 const ChatConfig = (_: any, ref: any) => {
   const { subjectName } = useContext(MyContext)

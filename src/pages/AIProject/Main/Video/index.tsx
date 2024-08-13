@@ -7,7 +7,7 @@ import StoryboardLayoutMain from './components/StoryboardLayoutMain'
 import Styles from './index.module.less'
 import CommonUpload from '@/components/CommonUpload'
 import { createContext, useEffect, useMemo, useState } from 'react'
-import { ShotList } from '@/api/type'
+import { ShotList } from '@/api/types/video'
 import { useDispatch } from 'react-redux'
 import { Dispatch } from '@/store'
 
@@ -43,6 +43,7 @@ export default () => {
 
   useEffect(() => {
     dispatch.common.getPathConfig()
+    dispatch.auth.getUserInfo()
   }, [])
   const contextValue = {
     list,
@@ -53,6 +54,7 @@ export default () => {
     selectedType,
     setSelectedType,
   }
+
   return (
     <MyContext.Provider value={contextValue}>
       <Layout className={Styles['page-storyboard']}>

@@ -1,5 +1,5 @@
 import api from '../index'
-import { ScriptStatus } from '../type'
+import { ScriptStatus } from '../types/script'
 const http = import.meta.env.VITE_API_SERVER
 export interface ProjectList {
   created: string

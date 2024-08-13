@@ -1,4 +1,4 @@
-import { MessageList, Role } from '@/api/type'
+import { MessageList, Role } from '@/api/types/script'
 import HeadLayout from '../../../../../components/messageHeadLayout'
 import FileChat from '../FileChat'
 import { Flex } from 'antd'

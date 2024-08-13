@@ -1,6 +1,6 @@
 import { ProjectList } from '@/api/models/project'
 import api from '../index'
-import { ScriptPrompt, MessageList } from '../type'
+import { ScriptPrompt, MessageList } from '../types/script'
 
 const http = import.meta.env.VITE_API_SERVER
 export const CHAT_URL = `${http}/api/text/v1/ai/stream/sessionChat`

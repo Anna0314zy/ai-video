@@ -2,7 +2,7 @@ import HeaderLayout from '../../../components/HeaderLayout'
 import IconWidget from '@/components/IconWidget'
 import { Button } from 'antd'
 import Styles from '../index.module.less'
-import { getHeaderTips } from '@/api/type'
+import { getHeaderTips } from '@/api/types/script'
 import { MyContext } from '../index'
 import { useContext } from 'react'
 

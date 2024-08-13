@@ -1,6 +1,6 @@
 import { createModel } from '@rematch/core'
 import { RootModel } from '.'
-import { PathConfigList } from '@/api/type'
+import { PathConfigList } from '@/api/types/video'
 import * as api from '@/api/models/common'
 interface CommonState {
   pathConfig: PathConfigList
