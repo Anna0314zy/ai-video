@@ -1,4 +1,5 @@
 import api from '../index'
+import { ShotList } from '@/api/types/video'
 const http = import.meta.env.VITE_API_SERVER
 // 获取图片配置接口
 export const getImagePromptBtnList = (shotId: number) => {
@@ -36,8 +37,10 @@ export const getOtherAudioConfig = () => {
 }
 // 根据项目id获取所有分镜头信息
 export const getShotListByProjectId = (projectId: number) => {
-  return api.get<{ pitchElementRespList: ApiOptions[]; rateElementRespList: ApiOptions[] }>(
-    `${http}/api/scriptShot/v1/shotListByProjectId`,
-    { projectId },
-  )
+  return api.get<{ shotBaseInfoList: ShotList[] }>(`${http}/api/scriptShot/v1/shotListByProjectId`, { projectId })
+}
+// 添加MJ文生图任务
+
+export const addText2imageTask = (params: { shotId: number; text: string; projectId: number }) => {
+  return api.post<any>(`${http}/api/text2image/v1/mj/text2image/addTask`, params)
 }

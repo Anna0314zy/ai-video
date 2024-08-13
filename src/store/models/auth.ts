@@ -5,7 +5,7 @@ import { LoginUrl } from '@/config/login'
 import { getToken, setToken } from '@/utils/auth'
 interface AuthState {
   token: string
-  userInfo: api.LoginResponse | Record<string, any>
+  userInfo: api.UserInfo
 }
 
 export default createModel<RootModel>()({
@@ -24,37 +24,37 @@ export default createModel<RootModel>()({
       console.log(res, 'res')
       dispatch.auth.updateData({ userInfo: res })
     },
-    async login() {
-      const systemToken = getToken()
-      if (systemToken) {
-        const userInfo = await api.login({ systemToken })
-        dispatch.auth.updateData({
-          token: systemToken,
-          userInfo,
-        })
-      } else {
-        window.location.href = LoginUrl
-      }
-    },
-    async checkLogin() {
-      const systemToken = getToken()
-      if (systemToken) {
-        dispatch.auth.updateData({ token: systemToken })
-        const res = await api.checkLogin({ systemToken })
-        if (res.systemToken) {
-          await dispatch.auth.updateData({ token: res.systemToken })
-          setToken(res.systemToken)
-        }
-      }
-    },
-    async logOut(empNo) {
-      await api.logout({ empNo })
-      localStorage.removeItem('token')
-      dispatch.auth.updateData({
-        token: '',
-        userInfo: {},
-      })
-      window.location.href = LoginUrl
-    },
+    // async login() {
+    //   const systemToken = getToken()
+    //   if (systemToken) {
+    //     const userInfo = await api.login({ systemToken })
+    //     dispatch.auth.updateData({
+    //       token: systemToken,
+    //       userInfo,
+    //     })
+    //   } else {
+    //     window.location.href = LoginUrl
+    //   }
+    // },
+    // async checkLogin() {
+    //   const systemToken = getToken()
+    //   if (systemToken) {
+    //     dispatch.auth.updateData({ token: systemToken })
+    //     const res = await api.checkLogin({ systemToken })
+    //     if (res.systemToken) {
+    //       await dispatch.auth.updateData({ token: res.systemToken })
+    //       setToken(res.systemToken)
+    //     }
+    //   }
+    // },
+    // async logOut(empNo) {
+    //   await api.logout({ empNo })
+    //   localStorage.removeItem('token')
+    //   dispatch.auth.updateData({
+    //     token: '',
+    //     userInfo: {},
+    //   })
+    //   window.location.href = LoginUrl
+    // },
   }),
 })

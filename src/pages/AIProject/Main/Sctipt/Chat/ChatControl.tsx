@@ -5,7 +5,8 @@ import { Flex, Button, Space, message } from 'antd'
 import IconWidget from '@/components/IconWidget'
 import { v4 as uuidv4 } from 'uuid'
 import { MyContext } from '../index'
-import ChatInput from './components/ChatInput'
+import ChatInput from '../../../components/ChatInput'
+import ChatUpload from './components/ChatUpload'
 import * as api from '@/api/models/main'
 import { Role } from '@/api/types/script'
 import useTyped from '../hooks/useTyped'
@@ -38,15 +39,7 @@ const ChatControl = (props: any) => {
     promptRequestLogId: 0,
   })
   const chatRef = useRef<{ form: FormInstance<any> }>(null)
-  const handleInputChange = (val: string) => {
-    console.log('handleInputChange', val)
-    setPrompt(prev => {
-      return {
-        ...prev,
-        text: val,
-      }
-    })
-  }
+
   // 是不是文件
   const handleApply = async () => {
     const params = chatRef.current?.form.getFieldsValue()
@@ -156,6 +149,15 @@ const ChatControl = (props: any) => {
     if (!prompt?.text) return
     handleSendMessage()
   }
+  const handleInputChange = (val: string) => {
+    console.log('handleInputChange', val)
+    setPrompt(prev => {
+      return {
+        ...prev,
+        text: val,
+      }
+    })
+  }
   return (
     <div className={Style['chat-control']}>
       <Flex justify='space-between' wrap={false} align='center'>
@@ -181,12 +183,9 @@ const ChatControl = (props: any) => {
         }}>
         销毁
       </Button> */}
-      <ChatInput
-        prompt={prompt}
-        onChange={handleInputChange}
-        onSend={handleInputSend}
-        chatIng={chatIng}
-        onSuccess={handleUploadSuccess}></ChatInput>
+      <ChatInput prompt={prompt} onChange={handleInputChange} onSend={handleInputSend} chatIng={chatIng}>
+        <ChatUpload onSuccess={handleUploadSuccess}></ChatUpload>
+      </ChatInput>
     </div>
   )
 }

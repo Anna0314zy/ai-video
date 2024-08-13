@@ -1,10 +1,11 @@
 import Header from './Header'
 import StompSocket from '@/utils/stompSocket'
+import { SEND_THOROUGH, SUBSCRIBE_THOROUGH } from '@/const/socket'
 import ChatContent from './Chat/ChatContent'
 import ChatControl from './Chat/ChatControl'
 import { Layout, Button } from 'antd'
 import { createContext, useEffect, useRef, useState, useMemo } from 'react'
-import { SEND_THOROUGH, SUBSCRIBE_THOROUGH } from '@/const/socket'
+
 import { MessageList, ScriptPageList, ScriptStatus } from '@/api/types/script'
 import { useParams } from 'react-router-dom'
 import { getQueryParam } from '@/utils'
@@ -18,7 +19,7 @@ interface Context {
   projectId: number
   sessionId: number
   scriptPageList: ScriptPageList[]
-  state: keyof typeof ScriptStatus
+  currentState: keyof typeof ScriptStatus
   [k: string]: any
 }
 export const MyContext = createContext<Context>({} as Context)
@@ -43,12 +44,10 @@ const layoutStyle: React.CSSProperties = {
 
 export default () => {
   const { id } = useParams() // 获取路由参数 userId
-  // const projectName = getQueryParam('projectName')
-  // const subjectName = getQueryParam('subjectName')
-  // const sessionIdQuery = getQueryParam('sessionId')
-  // const state = getQueryParam('state')
-  const [project, setProject] = useState<ProjectList>()
+  const projectName = getQueryParam('projectName')
+  const subjectName = getQueryParam('subjectName')
   const [sessionId, setSessionId] = useState<number>()
+  const [currentState, setCurrentState] = useState<keyof typeof ScriptStatus>('ScriptProcessing')
   const [messageList, setMessageList] = useState<MessageList[]>([])
   const containerRef = useRef<any>()
   const [scriptPageList, setScriptPageList] = useState<ScriptPageList[]>([])
@@ -131,7 +130,8 @@ export default () => {
     if (!latestSessionId) {
       handleCreateChat()
     }
-    setProject(project)
+    // setProject(project)
+    setCurrentState(currentState)
   }
   useEffect(() => {
     getDetail()
@@ -142,16 +142,16 @@ export default () => {
     // form,
     containerRef,
     updateMessage,
-    projectName: project?.projectType,
+    projectName,
     projectId: Number(id),
-    subjectName: project?.subjectName,
+    subjectName,
     sessionId: Number(sessionId),
     getChatHistories,
     handleCreateChat,
     getScriptPageList,
     setScriptPageList,
     scriptPageList,
-    state: project?.state!,
+    currentState,
     disabled,
     chatIng,
     setChatIng,

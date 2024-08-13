@@ -1,21 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react'
-import './index.less' // 用于样式
+import Styles from './index.module.less' // 用于样式
 import { LinkOutlined, SendOutlined } from '@ant-design/icons'
 import { Input } from 'antd'
-import ChatUpload from './ChatUpload'
 const wrapperStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  border: '1px solid #E7E7E7',
+  border: '1px solid #e0e0e0',
   borderRadius: '8px',
-  padding: '10px',
+  padding: '5px',
+  backgroundColor: '#ffffff',
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+  color: ' #000',
 }
 const ChatInput = ({
   prompt,
   onChange,
   onSend,
-  onSuccess,
   chatIng,
+  children,
 }: {
   chatIng?: boolean
   prompt: {
@@ -25,7 +27,7 @@ const ChatInput = ({
   }
   onChange: (val: string) => void
   onSend: (val: string) => void
-  onSuccess: (val: { fileId: number; fileName: string }) => void
+  children: React.ReactNode
 }) => {
   const handleSend = () => {
     if (chatIng || !prompt.text) return
@@ -45,8 +47,8 @@ const ChatInput = ({
     }
   }
   return (
-    <div className='chat-input-container'>
-      <ChatUpload onSuccess={onSuccess} accept='.md,.xlsx,.docx' disabled={chatIng}></ChatUpload>
+    <div className={Styles['chat-input-container']} style={wrapperStyle}>
+      {children}
       <div
         title={prompt.fileName}
         style={{

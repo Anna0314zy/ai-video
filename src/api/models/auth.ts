@@ -20,8 +20,12 @@ export const checkLogin = (params: { systemToken: string }): Promise<LoginRespon
 export const logout = (params: { empNo: string }): Promise<any> => {
   return api.post(`${http}/classroom-slides/auth/logout`, params)
 }
-
-// /api/account/userInfo/get
+export interface UserInfo {
+  accountId: string
+  uid: number
+  username: string
+  workcode: string
+}
 export const getUerInfo = (): Promise<any> => {
-  return api.get(`${http}/api/account/userInfo/get`)
+  return api.get<UserInfo>(`${http}/api/account/userInfo/get`)
 }
