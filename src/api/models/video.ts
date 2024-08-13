@@ -34,3 +34,10 @@ export const getOtherAudioConfig = () => {
     `${http}/api/tts/v1/otherOptions`,
   )
 }
+// 根据项目id获取所有分镜头信息
+export const getShotListByProjectId = (projectId: number) => {
+  return api.get<{ pitchElementRespList: ApiOptions[]; rateElementRespList: ApiOptions[] }>(
+    `${http}/api/scriptShot/v1/shotListByProjectId`,
+    { projectId },
+  )
+}

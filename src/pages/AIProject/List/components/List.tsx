@@ -38,7 +38,7 @@ export default ({
     console.log('%c zy handleClick', 'color:red', windowName, record.sessionList)
     let sessionId = 0
     if (record.sessionList?.length) sessionId = record.sessionList[record.sessionList?.length - 1].id
-    const query = `projectName=${record.projectName}&subjectName=${record.subjectName}&state=${record.state}`
+    const query = `projectName=${record.projectName}&subjectName=${record.subjectName}&state=${record.state}&scriptId=${record.projectName}`
     let hashBase = `#/project/${record.id}/script`
     console.log('mport.meta.env', import.meta.env)
     if (import.meta.env.DEV) {

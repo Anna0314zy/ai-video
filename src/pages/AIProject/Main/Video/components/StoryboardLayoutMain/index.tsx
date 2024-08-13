@@ -1,4 +1,4 @@
-import { Layout } from 'antd'
+import { Layout, Flex } from 'antd'
 import ChatContent from './ChatContent'
 import ChatControl from './ChatControl'
 import { useContext, useEffect } from 'react'
@@ -17,8 +17,12 @@ export default () => {
 
   return (
     <Layout.Content className='page-storyboard-main' style={{ height: '100%' }}>
-      <ChatContent />
-      <ChatControl />
+      <Flex vertical={true} style={{ height: '100%' }}>
+        <Flex flex={1}>
+          <ChatContent />
+        </Flex>
+        <ChatControl />
+      </Flex>
     </Layout.Content>
   )
 }

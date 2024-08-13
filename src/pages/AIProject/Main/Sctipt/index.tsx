@@ -13,6 +13,7 @@ import { getProjectDetail } from '@/api/models/project'
 import { setEngine } from 'crypto'
 import { convertToMarkdown } from '@/utils'
 import RightPanel from './RightPanel'
+import { ProjectList } from '@/api/models/project'
 interface Context {
   projectId: number
   sessionId: number
@@ -42,11 +43,12 @@ const layoutStyle: React.CSSProperties = {
 
 export default () => {
   const { id } = useParams() // 获取路由参数 userId
-  const projectName = getQueryParam('projectName')
-  const subjectName = getQueryParam('subjectName')
-  const sessionIdQuery = getQueryParam('sessionId')
-  const state = getQueryParam('state')
-  const [sessionId, setSessionId] = useState<number>(Number(sessionIdQuery))
+  // const projectName = getQueryParam('projectName')
+  // const subjectName = getQueryParam('subjectName')
+  // const sessionIdQuery = getQueryParam('sessionId')
+  // const state = getQueryParam('state')
+  const [project, setProject] = useState<ProjectList>()
+  const [sessionId, setSessionId] = useState<number>()
   const [messageList, setMessageList] = useState<MessageList[]>([])
   const containerRef = useRef<any>()
   const [scriptPageList, setScriptPageList] = useState<ScriptPageList[]>([])
@@ -129,6 +131,7 @@ export default () => {
     if (!latestSessionId) {
       handleCreateChat()
     }
+    setProject(project)
   }
   useEffect(() => {
     getDetail()
@@ -139,16 +142,16 @@ export default () => {
     // form,
     containerRef,
     updateMessage,
-    projectName,
+    projectName: project?.projectType,
     projectId: Number(id),
-    subjectName,
+    subjectName: project?.subjectName,
     sessionId: Number(sessionId),
     getChatHistories,
     handleCreateChat,
     getScriptPageList,
     setScriptPageList,
     scriptPageList,
-    state: state as keyof typeof ScriptStatus,
+    state: project?.state!,
     disabled,
     chatIng,
     setChatIng,

@@ -10,19 +10,23 @@ import { createContext, useEffect, useMemo, useState } from 'react'
 import { ShotList } from '@/api/types/video'
 import { useDispatch } from 'react-redux'
 import { Dispatch } from '@/store'
-
+import { useParams } from 'react-router-dom'
+import * as api from '@/api/models/video'
+type SelectType = 'pic' | 'video' | 'voice'
 interface Context {
   // projectId: number
   // sessionId: number
   list: ShotList[]
   curShot?: ShotList
+  selectedType: SelectType
   [k: string]: any
 }
 export const MyContext = createContext<Context>({} as Context)
 export default () => {
+  const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
   // 当前选中的是图片 视频 还是音频
-  const [selectedType, setSelectedType] = useState<'pic' | 'video' | 'voice'>('pic')
+  const [selectedType, setSelectedType] = useState<SelectType>('pic')
   const [list, setList] = useState<ShotList[]>([
     {
       shotId: 67,
@@ -40,10 +44,13 @@ export default () => {
   const curShot = useMemo(() => {
     return list.find(v => v.shotId === curId)
   }, [list])
-
+  const getShotListByProjectId = async () => {
+    api.getShotListByProjectId(Number(id))
+  }
   useEffect(() => {
     dispatch.common.getPathConfig()
     dispatch.auth.getUserInfo()
+    getShotListByProjectId()
   }, [])
   const contextValue = {
     list,

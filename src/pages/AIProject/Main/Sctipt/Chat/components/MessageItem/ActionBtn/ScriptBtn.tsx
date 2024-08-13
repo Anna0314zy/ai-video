@@ -119,8 +119,8 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
   ]
   // 查看当前是否已经添加到剧本
   const hasAdd = useMemo(() => {
-    const index = scriptPageList?.findIndex(v => v.scriptId === messageInfo.scriptId)
-    return index && index > -1
+    const index = (scriptPageList || []).findIndex(v => v.scriptId === messageInfo.scriptId)
+    return index > -1
   }, [scriptPageList])
 
   const showData = useMemo(() => {
@@ -129,11 +129,11 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
   return (
     <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
       <Space>
-        {hasAdd && (
+        {hasAdd ? (
           <Tag style={{ color: '#FF7A2F' }} color='rgba(254, 126, 7, 0.1)' icon={<AntdIcon icon='script' />}>
             剧本
           </Tag>
-        )}
+        ) : null}
         {showData.map(item => (
           <ActionBtn
             {...item}
