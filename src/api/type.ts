@@ -79,3 +79,13 @@ export interface ShotList {
   voiceStatus?: keyof typeof ShotStatus
   imageUrl?: string
 }
+
+export type UploadType = 'video' | 'image' | 'audio'
+export interface PathConfigList {
+  cdnPath: string
+  cosPathConfigList: {
+    type: UploadType
+    name: string
+    path: string
+  }[]
+}

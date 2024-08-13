@@ -8,6 +8,10 @@ import Styles from './index.module.less'
 import CommonUpload from '@/components/CommonUpload'
 import { createContext, useEffect, useMemo, useState } from 'react'
 import { ShotList } from '@/api/type'
+import { useDispatch } from 'react-redux'
+import { Dispatch } from '@/store'
+import * as api from '@/api/models/common'
+
 interface Context {
   // projectId: number
   // sessionId: number
@@ -17,6 +21,7 @@ interface Context {
 }
 export const MyContext = createContext<Context>({} as Context)
 export default () => {
+  const dispatch = useDispatch<Dispatch>()
   const [list, setList] = useState<ShotList[]>([
     {
       shotId: 67,
@@ -34,6 +39,10 @@ export default () => {
   const curShot = useMemo(() => {
     return list.find(v => v.shotId === curId)
   }, [list])
+
+  useEffect(() => {
+    dispatch.common.getPathConfig()
+  }, [])
   const contextValue = {
     list,
     setList,
@@ -41,7 +50,6 @@ export default () => {
     setCurId,
     curShot,
   }
-
   return (
     <MyContext.Provider value={contextValue}>
       <Layout className={Styles['page-storyboard']}>
