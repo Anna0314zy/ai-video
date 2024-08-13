@@ -41,8 +41,8 @@ export default function MainLayout() {
               </Badge>
               <Dropdown menu={{ items }} placement='bottomLeft'>
                 <div className='header-useInfo'>
-                  <div className='header-avatar'>{userInfo.name?.substring(0, 1)}</div>
-                  <span className='header-username'>{userInfo.name}</span>
+                  <div className='header-avatar'>{userInfo.username?.substring(0, 1)}</div>
+                  <span className='header-username'>{userInfo.username}</span>
                   <IconWidget className='icon-arrow-bottom' name='arrowBottom' />
                 </div>
               </Dropdown>
