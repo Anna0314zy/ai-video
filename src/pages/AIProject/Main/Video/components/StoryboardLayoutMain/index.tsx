@@ -2,9 +2,9 @@ import { Layout, Flex } from 'antd'
 import ChatContent from './ChatContent'
 import ChatControl from './ChatControl'
 import { useContext, useState } from 'react'
-import { MyContext } from '../..'
+import { MyContext } from '../../index'
 import { ChatMessageList, Text2imageMessageOptions } from '@/api/types/video'
-
+import useControlMsg from '../../useControlMsg'
 const contentStyle: React.CSSProperties = {
   // textAlign: 'center',
   height: '100%',
@@ -16,7 +16,6 @@ const contentStyle: React.CSSProperties = {
 }
 export default () => {
   const { curShot } = useContext(MyContext)
-
   return (
     <Flex vertical={true} style={contentStyle}>
       <ChatContent />

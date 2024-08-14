@@ -8,6 +8,10 @@ const MaterialContent = ({ data }: { data: ChatMessageList }) => {
   const { cdnPath } = useSelector((state: RootState) => state.common.pathConfig)
   if (data.type === EnumUploadType['IMAGE'] && data.originImgUrl) {
     return <Image src={cdnPath + data.originImgUrl} preview={false}></Image>
+  } else if (data.type === EnumUploadType['VIDEO'] && data.originImgUrl) {
+    return <video src={cdnPath + data.originImgUrl}></video>
+  } else if (data.type === EnumUploadType['AUDIO'] && data.originImgUrl) {
+    return <audio src={cdnPath + data.originImgUrl}></audio>
   }
 
   // 对state 进行解释
@@ -21,7 +25,9 @@ const MaterialContent = ({ data }: { data: ChatMessageList }) => {
         paddingLeft: '10px',
         borderRadius: '8px',
       }}>
-      <AntdIcon icon='loading'></AntdIcon>
+      {!['Completed', 'Failed'].includes(data.state) ? (
+        <AntdIcon icon='loading' style={{ animation: 'spin 1s linear infinite' }}></AntdIcon>
+      ) : null}
 
       <span style={{ paddingLeft: '15px' }}> {TaskState[data.state]}</span>
     </Flex>

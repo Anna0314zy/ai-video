@@ -1,17 +1,17 @@
 import { Layout, message } from 'antd'
 import { Flex, Image } from 'antd'
 import * as api from '@/api/models/video'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, useRef, useCallback } from 'react'
 import { ChatMessageList, EnumUploadType, Text2imageMessageOptions, ResourceTypeMap } from '@/api/types/video'
 
-import { MyContext } from '../..'
+import { MyContext } from '../../index'
 import dayjs from 'dayjs'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import ActionBtn from '@/pages/AIProject/components/ActionBtn'
 import MessageLayout from './MessageLayout'
 import MaterialContent from './MaterialContent'
-import useControlMsg from './hooks/useControlMsg'
+import useControlMsg from '../../useControlMsg'
 
 const config: {
   key: 'add' | 'refresh'
@@ -33,13 +33,16 @@ const style: React.CSSProperties = {
   backgroundColor: '#F2F3F7',
   flex: '1',
   overflow: 'auto',
+  height: '100px',
 }
 const ChatContent = () => {
   const { cdnPath } = useSelector((state: RootState) => state.common.pathConfig)
-  const { curShot, projectId, selectedType } = useContext(MyContext)
+  const { curShot, projectId, selectedType, messageList, getMessageList, addChatTask, searchParams, hasMore } =
+    useContext(MyContext)
   const [loading, setLoading] = useState({})
-  const { messageList, getMessageList, addChatTask } = useControlMsg()
+  const [scrollLoading, setScrollLoading] = useState<boolean>(false) // 是否正在加载
 
+  const listRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!curShot?.shotId) return
     getMessageList(selectedType, curShot?.shotId)
@@ -77,8 +80,26 @@ const ChatContent = () => {
       console.log('refresh')
     }
   }
+
+  async function checkScrollPosition() {
+    if (scrollLoading || !hasMore) return
+    const listElement = listRef.current
+    if (listElement) {
+      const { scrollTop, clientHeight, scrollHeight } = listElement
+
+      if (scrollTop + clientHeight >= scrollHeight - 150) {
+        setScrollLoading(true)
+        searchParams.current.current += 1
+        try {
+          await getMessageList(selectedType, curShot?.shotId, true)
+        } finally {
+          setScrollLoading(false)
+        }
+      }
+    }
+  }
   return (
-    <Layout.Content style={style}>
+    <Layout.Content style={style} ref={listRef} onScroll={checkScrollPosition}>
       <div>
         {messageList.map(item => {
           return (

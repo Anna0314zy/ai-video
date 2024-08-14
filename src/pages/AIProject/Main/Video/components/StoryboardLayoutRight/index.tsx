@@ -5,7 +5,7 @@ import StoryboardVideo from './modules/StoryboardVideo'
 import StoryboardAudio from './modules/StoryboardAudio'
 import Styles from './index.module.less'
 import { EnumUploadType } from '@/api/types/video'
-import { MyContext } from '../..'
+import { MyContext } from '../../index'
 
 const data = {
   size: 0,

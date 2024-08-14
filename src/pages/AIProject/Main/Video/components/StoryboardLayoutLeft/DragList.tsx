@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import { Flex } from 'antd'
-import { MyContext } from '../..'
+import { MyContext } from '../../index'
 import FrameItem from './modules/FrameItem'
 const DragList = () => {
   const { list, setList, curId, setCurId } = useContext(MyContext)

@@ -1,25 +1,21 @@
 import { Button, Flex, message, Image } from 'antd'
 import { useContext, useState, useRef } from 'react'
-import { MyContext } from '../..'
+import { MyContext } from '../../index'
 import AudioChatConfig from './AudioChatConfig'
 import VideoChatConfig from './VideoChatConfig'
 import ImageChatConfig from './ImageChatConfig'
 import ChatInput from '../../../../components/ChatInput'
 import * as api from '@/api/models/video'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
-import { IUploadInput } from '@ld/file-upload'
-import { text } from 'stream/consumers'
 import { RcFile } from 'antd/lib/upload'
 import { EnumUploadType } from '@/api/types/video'
-import useControlMsg from './hooks/useControlMsg'
 const style: React.CSSProperties = {
   backgroundColor: '#fff',
   padding: '10px',
 }
 const ChatControl = () => {
-  const { selectedType, curShot, projectId } = useContext(MyContext)
+  const { selectedType, curShot, projectId, addChatTask } = useContext(MyContext)
   const formRef = useRef<any>()
-  const { addChatTask } = useControlMsg()
   const [prompt, setPrompt] = useState<{
     text?: string
     fileUrl?: string

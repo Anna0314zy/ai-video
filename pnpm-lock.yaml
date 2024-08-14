@@ -28,7 +28,7 @@ dependencies:
     version: 5.20.1(react-dom@18.3.1)(react@18.3.1)
   axios:
     specifier: ^1.7.2
-    version: 1.7.3
+    version: 1.7.4
   classnames:
     specifier: ^2.5.1
     version: 2.5.1
@@ -168,7 +168,7 @@ devDependencies:
     version: 12.2.0(less@4.2.0)
   lint-staged:
     specifier: ^15.2.7
-    version: 15.2.8
+    version: 15.2.9
   typescript:
     specifier: ^5.2.2
     version: 5.5.4
@@ -2983,7 +2983,7 @@ packages:
       rc-motion: 2.9.2(react-dom@18.3.1)(react@18.3.1)
       rc-notification: 5.6.0(react-dom@18.3.1)(react@18.3.1)
       rc-pagination: 4.2.0(react-dom@18.3.1)(react@18.3.1)
-      rc-picker: 4.6.12(dayjs@1.11.12)(react-dom@18.3.1)(react@18.3.1)
+      rc-picker: 4.6.13(dayjs@1.11.12)(react-dom@18.3.1)(react@18.3.1)
       rc-progress: 4.0.0(react-dom@18.3.1)(react@18.3.1)
       rc-rate: 2.13.0(react-dom@18.3.1)(react@18.3.1)
       rc-resize-observer: 1.4.0(react-dom@18.3.1)(react@18.3.1)
@@ -3058,8 +3058,8 @@ packages:
     resolution: {integrity: sha512-u5w79Rd7SU4JaIlA/zFqG+gOiuq25q5VLyZ8E+ijJeILuTxVzZgp2CaGw/UTw6pXYN9XMO9yiqj/nEHmhTG5CA==}
     dev: false
 
-  /axios@1.7.3:
-    resolution: {integrity: sha512-Ar7ND9pU99eJ9GpoGQKhKf58GpUOgnzuaB7ueNQ5BMi0p+LZ5oaEnfF999fAArcTIBwXTCHAmGcHOZJaWPq9Nw==}
+  /axios@1.7.4:
+    resolution: {integrity: sha512-DukmaFRnY6AzAALSH4J2M3k6PkaC+MfaAGdEERRWcC9q3/TWQwLpHR8ZRLKTdQ3aBDL64EdluRDjJqKw+BPZEw==}
     dependencies:
       follow-redirects: 1.15.6
       form-data: 4.0.0
@@ -3152,7 +3152,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001651
-      electron-to-chromium: 1.5.6
+      electron-to-chromium: 1.5.7
       node-releases: 2.0.18
       update-browserslist-db: 1.1.0(browserslist@4.23.3)
 
@@ -3637,8 +3637,8 @@ packages:
       safer-buffer: 2.1.2
     dev: false
 
-  /electron-to-chromium@1.5.6:
-    resolution: {integrity: sha512-jwXWsM5RPf6j9dPYzaorcBSUg6AiqocPEyMpkchkvntaH9HGfOOMZwxMJjDY/XEs3T5dM7uyH1VhRMkqUU9qVw==}
+  /electron-to-chromium@1.5.7:
+    resolution: {integrity: sha512-6FTNWIWMxMy/ZY6799nBlPtF1DFDQ6VQJ7yyDP27SJNt5lwtQ5ufqVvHylb3fdQefvRcgA3fKcFMJi9OLwBRNw==}
 
   /emoji-regex@10.3.0:
     resolution: {integrity: sha512-QpLs9D9v9kArv4lfDEgg1X/gN5XLnf/A6l9cs8SPZLRZR3ZkY9+kwIQTxm+fsSej5UMYGE8fdoaZVIBlqG0XTw==}
@@ -4544,8 +4544,8 @@ packages:
       uc.micro: 2.1.0
     dev: false
 
-  /lint-staged@15.2.8:
-    resolution: {integrity: sha512-PUWFf2zQzsd9EFU+kM1d7UP+AZDbKFKuj+9JNVTBkhUFhbg4MAt6WfyMMwBfM4lYqd4D2Jwac5iuTu9rVj4zCQ==}
+  /lint-staged@15.2.9:
+    resolution: {integrity: sha512-BZAt8Lk3sEnxw7tfxM7jeZlPRuT4M68O0/CwZhhaw6eeWu0Lz5eERE3m386InivXB64fp/mDID452h48tvKlRQ==}
     engines: {node: '>=18.12.0'}
     hasBin: true
     dependencies:
@@ -5377,8 +5377,8 @@ packages:
       react-dom: 18.3.1(react@18.3.1)
     dev: false
 
-  /rc-picker@4.6.12(dayjs@1.11.12)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-wZhBf/L1JV/yCnhuVol42nBpZqxV+Nam1/tnsYm5ZWq0QvMLtX1lQEWceu3FyBESzOPEBIAZixiCnISHcbHsgw==}
+  /rc-picker@4.6.13(dayjs@1.11.12)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-yi4JWPGjm420Q8rHjZ6YNy2c5IfV+9EAzx2pewVRPOjJqfg7uifO/Z0uqxdl/h6AhBocuvRvtlyz6ehrAvTq7A==}
     engines: {node: '>=8.x'}
     peerDependencies:
       date-fns: '>= 2.x'
@@ -6647,7 +6647,7 @@ packages:
     dev: true
 
   npm.ledupeiyou.com/@ld/file-upload@1.0.26:
-    resolution: {integrity: sha512-PhtNjUiWDMJDfaxHSIkx2S84Qj1MXM70zGPhzKFKkS/NJcrNReKT+XoMRaaBqDWDGDG6oJTR3p9m4bKi9F3Icg==, registry: https://npm.xuepeiyou.com/, tarball: https://npm.ledupeiyou.com/@ld/file-upload/-/file-upload-1.0.26.tgz}
+    resolution: {integrity: sha512-PhtNjUiWDMJDfaxHSIkx2S84Qj1MXM70zGPhzKFKkS/NJcrNReKT+XoMRaaBqDWDGDG6oJTR3p9m4bKi9F3Icg==, tarball: https://npm.ledupeiyou.com/@ld/file-upload/-/file-upload-1.0.26.tgz}
     name: '@ld/file-upload'
     version: 1.0.26
     dependencies:

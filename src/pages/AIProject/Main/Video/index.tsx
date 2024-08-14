@@ -5,9 +5,8 @@ import StoryboardLayoutLeft from './components/StoryboardLayoutLeft'
 import StoryboardLayoutRight from './components/StoryboardLayoutRight'
 import StoryboardLayoutMain from './components/StoryboardLayoutMain'
 import Styles from './index.module.less'
-import CommonUpload from '@/components/CommonUpload'
 import { createContext, useEffect, useMemo, useState, useRef } from 'react'
-import { ShotList } from '@/api/types/video'
+import { ShotList, ChatMessageList } from '@/api/types/video'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 import { useParams } from 'react-router-dom'
@@ -15,16 +14,19 @@ import * as api from '@/api/models/video'
 import StompSocket from '@/utils/stompSocket'
 import { SEND_THOROUGH, TEXT_TO_IMAGE_THOROUGH } from '@/const/socket'
 import { ResourceType, EnumUploadType } from '@/api/types/video'
+import useControlMsg from './useControlMsg'
 interface Context {
   // projectId: number
   // sessionId: number
+  messageList: ChatMessageList[]
   list: ShotList[]
   curShot?: ShotList
   selectedType: ResourceType
   [k: string]: any
 }
 export const MyContext = createContext<Context>({} as Context)
-export default () => {
+const VideoProcess = () => {
+  const { messageList, getMessageList, addChatTask, searchParams, hasMore } = useControlMsg()
   const { accountId } = useSelector((state: RootState) => state.auth.userInfo)
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
@@ -61,6 +63,11 @@ export default () => {
     selectedType,
     setSelectedType,
     projectId: Number(id),
+    messageList,
+    getMessageList,
+    addChatTask,
+    searchParams,
+    hasMore,
   }
   let stompSocket = useRef<any>(null)
   useEffect(() => {
@@ -94,3 +101,4 @@ export default () => {
     </MyContext.Provider>
   )
 }
+export default VideoProcess

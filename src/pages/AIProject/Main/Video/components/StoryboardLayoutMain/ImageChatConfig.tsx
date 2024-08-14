@@ -46,7 +46,7 @@ const ImageChatConfig = (_: any, ref: any) => {
   }))
 
   const onValuesChange = (val: Record<keyof ImageChatParams, any>) => {
-    console.log('onValuesChange', val, form, Object.keys(val), Object.values(val))
+    // console.log('onValuesChange', val, form, Object.keys(val), Object.values(val))
   }
   function generateRandom18DigitNumber() {
     // 生成一个18位的随机数字

@@ -85,6 +85,7 @@ export interface Text2imageMessage extends CommonMessage {
   width?: number
   height?: number
   options?: Text2imageMessageOptions[]
+  isTrimming?: number // 表示该资源是否可以被添加
 }
 
 export type ChatMessageList = Text2imageMessage

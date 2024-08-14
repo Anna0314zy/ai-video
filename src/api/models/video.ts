@@ -87,3 +87,11 @@ export const getResourceList = (params: { shotId: number; size?: number; current
 export const addResource = (params: { historyId: number; type: ResourceType }) => {
   return api.get<any>(`${http}/api/resource/v1/add`, params)
 }
+// 重新生成
+export const reinstateTask = (params: { historyId: number; type: ResourceType }) => {
+  return api.get<any>(`${http}/api/queue/v1/task/reinstateTask`, params)
+}
+// 获取状态为【队列中】的任务列表
+export const getQueuedTaskList = (params: { shotId: number }) => {
+  return api.post<any>(`${http}/api/queue/v1/task/getQueuedTaskList?shotId=${params.shotId}`, {})
+}
