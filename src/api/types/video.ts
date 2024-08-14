@@ -4,7 +4,11 @@ export enum EnumUploadType {
   AUDIO = 'voice',
   MJIMAGE = 'mjImage',
 }
-
+export const ResourceTypeMap = {
+  image: '图片',
+  video: '视频',
+  voice: '音频',
+}
 export type UploadType = `${EnumUploadType}`
 
 export type ResourceType = `${Exclude<`${EnumUploadType}`, 'mjImage'>}`
@@ -71,7 +75,8 @@ export interface CommonMessage {
   id?: number
   taskId: string //列表唯一值
   state: keyof typeof TaskState
-  type: UploadType
+  type: ResourceType
+  created?: string
 }
 export interface Text2imageMessage extends CommonMessage {
   originImgUrl?: string

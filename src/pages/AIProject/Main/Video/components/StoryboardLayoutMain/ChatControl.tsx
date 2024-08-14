@@ -113,7 +113,7 @@ const ChatControl = () => {
           beforeUpload={beforeUpload}
           onFinish={onFinish}
           onError={onError}
-          type={EnumUploadType['IMAGE']}></CommonUpload>
+          type={EnumUploadType['MJIMAGE']}></CommonUpload>
         {prompt.fileUrl ? <Image src={prompt.fileUrl} style={{ width: '100px', objectFit: 'contain' }} /> : null}
       </ChatInput>
     </Flex>

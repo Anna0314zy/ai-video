@@ -1,8 +1,8 @@
-import { Layout } from 'antd'
+import { Layout, message } from 'antd'
 import { Flex, Image } from 'antd'
 import * as api from '@/api/models/video'
 import { useContext, useEffect, useState } from 'react'
-import { ChatMessageList, EnumUploadType, Text2imageMessageOptions } from '@/api/types/video'
+import { ChatMessageList, EnumUploadType, Text2imageMessageOptions, ResourceTypeMap } from '@/api/types/video'
 
 import { MyContext } from '../..'
 import dayjs from 'dayjs'
@@ -12,6 +12,7 @@ import ActionBtn from '@/pages/AIProject/components/ActionBtn'
 import MessageLayout from './MessageLayout'
 import MaterialContent from './MaterialContent'
 import useControlMsg from './hooks/useControlMsg'
+
 const config: {
   key: 'add' | 'refresh'
   value: string
@@ -64,9 +65,14 @@ const ChatContent = () => {
       }))
     }
   }
-  const handleClick = (key: string) => {
+  const handleClick = async (key: string, item: ChatMessageList) => {
     if (key === 'add') {
       console.log('add')
+      await api.addResource({
+        historyId: item.id!,
+        type: item.type,
+      })
+      message.success(`${ResourceTypeMap[item.type]}标记成功`)
     } else if (key === 'refresh') {
       console.log('refresh')
     }
@@ -76,7 +82,7 @@ const ChatContent = () => {
       <div>
         {messageList.map(item => {
           return (
-            <MessageLayout key={item.taskId}>
+            <MessageLayout key={item.taskId} data={item}>
               <Flex vertical={true}>
                 <div>{item.content}</div>
                 <MaterialContent data={item} />
@@ -86,7 +92,11 @@ const ChatContent = () => {
                   })}
 
                   {config.map(v => (
-                    <ActionBtn key={v.key} value={v.value} icon={v.icon} onClick={() => handleClick(v.key)}></ActionBtn>
+                    <ActionBtn
+                      key={v.key}
+                      value={v.key === 'add' ? `标记为${ResourceTypeMap[item.type]}` : v.value}
+                      icon={v.icon}
+                      onClick={() => handleClick(v.key, item)}></ActionBtn>
                   ))}
                 </Flex>
               </Flex>

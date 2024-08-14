@@ -1,5 +1,5 @@
 import api from '../index'
-import { ShotList, Text2imageMessageOptions } from '@/api/types/video'
+import { ResourceType, ShotList, Text2imageMessageOptions } from '@/api/types/video'
 
 import { PageList } from '@/api/models/project'
 import { Text2imageMessage, TaskState } from '@/api/types/video'
@@ -82,4 +82,8 @@ export const generateImagePrompt = (params: {
 
 export const getResourceList = (params: { shotId: number; size?: number; current?: number }) => {
   return api.post<any>(`${http}/api/text2image/v1/image/resource/page`, params)
+}
+
+export const addResource = (params: { historyId: number; type: ResourceType }) => {
+  return api.get<any>(`${http}/api/resource/v1/add`, params)
 }
