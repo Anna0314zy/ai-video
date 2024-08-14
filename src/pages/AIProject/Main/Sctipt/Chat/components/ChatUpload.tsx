@@ -12,7 +12,7 @@ interface IProps {
   customRequest?: (options: any) => void
   disabled?: boolean
 }
-const ChatUpload = ({ onSuccess, accept = '.md,.xlsx', children, customRequest, disabled = false }: IProps) => {
+const ChatUpload = ({ onSuccess, accept = '.md,.xlsx,.docx', children, customRequest, disabled = false }: IProps) => {
   const props: UploadProps = {
     accept,
     maxCount: 1,
