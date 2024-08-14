@@ -17,7 +17,7 @@ export interface ProjectList {
   id: string
   sessionList?: { id: number }[]
 }
-export interface PageList<T> {
+export interface PageList<T = ProjectList> {
   size: number
   current: number
   total: number
