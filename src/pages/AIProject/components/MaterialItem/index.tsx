@@ -9,7 +9,7 @@ import * as api from '@/api/models/main'
 import { downloadFromServer } from '@/utils'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
 import { MyContext } from '@/pages/AIProject/Main/Sctipt'
-import ScriptPreview from '../../Main/Sctipt/RightPanel/ScriptPreview'
+import ScriptPreview from './ScriptPreview'
 import DownloadScript from './DownloadScript'
 import Styles from './index.module.less'
 
@@ -18,6 +18,7 @@ interface IMaterialItem {
   icon?: string // 素材icon
   actived?: boolean // 选中状态
   onChange: (val: ScriptPageList) => void
+  // onHandleDownload
 }
 export default (props: IMaterialItem) => {
   const { getScriptPageList } = useContext(MyContext)
@@ -77,7 +78,7 @@ export default (props: IMaterialItem) => {
           [Styles.actived]: data.actived || actived,
         })}
         onClick={() => onChange(data)}>
-        {data.isFinal ? <AntdIcon icon='checkCircle' classname={Styles['checkCircle']}></AntdIcon> : null}
+        {/* {data.isFinal ? <AntdIcon icon='checkCircle' classname={Styles['checkCircle']}></AntdIcon> : null} */}
         <IconWidget
           className='material-icon'
           name={props.icon}

@@ -1,7 +1,8 @@
 import { Fragment, useState, useRef, useEffect } from 'react'
 import { Layout, message } from 'antd'
 import Styles from './index.module.less'
-import MaterialItem from '@/pages/AIProject/components/MaterialItem'
+// import MaterialItem from '@/pages/AIProject/components/MaterialItem'
+import { fileIcon, downIcon, moreIcon } from '@/components/IconWidget/Icons'
 import { useSelector, useDispatch } from 'react-redux'
 
 interface IStoryboardScreen {
@@ -77,14 +78,25 @@ export default (props: IStoryboardScreen) => {
         </div>
         <div ref={scrollContainerRef} className='storyboard-image-content__list'>
           {[...(step === 1 ? imgData : videoData)].map((item: any, index: number) => (
-            <MaterialItem
-              key={index}
-              data={item}
-              onChange={() => {
-                dispatch.aiVideo.updateData({ selectedImage: item })
-              }}
-              actived={item.scriptId === (step === 1 ? selectedImage : selectedVideo)['scriptId']}
-            />
+            // <MaterialItem
+            //   key={index}
+            //   data={item}
+            //   onChange={() => {
+            //     dispatch.aiVideo.updateData({ selectedImage: item })
+            //   }}
+            //   actived={item.scriptId === (step === 1 ? selectedImage : selectedVideo)['scriptId']}
+            // />
+            <div className='file-item'>
+              <div className='file-item__icon f-center'>{fileIcon()}</div>
+              <div className='file-item__content '>
+                <span className='one-line-ellipsis'>SC01-P01《高尔基与童年》</span>
+                <span>2024.08.20 13:20:55</span>
+              </div>
+              <div className='file-item__operation'>
+                <span>{downIcon()}</span>
+                <span>{moreIcon()}</span>
+              </div>
+            </div>
           ))}
         </div>
         <div className='storyboard-image-content__btn' onClick={() => onHandleJumpNextStep()}>
