@@ -9,6 +9,7 @@ interface SocketParam {
   subscribeThorough: string // 订阅地址
 }
 class StompSocket extends EventEmitter {
+  public subscription: any
   constructor(socketParam: SocketParam) {
     super()
     this.initParam = socketParam
@@ -32,20 +33,27 @@ class StompSocket extends EventEmitter {
       },
       () => {
         console.log('connect--')
-        this.stompClient.subscribe(this.initParam.subscribeThorough, (message: any) => {
+        this.subscription = this.stompClient.subscribe(this.initParam.subscribeThorough, (message: any) => {
           console.log('onSubscribe', message)
           this.emit('onSubscribe', message)
         })
       },
-      (err) => {
+      err => {
         console.log('connect-error', err)
-      }
+      },
     )
   }
 
   public send() {
     console.log('发送的消息')
     this.stompClient.send(this.initParam.sendThorough, {}, 'hhh')
+  }
+  // 清除订阅
+  unsubscribe() {
+    if (this.subscription) {
+      this.subscription.unsubscribe()
+      this.subscription = null
+    }
   }
 }
 

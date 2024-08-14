@@ -2,7 +2,7 @@ import api from '../index'
 import { ShotList, Text2imageMessageOptions } from '@/api/types/video'
 
 import { PageList } from '@/api/models/project'
-import { Text2imageMessage } from '@/api/types/video'
+import { Text2imageMessage, TaskState } from '@/api/types/video'
 const http = import.meta.env.VITE_API_SERVER
 // 获取图片配置接口
 export const getImagePromptBtnList = (shotId: number) => {
@@ -46,11 +46,16 @@ export const getShotListByProjectId = (projectId: number) => {
 
 export const addText2imageTask = (params: {
   shotId: number
-  text: string
+  text?: string
   projectId: number
   option?: Text2imageMessageOptions
+  requestLogId?: number
 }) => {
-  return api.post<any>(`${http}/api/text2image/v1/mj/text2image/addTask`, params)
+  return api.post<{
+    state: TaskState
+    taskId: string
+    text: string
+  }>(`${http}/api/text2image/v1/mj/text2image/addTask`, params)
 }
 
 export const getText2imageHistories = (params: { shotId: number }) => {

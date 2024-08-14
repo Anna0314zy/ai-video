@@ -1,28 +1,26 @@
 import { Layout, Flex } from 'antd'
 import ChatContent from './ChatContent'
 import ChatControl from './ChatControl'
-import { useContext, useEffect } from 'react'
+import { useContext, useState } from 'react'
 import { MyContext } from '../..'
+import { ChatMessageList, Text2imageMessageOptions } from '@/api/types/video'
+
 const contentStyle: React.CSSProperties = {
-  textAlign: 'center',
+  // textAlign: 'center',
   height: '100%',
   color: '#fff',
   backgroundColor: '#FFF',
   display: 'flex',
   flexDirection: 'column',
+  justifyContent: 'flex-start',
 }
 export default () => {
   const { curShot } = useContext(MyContext)
-  // 需要知道当前到了哪个阶段
 
   return (
-    <Layout.Content className='page-storyboard-main' style={{ height: '100%' }}>
-      <Flex vertical={true} style={{ height: '100%' }}>
-        <Flex flex={1}>
-          <ChatContent />
-        </Flex>
-        <ChatControl />
-      </Flex>
-    </Layout.Content>
+    <Flex vertical={true} style={contentStyle}>
+      <ChatContent />
+      <ChatControl />
+    </Flex>
   )
 }

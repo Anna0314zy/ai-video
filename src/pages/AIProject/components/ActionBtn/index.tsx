@@ -1,5 +1,6 @@
 import Icon from '@/components/IconWidget/AntdIcon'
 import { Button } from 'antd'
+import Style from './index.module.less'
 interface IProps {
   value: string
   onClick: () => void
@@ -9,8 +10,8 @@ interface IProps {
 }
 const ActionBtn = ({ value = '标记为剧本', onClick, icon, loading, disabled }: IProps) => {
   return (
-    <div onClick={onClick} className='chat-btn'>
-      <span className='chat-btn-bg'>
+    <div onClick={onClick}>
+      <span className={Style['chat-btn-bg']}>
         {icon ? <Icon icon={icon} style={{ paddingRight: '5px' }}></Icon> : null}
         <Button disabled={disabled} loading={loading} type='link' style={{ height: 'auto', padding: 0, color: '#000' }}>
           {value}

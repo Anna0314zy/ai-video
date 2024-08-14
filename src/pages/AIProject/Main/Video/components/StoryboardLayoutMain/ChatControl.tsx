@@ -10,6 +10,8 @@ import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import { IUploadInput } from '@ld/file-upload'
 import { text } from 'stream/consumers'
 import { RcFile } from 'antd/lib/upload'
+import { EnumUploadType } from '@/api/types/video'
+import useControlMsg from './hooks/useControlMsg'
 const style: React.CSSProperties = {
   backgroundColor: '#fff',
   padding: '10px',
@@ -17,18 +19,19 @@ const style: React.CSSProperties = {
 const ChatControl = () => {
   const { selectedType, curShot, projectId } = useContext(MyContext)
   const formRef = useRef<any>()
+  const { addChatTask } = useControlMsg()
   const [prompt, setPrompt] = useState<{
     text?: string
     fileUrl?: string
   }>({
-    text: 'imagine Fantasy landscape, a serene lake surrounded by towering mountains, lush green forests, and vibrant wildflowers in full bloom. A majestic castle sits atop one of the mountains, with its spires piercing through fluffy clouds. The sky is painted with hues of pink, orange, and purple from a setting sun, casting a magical glow over the scene. --v 5 --ar 16:9 --q 2 ',
+    text: '',
   })
-  const content = () => {
-    if (selectedType === 'pic') {
+  const chatContentConfig = () => {
+    if (selectedType === EnumUploadType['IMAGE']) {
       return <ImageChatConfig ref={formRef}></ImageChatConfig>
-    } else if (selectedType === 'video') {
+    } else if (selectedType === EnumUploadType['VIDEO']) {
       return <VideoChatConfig ref={formRef} />
-    } else if (selectedType === 'voice') {
+    } else if (selectedType === EnumUploadType['AUDIO']) {
       return <AudioChatConfig ref={formRef} />
     }
   }
@@ -44,9 +47,8 @@ const ChatControl = () => {
   }
   const handleInputSend = async () => {
     if (!prompt?.text) return
-    // handleSendMessage()
-    // api
-    await api.addText2imageTask({
+    addChatTask({
+      type: EnumUploadType['IMAGE'],
       text: prompt.text,
       shotId: curShot?.shotId!,
       projectId: projectId!,
@@ -98,8 +100,8 @@ const ChatControl = () => {
   return (
     <Flex vertical={true} style={style}>
       <Flex align='center'>
-        <div>{content()}</div>
-        {selectedType === 'pic' ? (
+        <div>{chatContentConfig()}</div>
+        {selectedType === EnumUploadType['IMAGE'] ? (
           <Button type={'primary'} style={{ marginLeft: '10px' }} onClick={handleCreatePrompt}>
             应用
           </Button>
@@ -111,7 +113,7 @@ const ChatControl = () => {
           beforeUpload={beforeUpload}
           onFinish={onFinish}
           onError={onError}
-          type={'pic'}></CommonUpload>
+          type={EnumUploadType['IMAGE']}></CommonUpload>
         {prompt.fileUrl ? <Image src={prompt.fileUrl} style={{ width: '100px', objectFit: 'contain' }} /> : null}
       </ChatInput>
     </Flex>

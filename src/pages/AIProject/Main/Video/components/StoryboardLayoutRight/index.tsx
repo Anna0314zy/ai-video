@@ -4,7 +4,7 @@ import * as api from '@/api/models/video'
 import StoryboardVideo from './modules/StoryboardVideo'
 import StoryboardAudio from './modules/StoryboardAudio'
 import Styles from './index.module.less'
-
+import { EnumUploadType } from '@/api/types/video'
 import { MyContext } from '../..'
 
 const data = {
@@ -77,17 +77,17 @@ export default () => {
           setSelectedType(key)
         }}
         className={Styles['storyboard-tab']}
-        defaultActiveKey='pic'
+        defaultActiveKey={EnumUploadType['IMAGE']}
         centered
         items={[
           {
             label: <div>画面</div>,
-            key: 'pic',
+            key: EnumUploadType['IMAGE'],
             children: <StoryboardVideo data={data.records} />,
           },
           {
             label: <div>旁白</div>,
-            key: 'voice',
+            key: EnumUploadType['AUDIO'],
             children: <StoryboardAudio data={data.records} />,
           },
         ]}

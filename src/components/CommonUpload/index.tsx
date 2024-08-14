@@ -7,6 +7,7 @@ import { store } from '@/store'
 import { LinkOutlined } from '@ant-design/icons'
 import { UploadType } from '@/api/types/video'
 import { RcFile } from 'antd/lib/upload'
+import { EnumUploadType } from '@/api/types/video'
 export interface IUploadOptions {
   fileMd5: string
   fileName: string
@@ -31,7 +32,7 @@ export interface CommonUploadProps {
 const CommonUpload = ({
   beforeUpload,
   children,
-  type = 'pic',
+  type = EnumUploadType['IMAGE'],
   onProgress,
   onFinish,
   onError,
