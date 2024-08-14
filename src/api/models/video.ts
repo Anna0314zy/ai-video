@@ -44,3 +44,8 @@ export const getShotListByProjectId = (projectId: number) => {
 export const addText2imageTask = (params: { shotId: number; text: string; projectId: number }) => {
   return api.post<any>(`${http}/api/text2image/v1/mj/text2image/addTask`, params)
 }
+// 获取图片资源分页列表
+
+export const getResourceList = (params: { shotId: number; size?: number; current?: number }) => {
+  return api.post<any>(`${http}/api/text2image/v1/image/resource/page`, params)
+}
