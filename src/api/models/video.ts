@@ -52,7 +52,7 @@ export const addText2imageTask = (params: {
   requestLogId?: number
 }) => {
   return api.post<{
-    state: TaskState
+    state: keyof typeof TaskState
     taskId: string
     text: string
   }>(`${http}/api/text2image/v1/mj/text2image/addTask`, params)

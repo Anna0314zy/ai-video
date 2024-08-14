@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import { ChatMessageList, Text2imageMessageOptions } from '@/api/types/video'
 import * as api from '@/api/models/video'
-import { UploadType, EnumUploadType } from '@/api/types/video'
+import { ResourceType, EnumUploadType } from '@/api/types/video'
 const useControlMsg = () => {
   const [messageList, setMessageList] = useState<ChatMessageList[]>([])
   const updateMessage = (data: ChatMessageList) => {
@@ -30,7 +30,7 @@ const useControlMsg = () => {
     )
   }
 
-  const getMessageList = (type: UploadType, shotId: number) => {
+  const getMessageList = (type: ResourceType, shotId: number) => {
     if (type === EnumUploadType['IMAGE']) {
       getText2imageHistories(shotId)
     }
@@ -43,7 +43,7 @@ const useControlMsg = () => {
     option,
     requestLogId,
   }: {
-    type: UploadType
+    type: ResourceType
     text?: string
     shotId: number
     projectId: number

@@ -1,10 +1,13 @@
 export enum EnumUploadType {
-  IMAGE = 'pic',
+  IMAGE = 'image',
   VIDEO = 'video',
   AUDIO = 'voice',
+  MJIMAGE = 'mjImage',
 }
 
 export type UploadType = `${EnumUploadType}`
+
+export type ResourceType = `${Exclude<`${EnumUploadType}`, 'mjImage'>}`
 export interface PathConfigList {
   cdnPath: string
   cosPathConfigList: {
@@ -50,6 +53,7 @@ export interface ImageChatParams {
   btnValue: string
 }
 // / 获取文生图历史记录
+
 export enum TaskState {
   Queued = '队列中',
   Processing = '生成中',
@@ -66,7 +70,7 @@ export interface Text2imageMessageOptions {
 export interface CommonMessage {
   id?: number
   taskId: string //列表唯一值
-  state: TaskState
+  state: keyof typeof TaskState
   type: UploadType
 }
 export interface Text2imageMessage extends CommonMessage {
