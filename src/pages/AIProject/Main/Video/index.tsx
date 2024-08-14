@@ -14,13 +14,13 @@ import { useParams } from 'react-router-dom'
 import * as api from '@/api/models/video'
 import StompSocket from '@/utils/stompSocket'
 import { SEND_THOROUGH, TEXT_TO_IMAGE_THOROUGH } from '@/const/socket'
-type SelectType = 'pic' | 'video' | 'voice'
+import { UploadType } from '@/api/types/video'
 interface Context {
   // projectId: number
   // sessionId: number
   list: ShotList[]
   curShot?: ShotList
-  selectedType: SelectType
+  selectedType: UploadType
   [k: string]: any
 }
 export const MyContext = createContext<Context>({} as Context)
@@ -29,15 +29,17 @@ export default () => {
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
   // 当前选中的是图片 视频 还是音频
-  const [selectedType, setSelectedType] = useState<SelectType>('pic')
+  const [selectedType, setSelectedType] = useState<UploadType>('pic')
   const [list, setList] = useState<ShotList[]>([])
-  const onFinish = (options: any) => {
-    console.log('zy onFinish', options)
-  }
   // 选中的id
   const [curId, setCurId] = useState<number>()
 
   const curShot = useMemo(() => {
+    console.log(
+      '----curShot',
+      list,
+      list?.find(v => v.shotId === curId),
+    )
     return list?.find(v => v.shotId === curId)
   }, [list, curId])
   const getShotListByProjectId = async () => {
@@ -77,8 +79,6 @@ export default () => {
     <MyContext.Provider value={contextValue}>
       <Layout className={Styles['page-storyboard']}>
         <PageHeader icon='excel' status={<img src={confirm} width={68}></img>}>
-          <CommonUpload onFinish={onFinish} />
-
           <Button type='primary'>打包导出</Button>
         </PageHeader>
         <Layout className='page-storyboard-content'>

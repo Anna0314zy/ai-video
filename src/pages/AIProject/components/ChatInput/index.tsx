@@ -49,16 +49,7 @@ const ChatInput = ({
   return (
     <div className={Styles['chat-input-container']} style={wrapperStyle}>
       {children}
-      <div
-        title={prompt.fileName}
-        style={{
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          maxWidth: '200px',
-          textOverflow: 'ellipsis',
-        }}>
-        {prompt.fileName}
-      </div>
+
       <Input.TextArea
         value={prompt.text}
         onChange={handleChange}

@@ -1,5 +1,5 @@
 import { MessageList, Role } from '@/api/types/script'
-import HeadLayout from '../../../../../components/messageHeadLayout'
+import HeadLayout from './messageHeadLayout'
 import FileChat from '../FileChat'
 import { Flex } from 'antd'
 import ScriptBtn from './ActionBtn/ScriptBtn'

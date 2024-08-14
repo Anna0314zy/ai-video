@@ -17,15 +17,15 @@ export interface ProjectList {
   id: string
   sessionList?: { id: number }[]
 }
-export interface PageList {
+export interface PageList<T> {
   size: number
   current: number
   total: number
-  records: ProjectList[]
+  records: T[]
 }
 // 项目分页列表
 export const projectList = (params: any) => {
-  return api.post<PageList>(`${http}/api/project/page`, params)
+  return api.post<PageList<ProjectList>>(`${http}/api/project/page`, params)
 }
 
 // 新建项目

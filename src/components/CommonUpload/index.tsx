@@ -4,23 +4,39 @@ import { getCosCredential } from '@/api/models/common'
 import { v4 as uuidv4 } from 'uuid'
 import FileUpload, { IAuthInfo, ICOSInfo, IUploadInput } from '@ld/file-upload'
 import { store } from '@/store'
-interface IUploadOptions {
+import { LinkOutlined } from '@ant-design/icons'
+import { UploadType } from '@/api/types/video'
+import { RcFile } from 'antd/lib/upload'
+export interface IUploadOptions {
   fileMd5: string
   fileName: string
   cosFullPath: string
 }
+
 const uploadPath = (type: string) => {
   const data = store.getState().common.pathConfig.cosPathConfigList
   const path = data?.find((o: { type: string }) => o.type == type)?.path
 
   return path
 }
-interface IProps {
+export interface CommonUploadProps {
   onProgress?: IUploadInput<File, IUploadOptions>['onProgress']
   onFinish?: IUploadInput<File, IUploadOptions>['onFinish']
   onError?: IUploadInput<File, IUploadOptions>['onError']
+  type: UploadType
+  children?: React.ReactNode
+  beforeUpload?: (file: RcFile) => Promise<boolean>
+  style?: React.CSSProperties
 }
-const CommonUpload = ({ beforeUpload, pathConfigList, type, onProgress, onFinish, onError }: any) => {
+const CommonUpload = ({
+  beforeUpload,
+  children,
+  type = 'pic',
+  onProgress,
+  onFinish,
+  onError,
+  style = {},
+}: CommonUploadProps) => {
   const uploadProps: UploadProps = {
     multiple: false,
     maxCount: 1,
@@ -29,12 +45,10 @@ const CommonUpload = ({ beforeUpload, pathConfigList, type, onProgress, onFinish
     customRequest: async (options: any) => {
       try {
         console.log('options', options)
-        if (beforeUpload) {
-          const res = await beforeUpload()
-          if (res) return
-        }
-
         const { file } = options
+        if (beforeUpload) {
+          await beforeUpload(file)
+        }
         const credentialData = await getCosCredential()
         const Bucket = import.meta.env.VITE_BUCKET
         if (!store.getState().common.pathConfig?.cdnPath) throw new Error('上传路径获取失败,请刷新页面')
@@ -56,9 +70,14 @@ const CommonUpload = ({ beforeUpload, pathConfigList, type, onProgress, onFinish
         }
         // 实例化cos
         const cos = new FileUpload(authInfo, cosInfo)
-        const suffix = file.name.split('.').pop().toLocaleLowerCase()
+        const suffix = (file.name || '').split('.').pop().toLocaleLowerCase()
         const Md5 = uuidv4()
         const cosFullPath = cosInfo.Folder + '/' + Md5 + '.' + suffix
+        console.log('uploadOptions', {
+          fileMd5: Md5,
+          fileName: file.name,
+          cosFullPath,
+        })
         cos.upload({
           file: file,
           onProgress,
@@ -69,7 +88,7 @@ const CommonUpload = ({ beforeUpload, pathConfigList, type, onProgress, onFinish
           uploadOptions: {
             fileMd5: Md5,
             fileName: file.name,
-            cosFullPath,
+            cosFullPath: CdnHost + cosFullPath,
           },
         })
       } catch (e: any) {
@@ -77,6 +96,8 @@ const CommonUpload = ({ beforeUpload, pathConfigList, type, onProgress, onFinish
       }
     },
   }
-  return <Upload {...uploadProps}>上传</Upload>
+  return (
+    <Upload {...uploadProps}>{children ? children : <LinkOutlined style={{ cursor: 'pointer', ...style }} />}</Upload>
+  )
 }
 export default CommonUpload

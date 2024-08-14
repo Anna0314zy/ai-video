@@ -1,4 +1,4 @@
-export type UploadType = 'video' | 'image' | 'audio'
+export type UploadType = 'pic' | 'video' | 'voice'
 export interface PathConfigList {
   cdnPath: string
   cosPathConfigList: {
@@ -42,4 +42,29 @@ export interface VideoChatParams {
 export interface ImageChatParams {
   category: string
   btnValue: string
+}
+// / 获取文生图历史记录
+enum TaskState {
+  Queued = '队列中',
+  Processing = '生成中',
+  Completed = '已完成',
+  Transcoding = '转码中',
+  Failed = '已失败',
+}
+export interface Text2imageMessageOptions {
+  custom: string
+  label: string
+  style: number
+  type: number
+}
+export interface Text2imageMessage {
+  originImgUrl: string
+  taskId: string
+  taskState: TaskState
+  compressImgUrl?: string
+  content?: string
+  id: number
+  width: number
+  height: number
+  options: Text2imageMessageOptions[]
 }

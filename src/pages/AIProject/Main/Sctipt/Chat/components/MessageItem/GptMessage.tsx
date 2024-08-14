@@ -1,5 +1,5 @@
 import { MessageList } from '@/api/types/script'
-import HeadLayout from '../../../../../components/messageHeadLayout'
+import HeadLayout from './messageHeadLayout'
 import { Spin } from 'antd'
 interface IProps {
   messageInfo: MessageList

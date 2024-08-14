@@ -1,5 +1,8 @@
 import api from '../index'
-import { ShotList } from '@/api/types/video'
+import { ShotList, Text2imageMessageOptions } from '@/api/types/video'
+
+import { PageList } from '@/api/models/project'
+import { Text2imageMessage } from '@/api/types/video'
 const http = import.meta.env.VITE_API_SERVER
 // 获取图片配置接口
 export const getImagePromptBtnList = (shotId: number) => {
@@ -41,6 +44,32 @@ export const getShotListByProjectId = (projectId: number) => {
 }
 // 添加MJ文生图任务
 
-export const addText2imageTask = (params: { shotId: number; text: string; projectId: number }) => {
+export const addText2imageTask = (params: {
+  shotId: number
+  text: string
+  projectId: number
+  option?: Text2imageMessageOptions
+}) => {
   return api.post<any>(`${http}/api/text2image/v1/mj/text2image/addTask`, params)
+}
+
+export const getText2imageHistories = (params: { shotId: number }) => {
+  return api.post<PageList<Text2imageMessage>>(`${http}/api/text2image/v1/mj/text2image/getHistories`, params)
+}
+//保存为图片资源
+
+export const postSaveImage = (params: { shotId: number }) => {
+  return api.post<PageList<Text2imageMessage>>(`${http}/api/text2image/v1/image/resource/save`, params)
+}
+// 生成图片时解析prompt
+export const generateImagePrompt = (params: {
+  shotId: number
+  button: {
+    btnName: string
+    btnValue: string
+    btnType: string
+  }
+  imageUrl?: string
+}) => {
+  return api.post<string>(`${http}/api/prompt/v1/generateImage/parse`, params)
 }

@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { Flex, Image } from 'antd'
-import chatGpt from './chatGpt.png'
+import chatGpt from '@/assets/images/chatGpt.png'
 import { MessageList, Role } from '@/api/types/script'
 import classNames from 'classnames'
 

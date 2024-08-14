@@ -42,6 +42,7 @@ const ImageChatConfig = (_: any, ref: any) => {
   // // 绑定ref对外引用
   useImperativeHandle(ref, () => ({
     form,
+    btnList,
   }))
 
   const onValuesChange = (val: Record<keyof ImageChatParams, any>) => {
@@ -69,6 +70,7 @@ const ImageChatConfig = (_: any, ref: any) => {
         v.options = btnList.map(item => ({
           label: item.btnName,
           value: item.btnName,
+          type: item.btnType,
         }))
       }
       return v

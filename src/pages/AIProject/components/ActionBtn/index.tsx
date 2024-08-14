@@ -3,7 +3,7 @@ import { Button } from 'antd'
 interface IProps {
   value: string
   onClick: () => void
-  icon: string
+  icon?: string
   loading?: boolean
   disabled?: boolean
 }
@@ -11,7 +11,7 @@ const ActionBtn = ({ value = '标记为剧本', onClick, icon, loading, disabled
   return (
     <div onClick={onClick} className='chat-btn'>
       <span className='chat-btn-bg'>
-        <Icon icon={icon} style={{ paddingRight: '5px' }}></Icon>
+        {icon ? <Icon icon={icon} style={{ paddingRight: '5px' }}></Icon> : null}
         <Button disabled={disabled} loading={loading} type='link' style={{ height: 'auto', padding: 0, color: '#000' }}>
           {value}
         </Button>

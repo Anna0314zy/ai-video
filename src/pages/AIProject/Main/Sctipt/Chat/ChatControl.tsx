@@ -185,6 +185,17 @@ const ChatControl = (props: any) => {
       </Button> */}
       <ChatInput prompt={prompt} onChange={handleInputChange} onSend={handleInputSend} chatIng={chatIng}>
         <ChatUpload onSuccess={handleUploadSuccess}></ChatUpload>
+        {prompt.fileName ? (
+          <div
+            title={prompt.fileName}
+            style={{
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}>
+            {prompt.fileName}
+          </div>
+        ) : null}
       </ChatInput>
     </div>
   )
