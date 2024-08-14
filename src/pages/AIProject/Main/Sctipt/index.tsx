@@ -54,6 +54,7 @@ export default () => {
   const [scriptPageList, setScriptPageList] = useState<ScriptPageList[]>([])
   const [chatIng, setChatIng] = useState(false)
   const typeRef = useRef<any>()
+  const contentMessagesRef = useRef<HTMLDivElement>(null)
   const disabled = useMemo(() => {
     return scriptPageList.findIndex(v => v.isFinal) > -1
   }, [scriptPageList])
@@ -158,12 +159,12 @@ export default () => {
     setChatIng,
     messageList,
     typeRef,
+    contentMessagesRef,
   }
   useEffect(() => {
-    containerRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
+    setTimeout(() => {
+      if (contentMessagesRef.current) contentMessagesRef.current.scrollTop = contentMessagesRef.current.scrollHeight
+    }, 100)
   }, [messageList])
   console.log('zy 上下文 contextValue', contextValue)
   return (
@@ -172,7 +173,11 @@ export default () => {
         <Header />
         <Layout style={{ height: '100%' }}>
           <Content style={contentStyle}>
-            <ChatContent containerRef={containerRef} messageList={messageList} />
+            <ChatContent
+              containerRef={containerRef}
+              messageList={messageList}
+              contentMessagesRef={contentMessagesRef}
+            />
             <ChatControl containerRef={containerRef} />
           </Content>
           <Sider width={'24.4vw'} style={sliderStyle}>

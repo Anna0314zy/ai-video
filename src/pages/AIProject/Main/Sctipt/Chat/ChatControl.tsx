@@ -130,8 +130,8 @@ const ChatControl = (props: any) => {
       // scriptContent?: string // 剧本主题
       // characters?: string // 主角、配角，用英文逗号分隔
       duration: 120, // 总时长，单位秒
-      shotNum: 3, // 镜头数量
-      wordNum: 100, //剧本字数
+      shotNum: 4, // 镜头数量
+      wordNum: 600, //剧本字数
     })
   }, [])
   // 上传文件
