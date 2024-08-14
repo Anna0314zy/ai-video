@@ -36,6 +36,7 @@ const contentStyle: React.CSSProperties = {
 const sliderStyle: React.CSSProperties = {
   textAlign: 'center',
   backgroundColor: '#fff',
+  width: '24.4vw',
 }
 
 const layoutStyle: React.CSSProperties = {
@@ -174,7 +175,7 @@ export default () => {
             <ChatContent containerRef={containerRef} messageList={messageList} />
             <ChatControl containerRef={containerRef} />
           </Content>
-          <Sider width={352} style={sliderStyle}>
+          <Sider width={'24.4vw'} style={sliderStyle}>
             <RightPanel></RightPanel>
           </Sider>
         </Layout>
