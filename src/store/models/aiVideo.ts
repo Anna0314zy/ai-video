@@ -5,6 +5,7 @@ export default createModel<RootModel>()({
   state: {
     selectedVideo: {},
     selectedImage: {},
+    selectedAudio: {},
     currentSelectType: 0,
   },
   reducers: {
