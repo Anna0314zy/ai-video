@@ -1,8 +1,6 @@
 import { Fragment, useState, useRef, useEffect } from 'react'
-import { Layout, message } from 'antd'
+import { Layout } from 'antd'
 import Styles from './index.module.less'
-import MaterialItem from '@/pages/AIProject/components/MaterialItem'
-import { fileIcon, downIcon, moreIcon } from '@/components/IconWidget/Icons'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import Result from '../Result'
 import ResourceItem from '../ResourceItem'
@@ -24,12 +22,10 @@ export default (props: IStoryboardVideo) => {
   const { selectedImage, selectedVideo } = useSelector((state: any) => state.aiVideo)
   const [isShowResult, setIsShowResult] = useState(false)
   const scrollContainerRef = useRef(null)
-
-  useScrollToBottomHook(scrollContainerRef, 50, () => {
+  useEffect(() => {}, [data.length])
+  useScrollToBottomHook(scrollContainerRef, 1, () => {
     onChangeGetNewData()
-    console.log('%c 🚀 ~ [  ]-29', 'font-size:14px; background:green; color:#fff;', '到底部')
   })
-
   const setpData = [
     {
       id: 1,
