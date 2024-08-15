@@ -8,7 +8,7 @@ import AntdIcon from '@/components/IconWidget/AntdIcon'
 import './index.less'
 
 const ResourceItem: FC<any> = props => {
-  const { actived, onClick, data, onHandleDeleteResourceItem } = props
+  const { actived, onClick, data, onHandleDeleteResourceItem, onHandlePreviewResourceItem } = props
   const { currentSelectType } = useSelector((state: any) => state.aiVideo)
   const imageIconEnum: any = {
     image: fileIcon,
@@ -19,8 +19,11 @@ const ResourceItem: FC<any> = props => {
     {
       key: '1',
       label: (
-        <Flex>
-          <AntdIcon style={{ fontSize: '20px' }} icon='preview'></AntdIcon>
+        <Flex
+          onClick={() => {
+            onHandlePreviewResourceItem()
+          }}>
+          <AntdIcon style={{ fontSize: '20px' }} icon={'preview'}></AntdIcon>
           <span style={{ marginLeft: '8px' }}>预览</span>
         </Flex>
       ),
@@ -30,16 +33,16 @@ const ResourceItem: FC<any> = props => {
       label: (
         <Flex
           onClick={() => {
-            // delResourceItem
             onHandleDeleteResourceItem()
             console.log('%c 🚀 ~ [  ]-23', 'font-size:14px; background:green; color:#fff;', '删除资源')
           }}>
-          <AntdIcon style={{ fontSize: '20px' }} icon='delete'></AntdIcon>
+          <AntdIcon style={{ fontSize: '20px' }} icon={'delete'}></AntdIcon>
           <span style={{ marginLeft: '8px' }}>删除</span>
         </Flex>
       ),
     },
   ]
+
   console.log(
     '%c 🚀 ~ [ process.env.VITE_CDN_SERVER ]-44',
     'font-size:14px; background:green; color:#fff;',
@@ -63,4 +66,5 @@ const ResourceItem: FC<any> = props => {
     </div>
   )
 }
+
 export default ResourceItem

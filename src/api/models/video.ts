@@ -85,10 +85,11 @@ export const getResourceList = (params: { shotId: number; pageSize?: number; pag
 export const delResourceItem = (params: { resourceId: number; type: string }) => {
   return api.get<any>(`${http}/api/resource/v1/delete`, params)
 }
-
+// 添加资源
 export const addResource = (params: { historyId: number; type: ResourceType }) => {
   return api.get<any>(`${http}/api/resource/v1/add`, params)
 }
+
 // 重新生成
 export const reinstateTask = (params: { historyId: number; type: ResourceType }) => {
   return api.get<any>(`${http}/api/queue/v1/task/reinstateTask`, params)
@@ -129,4 +130,9 @@ export const addVideoTask = (params: { shotId: number }) => {
 
 export const addAudioTask = (params: { shotId: number }) => {
   return api.post<PageList<Text2imageMessage>>(`${http}/api/image2video/v1/svd/generateVideo/addTask`, params)
+}
+
+// 确认资源
+export const confirmResource = (params: { historyId: number; type: ResourceType }) => {
+  return api.get<any>(`${http}/api/resource/v1/confirm`, params)
 }

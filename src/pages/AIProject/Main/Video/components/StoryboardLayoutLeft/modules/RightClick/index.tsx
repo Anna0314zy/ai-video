@@ -2,6 +2,7 @@ import React from 'react'
 import type { MenuProps } from 'antd'
 import { Dropdown, Flex, theme } from 'antd'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
+// import { scriptIcon } from '@/components/IconWidget/Icons'
 const MenuLabel = ({ icon, text }: { icon: string; text: string }) => {
   const onClick = (key: string) => {
     console.log(key, 'key')

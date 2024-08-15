@@ -22,8 +22,8 @@ export default (props: IStoryboardCard) => {
         {!fail && (
           <Image
             src={img}
-            width={'100%'}
-            height={'100%'}
+            width={'9.86vw'}
+            height={'5.55vw'}
             preview={false}
             onError={() => {
               setFail(true)
