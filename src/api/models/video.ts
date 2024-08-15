@@ -133,6 +133,16 @@ export const addAudioTask = (params: { shotId: number }) => {
 }
 
 // 确认资源
-export const confirmResource = (params: { historyId: number; type: ResourceType }) => {
-  return api.get<any>(`${http}/api/resource/v1/confirm`, params)
+export const confirmResource = (params: { shotId: number; resourceId: number; type: ResourceType }) => {
+  return api.post<any>(`${http}/api/resource/v1/confirm`, params)
+}
+
+// 查询终选视频详情
+export const getVideoDetail = (params: { shotId: number }) => {
+  return api.get<any>(`${http}/api/resource/v1/final/video/detail`, params)
+}
+
+// 查询终选音频详情
+export const getVoiceDetail = (params: { shotId: number }) => {
+  return api.get<any>(`${http}/api/resource/v1/final/voice/detail`, params)
 }

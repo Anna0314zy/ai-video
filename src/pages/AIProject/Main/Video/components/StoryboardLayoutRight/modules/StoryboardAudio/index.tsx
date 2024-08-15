@@ -1,18 +1,45 @@
 import { useState, useRef } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import ResourceItem from '../ResourceItem'
 import Result from '../Result'
-import { useSelector, useDispatch } from 'react-redux'
+import * as api from '@/api/models/video'
 import './index.less'
 
 export default (props: any) => {
   const { data, onChangeGetNewData } = props
   const dispatch = useDispatch()
   const scrollAudioRef = useRef(null)
-  const { selectedAudio } = useSelector((state: any) => state.aiVideo)
+  const { selectedAudio, currentShotId, selectedVoice, currentSelectType } = useSelector((state: any) => state.aiVideo)
   const [isShowResult, setIsShowResult] = useState(false)
+  const [voiceDetail, setVoiceDetail] = useState(false)
   const onHandleJumpNext = () => {
+    console.log('%c 🚀 ~ [  ]-18', 'font-size:14px; background:green; color:#fff;', selectedVoice)
     if (Object.keys(selectedAudio).length) {
+      if (!isShowResult) {
+        api
+          .confirmResource({ shotId: currentShotId, resourceId: selectedAudio.resourceId, type: currentSelectType })
+          .then(async () => {
+            const videoEnum: any = {
+              voiceId: '旁白音频id',
+              created: '创建时间',
+              language: '语言',
+              shortName: '声音',
+              style: '情感',
+              rate: '语速',
+              pitch: '词调',
+            }
+            const res = await api.getVoiceDetail({ shotId: currentShotId })
+            const items: any = Object.keys(res).map((item: string, index: number) => {
+              return {
+                key: index,
+                label: videoEnum[item],
+                children: res[item],
+              }
+            })
+            setVoiceDetail(items)
+          })
+      }
       setIsShowResult(!isShowResult)
     }
   }
@@ -22,6 +49,7 @@ export default (props: any) => {
   const onHandleAddResource = () => {
     // 导入资源
   }
+
   return (
     <div className='storyboard-audio'>
       <div className='storyboard-audio__text'>
@@ -38,7 +66,7 @@ export default (props: any) => {
         </span>
       </div>
       {isShowResult ? (
-        <Result />
+        <Result data={voiceDetail} />
       ) : (
         <div ref={scrollAudioRef} className='storyboard-audio__list'>
           {data.map((item: any, index: number) => (
