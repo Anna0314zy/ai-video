@@ -79,6 +79,7 @@ export interface CommonMessage {
   created?: string
   originUrl?: string
   compressUrl?: string
+  text?: string
 }
 export interface Text2imageMessage extends CommonMessage {
   content?: string
@@ -89,3 +90,15 @@ export interface Text2imageMessage extends CommonMessage {
 }
 
 export type ChatMessageList = Text2imageMessage
+
+export interface AddImageTaskParams {
+  shotId: number
+  text?: string
+  projectId: number
+  option?: Text2imageMessageOptions
+  requestLogId?: number
+}
+
+export interface AudioTaskParams extends AudioChatParams {
+  shotId: number
+}

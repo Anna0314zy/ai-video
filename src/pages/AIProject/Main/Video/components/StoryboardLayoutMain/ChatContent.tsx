@@ -14,6 +14,7 @@ import MaterialContent from './MaterialContent'
 import MaterialState from './MaterialState'
 import useControlMsg from '../../useControlMsg'
 import usePullToRefresh from '@/hooks/usePullToRefresh'
+import ContentActionBtn from './ContentActionBtn'
 const PAGE_SIZE = 5
 const config: {
   key: 'add' | 'refresh'
@@ -42,7 +43,7 @@ const ChatContent = () => {
 
   const { currentSelectType, currentShotId } = useSelector((state: RootState) => state.aiVideo)
 
-  const { projectId, messageList, getMessageList, addChatTask, setMessageList } = useContext(MyContext)
+  const { projectId, messageList, getMessageList, addChatTask, reinstateTask } = useContext(MyContext)
   const [loading, setLoading] = useState({})
   const [scrollLoading, setScrollLoading] = useState<boolean>(false) // 是否正在加载
 
@@ -57,31 +58,20 @@ const ChatContent = () => {
       [item.taskId]: true,
     }))
     try {
-      await addChatTask({
-        shotId: currentShotId,
-        option: option.custom,
-        projectId,
-        requestLogIdrequestLogId: item.historyId,
-        type: EnumUploadType['IMAGE'],
-      })
+      await addChatTask(
+        {
+          shotId: currentShotId,
+          option: option.custom,
+          projectId,
+          requestLogId: item.historyId,
+        },
+        EnumUploadType['IMAGE'],
+      )
     } finally {
       setLoading(prev => ({
         ...prev,
         [item.taskId]: false,
       }))
-    }
-  }
-  const handleClick = async (key: string, item: ChatMessageList) => {
-    if (key === 'add') {
-      console.log('add')
-      if (!item.historyId) return
-      await api.addResource({
-        historyId: item.historyId,
-        type: item.type,
-      })
-      message.success(`${ResourceTypeMap[item.type]}标记成功`)
-    } else if (key === 'refresh') {
-      console.log('refresh')
     }
   }
 
@@ -112,22 +102,17 @@ const ChatContent = () => {
           return (
             <MessageLayout key={item.taskId} data={item}>
               <Flex vertical={true}>
-                <div>{item.content}</div>
+                <div>
+                  {item.taskId} | {item.content || item.text}
+                </div>
                 <MaterialContent data={item} />
                 <MaterialState data={item} />
                 <Flex wrap={true} gap={10} style={{ marginTop: '10px' }} className='btns'>
                   {item.options?.map(v => {
                     return <ActionBtn key={v.label} value={v.label} onClick={() => imageBtnClick(item, v)}></ActionBtn>
                   })}
-
-                  {config.map(v => (
-                    <ActionBtn
-                      key={v.key}
-                      value={v.key === 'add' ? `标记为${ResourceTypeMap[item.type]}` : v.value}
-                      icon={v.icon}
-                      onClick={() => handleClick(v.key, item)}></ActionBtn>
-                  ))}
                 </Flex>
+                <ContentActionBtn item={item} />
               </Flex>
             </MessageLayout>
           )

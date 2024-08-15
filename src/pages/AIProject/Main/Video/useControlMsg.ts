@@ -5,7 +5,7 @@ import { ResourceType, EnumUploadType } from '@/api/types/video'
 import { message } from 'antd'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
-
+import { AudioTaskParams, AddImageTaskParams } from '@/api/types/video'
 const useControlMsg = () => {
   const [messageList, setMessageList] = useState<ChatMessageList[]>([])
   const [hasMore, setHasMore] = useState(true) // 是否有更多数据
@@ -108,48 +108,32 @@ const useControlMsg = () => {
     }
     return data
   }
-  const addChatTask = async ({
-    type,
-    text,
-    shotId,
-    projectId,
-    option,
-    requestLogId,
-  }: {
-    type: ResourceType
-    text?: string
-    shotId: number
-    projectId: number
-    option?: Text2imageMessageOptions
-    requestLogId?: number
-  }) => {
+  const addChatTask = async (params: AudioTaskParams | AddImageTaskParams, type: ResourceType) => {
     let res = null
+
     if (type === EnumUploadType['IMAGE']) {
-      res = await api.addText2imageTask({
-        text: text,
-        shotId: shotId,
-        projectId: projectId,
-        requestLogId,
-        option,
-      })
+      res = await api.addText2imageTask(params as AddImageTaskParams)
+    } else if (type === EnumUploadType['AUDIO']) {
+      res = await api.addAudioTask(params as AudioTaskParams)
+    } else if (type === EnumUploadType['VIDEO']) {
+      // res = await api.addVideoTask(params as AudioTaskParams)
     }
     console.log('addChatTask----', res)
     if (res) {
-      updateMessage({
-        taskId: res.taskId,
-        type: EnumUploadType['IMAGE'],
-        taskState: res.taskState,
-        content: res.text,
-      })
+      updateMessage(res)
     }
   }
+  const reinstateTask = async (params: { historyId: number; type: ResourceType }) => {
+    const res = await api.reinstateTask(params)
+    updateMessage(res)
+  }
+
   return {
     messageList,
     updateMessage,
     getMessageList,
     addChatTask,
-    hasMore,
-    searchParams,
+    reinstateTask,
   }
 }
 export default useControlMsg

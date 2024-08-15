@@ -16,7 +16,7 @@ const contentStyle: React.CSSProperties = {
 }
 export default () => {
   return (
-    <Flex vertical={true} style={contentStyle}>
+    <Flex vertical={true} style={contentStyle} flex={1}>
       <ChatContent />
       <ChatControl />
     </Flex>

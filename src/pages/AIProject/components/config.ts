@@ -73,6 +73,7 @@ export const AudioDesign: AudioConfig[] = [
     label: '语言',
     prop: 'languagesName',
     type: 'select',
+    width: 200,
   },
   {
     label: '声音',

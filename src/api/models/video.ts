@@ -1,8 +1,8 @@
 import api from '../index'
-import { ResourceType, ShotList, Text2imageMessageOptions } from '@/api/types/video'
+import { ChatMessageList, ResourceType, ShotList, Text2imageMessageOptions } from '@/api/types/video'
 
 import { PageList } from '@/api/models/project'
-import { Text2imageMessage, TaskState } from '@/api/types/video'
+import { Text2imageMessage, TaskState, AudioChatParams, AddImageTaskParams, AudioTaskParams } from '@/api/types/video'
 const http = import.meta.env.VITE_API_SERVER
 // 获取图片配置接口
 export const getImagePromptBtnList = (shotId: number) => {
@@ -44,18 +44,8 @@ export const getShotListByProjectId = (projectId: number) => {
 }
 // 添加MJ文生图任务
 
-export const addText2imageTask = (params: {
-  shotId: number
-  text?: string
-  projectId: number
-  option?: Text2imageMessageOptions
-  requestLogId?: number
-}) => {
-  return api.post<{
-    taskState: keyof typeof TaskState
-    taskId: string
-    text: string
-  }>(`${http}/api/text2image/v1/mj/text2image/addTask`, params)
+export const addText2imageTask = (params: AddImageTaskParams) => {
+  return api.post<ChatMessageList>(`${http}/api/text2image/v1/mj/text2image/addTask`, params)
 }
 
 //保存为图片资源
@@ -92,7 +82,7 @@ export const addResource = (params: { historyId: number; type: ResourceType }) =
 
 // 重新生成
 export const reinstateTask = (params: { historyId: number; type: ResourceType }) => {
-  return api.get<any>(`${http}/api/queue/v1/task/reinstateTask`, params)
+  return api.get<ChatMessageList>(`${http}/api/queue/v1/task/reinstateTask`, params)
 }
 interface HistoryParams {
   shotId: number
@@ -101,7 +91,7 @@ interface HistoryParams {
 }
 // 获取图片资源历史记录
 export const getText2imageHistories = (params: HistoryParams) => {
-  return api.get<PageList<Text2imageMessage>>(`${http}/api/resource/v1/mj/image/history`, {
+  return api.get<PageList<ChatMessageList>>(`${http}/api/resource/v1/mj/image/history`, {
     shotId: params.shotId,
     pageIndex: params.current,
     pageSize: params.size,
@@ -109,14 +99,14 @@ export const getText2imageHistories = (params: HistoryParams) => {
 }
 // 获取声音资源历史记录
 export const getVideoHistories = (params: HistoryParams) => {
-  return api.get<PageList<Text2imageMessage>>(`${http}/api/resource/v1/svd/video/history`, {
+  return api.get<PageList<ChatMessageList>>(`${http}/api/resource/v1/svd/video/history`, {
     shotId: params.shotId,
     pageIndex: params.current,
     pageSize: params.size,
   })
 }
 export const getAudioHistories = (params: HistoryParams) => {
-  return api.get<PageList<Text2imageMessage>>(`${http}/api/resource/v1/tts/voice/history`, {
+  return api.get<PageList<ChatMessageList>>(`${http}/api/resource/v1/tts/voice/history`, {
     shotId: params.shotId,
     pageIndex: params.current,
     pageSize: params.size,
@@ -125,11 +115,11 @@ export const getAudioHistories = (params: HistoryParams) => {
 // 调svd服务生成视频
 
 export const addVideoTask = (params: { shotId: number }) => {
-  return api.post<PageList<Text2imageMessage>>(`${http}/api/image2video/v1/svd/generateVideo/addTask`, params)
+  return api.post<ChatMessageList>(`${http}/api/image2video/v1/svd/generateVideo/addTask`, params)
 }
 
-export const addAudioTask = (params: { shotId: number }) => {
-  return api.post<PageList<Text2imageMessage>>(`${http}/api/image2video/v1/svd/generateVideo/addTask`, params)
+export const addAudioTask = (params: AudioTaskParams) => {
+  return api.post<ChatMessageList>(`${http}/api/tts/v1/genVoices`, params)
 }
 
 // 确认资源

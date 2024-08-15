@@ -24,7 +24,7 @@ const ChatControl = () => {
     text?: string
     fileUrl?: string
   }>({
-    text: '',
+    text: 'imagine Fantasy landscape, a serene lake surrounded by towering mountains, lush green forests, and vibrant wildflowers in full bloom. A majestic castle sits atop one of the mountains, with its spires piercing through fluffy clouds. The sky is painted with hues of pink, orange, and purple from a setting sun, casting a magical glow over the scene. --v 5 --ar 16:9 --q 2',
   })
   const chatContentConfig = () => {
     if (currentSelectType === EnumUploadType['IMAGE']) {
@@ -47,12 +47,14 @@ const ChatControl = () => {
   }
   const handleInputSend = async () => {
     if (!prompt?.text) return
-    addChatTask({
-      type: EnumUploadType['IMAGE'],
-      text: prompt.text,
-      shotId: currentShotId,
-      projectId: projectId!,
-    })
+    addChatTask(
+      {
+        text: prompt.text,
+        shotId: currentShotId,
+        projectId: projectId!,
+      },
+      EnumUploadType['IMAGE'],
+    )
   }
   const handleInputChange = (val: string) => {
     console.log('handleInputChange', val)
@@ -101,6 +103,13 @@ const ChatControl = () => {
     console.log('formRef', formRef.current?.form.getFieldsValue())
     const params = formRef.current?.form.getFieldsValue()
     console.log('%c params', 'color: #ff0000;', params)
+    addChatTask(
+      {
+        ...params,
+        shotId: currentShotId,
+      },
+      currentSelectType,
+    )
   }
   return (
     <Flex vertical={true} style={style}>

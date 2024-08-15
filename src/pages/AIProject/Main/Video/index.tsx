@@ -14,7 +14,7 @@ import useControlMsg from './useControlMsg'
 import { MyContext } from './MyContext'
 import useStompSocket from '@/hooks/useStompSocket'
 const VideoProcess = () => {
-  const { messageList, getMessageList, addChatTask, updateMessage } = useControlMsg()
+  const { messageList, getMessageList, addChatTask, updateMessage, reinstateTask } = useControlMsg()
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
   useEffect(() => {
@@ -27,6 +27,7 @@ const VideoProcess = () => {
     messageList,
     getMessageList,
     addChatTask,
+    reinstateTask,
   }
   const socketCallback = (message: any) => {
     console.log('%c socketCallback', 'color:red', message)
