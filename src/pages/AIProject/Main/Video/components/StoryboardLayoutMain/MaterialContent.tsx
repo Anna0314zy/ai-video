@@ -6,12 +6,14 @@ import AntdIcon from '@/components/IconWidget/AntdIcon'
 // 配置颜色
 const MaterialContent = ({ data }: { data: ChatMessageList }) => {
   const { cdnPath } = useSelector((state: RootState) => state.common.pathConfig)
-  if (data.type === EnumUploadType['IMAGE'] && data.originImgUrl) {
-    return <Image src={cdnPath + data.originImgUrl} preview={false}></Image>
-  } else if (data.type === EnumUploadType['VIDEO'] && data.originImgUrl) {
-    return <video src={cdnPath + data.originImgUrl}></video>
-  } else if (data.type === EnumUploadType['AUDIO'] && data.originImgUrl) {
-    return <audio src={cdnPath + data.originImgUrl}></audio>
+  if (data.originUrl) {
+    if (data.type === EnumUploadType['IMAGE']) {
+      return <Image src={cdnPath + data.originUrl} preview={false}></Image>
+    } else if (data.type === EnumUploadType['VIDEO']) {
+      return <video src={cdnPath + data.originUrl}></video>
+    } else if (data.type === EnumUploadType['AUDIO']) {
+      return <audio src={cdnPath + data.originUrl}></audio>
+    }
   }
 
   // 对state 进行解释

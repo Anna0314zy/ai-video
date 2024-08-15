@@ -77,10 +77,10 @@ export interface CommonMessage {
   state: keyof typeof TaskState
   type: ResourceType
   created?: string
+  originUrl?: string
+  compressUrl?: string
 }
 export interface Text2imageMessage extends CommonMessage {
-  originImgUrl?: string
-  compressImgUrl?: string
   content?: string
   width?: number
   height?: number
