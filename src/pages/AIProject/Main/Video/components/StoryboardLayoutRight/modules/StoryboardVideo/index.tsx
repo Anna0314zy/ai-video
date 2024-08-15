@@ -1,10 +1,11 @@
 import { Fragment, useState, useRef, useEffect } from 'react'
 import { Layout } from 'antd'
-import Styles from './index.module.less'
+import { useSelector, useDispatch } from 'react-redux'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import Result from '../Result'
 import ResourceItem from '../ResourceItem'
-import { useSelector, useDispatch } from 'react-redux'
+import * as api from '@/api/models/video'
+import Styles from './index.module.less'
 
 interface IStoryboardVideo {
   data?: any
@@ -16,16 +17,16 @@ interface IStoryboardVideo {
 export default (props: IStoryboardVideo) => {
   const { data, onChangeGetNewData }: any = props
   const dispatch = useDispatch()
+  const scrollVideoRef = useRef(null)
+
   const [step, setStep]: any = useState(props.step || 1)
-  const [imgData, setImgData] = useState(data)
-  const [videoData, setVideoData] = useState(data)
-  const { selectedImage, selectedVideo } = useSelector((state: any) => state.aiVideo)
+  const { selectedImage, selectedVideo, currentSelectType } = useSelector((state: any) => state.aiVideo)
   const [isShowResult, setIsShowResult] = useState(false)
-  const scrollContainerRef = useRef(null)
-  useEffect(() => {}, [data.length])
-  useScrollToBottomHook(scrollContainerRef, 1, () => {
+
+  useScrollToBottomHook(scrollVideoRef, 1, () => {
     onChangeGetNewData()
   })
+
   const setpData = [
     {
       id: 1,
@@ -49,6 +50,9 @@ export default (props: IStoryboardVideo) => {
       setIsShowResult(false)
     }
   }
+  const onHandleAddResource = () => {
+    // 导入资源
+  }
   return (
     <Layout className={Styles['storyboard-image']}>
       <Layout.Sider className='storyboard-image-step'>
@@ -71,18 +75,29 @@ export default (props: IStoryboardVideo) => {
         {!isShowResult && (
           <div className='storyboard-image-content__header'>
             <span>{step === 1 ? '图片' : '视频'}资源</span>
-            <span>导入{step === 1 ? '图片' : '视频'}</span>
+            <span
+              onClick={() => {
+                onHandleAddResource()
+              }}>
+              导入{step === 1 ? '图片' : '视频'}
+            </span>
           </div>
         )}
         {isShowResult ? (
           <Result />
         ) : (
-          <div ref={scrollContainerRef} className='storyboard-image-content__list'>
+          <div ref={scrollVideoRef} className='storyboard-image-content__list'>
             {data.map((item: any, index: number) => (
               <ResourceItem
                 key={index}
                 data={item}
+                onHandlePreviewResourceItem={() => {
+                  // 预览
+                }}
                 onHandleDeleteResourceItem={() => {
+                  api.delResourceItem({ resourceId: item.resourceId, type: currentSelectType }).then(() => {
+                    onChangeGetNewData()
+                  })
                   // 删除某个资源
                 }}
                 onClick={() => {

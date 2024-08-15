@@ -1,20 +1,26 @@
-import { useState } from 'react'
-// import MaterialItem from '@/pages/AIProject/components/MaterialItem'
+import { useState, useRef } from 'react'
+import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import ResourceItem from '../ResourceItem'
 import Result from '../Result'
 import { useSelector, useDispatch } from 'react-redux'
 import './index.less'
 
 export default (props: any) => {
-  const { data } = props
+  const { data, onChangeGetNewData } = props
   const dispatch = useDispatch()
+  const scrollAudioRef = useRef(null)
   const { selectedAudio } = useSelector((state: any) => state.aiVideo)
   const [isShowResult, setIsShowResult] = useState(false)
   const onHandleJumpNext = () => {
-    console.log('%c 🚀 ~ [  ]-15', 'font-size:14px; background:green; color:#fff;', !Object.keys(selectedAudio).length)
     if (Object.keys(selectedAudio).length) {
       setIsShowResult(!isShowResult)
     }
+  }
+  useScrollToBottomHook(scrollAudioRef, 1, () => {
+    onChangeGetNewData()
+  })
+  const onHandleAddResource = () => {
+    // 导入资源
   }
   return (
     <div className='storyboard-audio'>
@@ -24,16 +30,24 @@ export default (props: any) => {
       </div>
       <div className='storyboard-audio__header'>
         <span>旁白资源</span>
-        <span>导入音频</span>
+        <span
+          onClick={() => {
+            onHandleAddResource()
+          }}>
+          导入音频
+        </span>
       </div>
       {isShowResult ? (
         <Result />
       ) : (
-        <div className='storyboard-audio__list'>
+        <div ref={scrollAudioRef} className='storyboard-audio__list'>
           {data.map((item: any, index: number) => (
             <ResourceItem
               key={index}
               data={item}
+              onHandlePreviewResourceItem={() => {
+                // 预览
+              }}
               onHandleDeleteResourceItem={() => {
                 // 删除某个资源
               }}
