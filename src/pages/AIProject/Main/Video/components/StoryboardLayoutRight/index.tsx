@@ -7,9 +7,9 @@ import StoryboardAudio from './modules/StoryboardAudio'
 import Styles from './index.module.less'
 import { EnumUploadType } from '@/api/types/video'
 export default () => {
-  const [data, setData]: any = useState({ records: [], total: 100, size: 10, current: 1 })
+  // const [data, setData]: any = useState({ records: [], total: 100, size: 10, current: 1 })
   const dispatch = useDispatch()
-  const { currentSelectType, selectedImage } = useSelector((state: any) => state.aiVideo)
+  const { currentSelectType, selectedImage, resourceList } = useSelector((state: any) => state.aiVideo)
 
   // 触底加载状态
   useEffect(() => {
@@ -17,18 +17,12 @@ export default () => {
   }, [currentSelectType])
 
   const getResourceList = (pageIndex?: number) => {
-    api.getResourceList({ shotId: 1, pageSize: 10, pageIndex: pageIndex || 1, type: currentSelectType }).then(res => {
-      if (pageIndex) {
-        setData({ ...res, records: [...data['records'], ...res['records']] })
-      } else {
-        setData(res)
-      }
-    })
+    dispatch.aiVideo.getResourceList({ shotId: 1, pageSize: 10, pageIndex: pageIndex || 1, type: currentSelectType })
   }
 
   const onChangeGetNewData = () => {
-    if (data?.total / 10 === data?.pageIndex) return
-    getResourceList(data?.pageIndex + 1)
+    if (resourceList?.total / 10 === resourceList?.pageIndex) return
+    getResourceList(resourceList?.pageIndex + 1)
   }
   return (
     <Layout.Sider className='page-storyboard-right'>
@@ -45,12 +39,14 @@ export default () => {
           {
             label: <div>画面</div>,
             key: EnumUploadType['IMAGE'],
-            children: <StoryboardVideo data={data?.records || []} onChangeGetNewData={() => onChangeGetNewData()} />,
+            children: (
+              <StoryboardVideo data={resourceList?.records || []} onChangeGetNewData={() => onChangeGetNewData()} />
+            ),
           },
           {
             label: <div>旁白</div>,
             key: EnumUploadType['AUDIO'],
-            children: <StoryboardAudio data={data?.records} />,
+            children: <StoryboardAudio data={resourceList?.records} />,
           },
         ]}
       />
