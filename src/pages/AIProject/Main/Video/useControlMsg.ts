@@ -3,7 +3,12 @@ import { ChatMessageList, Text2imageMessageOptions, Text2imageMessage } from '@/
 import * as api from '@/api/models/video'
 import { ResourceType, EnumUploadType } from '@/api/types/video'
 import { message } from 'antd'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
+
 const useControlMsg = () => {
+  const currentSelectType = useSelector((state: RootState) => state.aiVideo.currentSelectType)
+  console.log(currentSelectType, 'currentSelectType')
   const [messageList, setMessageList] = useState<ChatMessageList[]>([])
   const [hasMore, setHasMore] = useState(true) // 是否有更多数据
   const searchParams = useRef<{

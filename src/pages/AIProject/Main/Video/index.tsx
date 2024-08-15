@@ -16,50 +16,30 @@ import { SEND_THOROUGH, TEXT_TO_IMAGE_THOROUGH } from '@/const/socket'
 import { ResourceType, EnumUploadType } from '@/api/types/video'
 import useControlMsg from './useControlMsg'
 interface Context {
-  // projectId: number
-  // sessionId: number
   messageList: ChatMessageList[]
-  list: ShotList[]
-  curShot?: ShotList
-  selectedType: ResourceType
   [k: string]: any
 }
 export const MyContext = createContext<Context>({} as Context)
 const VideoProcess = () => {
   const { messageList, getMessageList, addChatTask, searchParams, hasMore } = useControlMsg()
   const { accountId } = useSelector((state: RootState) => state.auth.userInfo)
+  const { shotList } = useSelector((state: RootState) => state.aiVideo)
+
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
   // 当前选中的是图片 视频 还是音频
   const [selectedType, setSelectedType] = useState<ResourceType>(EnumUploadType['IMAGE'])
-  const [list, setList] = useState<ShotList[]>([])
+
   // 选中的id
   const [curId, setCurId] = useState<number>()
-
-  const curShot = useMemo(() => {
-    console.log(
-      '----curShot',
-      list,
-      list?.find(v => v.shotId === curId),
-    )
-    return list?.find(v => v.shotId === curId)
-  }, [list, curId])
-  const getShotListByProjectId = async () => {
-    const { shotBaseInfoList } = await api.getShotListByProjectId(Number(id))
-    setList(shotBaseInfoList || [])
-    setCurId(shotBaseInfoList[0].shotId)
-  }
   useEffect(() => {
     dispatch.common.getPathConfig()
     dispatch.auth.getUserInfo()
-    getShotListByProjectId()
+    dispatch.aiVideo.getShotListByProjectId(Number(id))
   }, [])
   const contextValue = {
-    list,
-    setList,
     curId,
     setCurId,
-    curShot,
     selectedType,
     setSelectedType,
     projectId: Number(id),
