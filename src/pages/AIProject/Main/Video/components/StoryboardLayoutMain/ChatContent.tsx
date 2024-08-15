@@ -4,7 +4,7 @@ import * as api from '@/api/models/video'
 import { useContext, useEffect, useState, useRef, useCallback } from 'react'
 import { ChatMessageList, EnumUploadType, Text2imageMessageOptions, ResourceTypeMap } from '@/api/types/video'
 
-import { MyContext } from '../../index'
+import { MyContext } from '../../MyContext'
 import dayjs from 'dayjs'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
@@ -12,7 +12,8 @@ import ActionBtn from '@/pages/AIProject/components/ActionBtn'
 import MessageLayout from './MessageLayout'
 import MaterialContent from './MaterialContent'
 import useControlMsg from '../../useControlMsg'
-
+import usePullToRefresh from '@/hooks/usePullToRefresh'
+const PAGE_SIZE = 5
 const config: {
   key: 'add' | 'refresh'
   value: string
@@ -40,14 +41,13 @@ const ChatContent = () => {
 
   const { currentSelectType, currentShotId } = useSelector((state: RootState) => state.aiVideo)
 
-  const { projectId, messageList, getMessageList, addChatTask, searchParams, hasMore } = useContext(MyContext)
+  const { projectId, messageList, getMessageList, addChatTask, setMessageList } = useContext(MyContext)
   const [loading, setLoading] = useState({})
   const [scrollLoading, setScrollLoading] = useState<boolean>(false) // 是否正在加载
 
-  const listRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!currentShotId) return
-    getMessageList(currentSelectType, currentShotId)
+    getMessageList(1, currentSelectType, currentShotId)
   }, [currentShotId, currentSelectType])
   const imageBtnClick = async (item: ChatMessageList, option: Text2imageMessageOptions) => {
     console.log('imageBtnClick', item)
@@ -83,25 +83,28 @@ const ChatContent = () => {
     }
   }
 
-  async function checkScrollPosition() {
-    if (scrollLoading || !hasMore) return
-    const listElement = listRef.current
-    if (listElement) {
-      const { scrollTop, clientHeight, scrollHeight } = listElement
+  const { hasMore, loadMore } = usePullToRefresh(
+    (current: number) => getMessageList(current, currentSelectType, currentShotId, true),
+    PAGE_SIZE,
+  )
+  const containerRef = useRef<HTMLDivElement>(null)
 
-      if (scrollTop + clientHeight >= scrollHeight - 150) {
-        setScrollLoading(true)
-        searchParams.current.current += 1
-        try {
-          await getMessageList(currentSelectType, currentShotId, true)
-        } finally {
-          setScrollLoading(false)
-        }
-      }
-    }
-  }
+  useEffect(() => {
+    setTimeout(() => {
+      if (containerRef.current) containerRef.current.scrollTop = containerRef.current.scrollHeight
+    }, 100)
+  }, [messageList])
+
   return (
-    <Layout.Content style={style} ref={listRef} onScroll={checkScrollPosition}>
+    <Layout.Content
+      ref={containerRef}
+      style={style}
+      onScroll={e => {
+        // 当滚动到顶部时触发加载更多
+        if (e.currentTarget.scrollTop === 0) {
+          loadMore()
+        }
+      }}>
       <div>
         {messageList.map(item => {
           return (

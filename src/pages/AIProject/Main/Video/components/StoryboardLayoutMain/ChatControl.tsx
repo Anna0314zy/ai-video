@@ -1,6 +1,6 @@
 import { Button, Flex, message, Image } from 'antd'
 import { useContext, useState, useRef } from 'react'
-import { MyContext } from '../../index'
+import { MyContext } from '../../MyContext'
 import AudioChatConfig from './AudioChatConfig'
 import VideoChatConfig from './VideoChatConfig'
 import ImageChatConfig from './ImageChatConfig'

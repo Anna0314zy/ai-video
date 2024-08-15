@@ -15,11 +15,7 @@ import StompSocket from '@/utils/stompSocket'
 import { SEND_THOROUGH, TEXT_TO_IMAGE_THOROUGH } from '@/const/socket'
 import { ResourceType, EnumUploadType } from '@/api/types/video'
 import useControlMsg from './useControlMsg'
-interface Context {
-  messageList: ChatMessageList[]
-  [k: string]: any
-}
-export const MyContext = createContext<Context>({} as Context)
+import { MyContext } from './MyContext'
 const VideoProcess = () => {
   const { messageList, getMessageList, addChatTask, searchParams, hasMore } = useControlMsg()
   const { accountId } = useSelector((state: RootState) => state.auth.userInfo)

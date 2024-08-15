@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import { Flex } from 'antd'
-import { MyContext } from '../../index'
+import { MyContext } from '../../MyContext'
 import FrameItem from './modules/FrameItem'
 import { useSelector, useDispatch } from 'react-redux'
 import { Dispatch, RootState } from '@/store'

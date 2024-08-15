@@ -37,40 +37,47 @@ const useControlMsg = () => {
       }
     })
   }
-  const getText2imageHistories = async (shotId: number): Promise<Text2imageMessage[]> => {
-    const res = await api.getText2imageHistories({
-      shotId,
-      ...searchParams.current,
-    })
+  const getText2imageHistories = async (params: {
+    shotId: number
+    current: number
+    size: number
+  }): Promise<Text2imageMessage[]> => {
+    const res = await api.getText2imageHistories(params)
     console.log(res, 'res', res.records?.length < searchParams.current.size)
-    if (res.records?.length < searchParams.current.size) setHasMore(false)
     return res.records.map(v => ({
       ...v,
       type: EnumUploadType['IMAGE'],
     }))
   }
 
-  const getMessageList = async (type: ResourceType, shotId: number, scroll = false) => {
+  const getMessageList = async (current: number, type: ResourceType, shotId: number, scroll = false) => {
     let data = null
+    console.log(
+      '%c getMessageList',
+      'color:green;font-size:14px;background-color:yellow',
+      current,
+      type,
+      shotId,
+      scroll,
+    )
     if (type === EnumUploadType['IMAGE']) {
-      data = await getText2imageHistories(shotId)
-    }
-    // 获取状态为【队列中】的任务列表
-    if (!scroll) {
-      const queuedTaskList = api.getQueuedTaskList({
+      data = await getText2imageHistories({
         shotId,
+        current,
+        size: 5,
       })
     }
 
     if (data) {
       if (scroll) {
         setMessageList(prev => {
-          return [...prev, ...data]
+          return [...data, ...prev]
         })
       } else {
         setMessageList(data)
       }
     }
+    return data
   }
   const addChatTask = async ({
     type,
