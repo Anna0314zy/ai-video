@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { getQueryParam } from '@/utils'
 import * as api from '@/api/models/main'
-import { getProjectDetail } from '@/api/models/project'
+import { getProjectDetail as getDetail } from '@/api/models/project'
 import { convertToMarkdown } from '@/utils'
 import RightPanel from './RightPanel'
 import { MessageList, ScriptPageList, ScriptStatus } from '@/api/types/script'
@@ -105,18 +105,18 @@ export default () => {
     console.log('handleCreate sessionId', sessionId)
   }
   //项目详情
-  const getDetail = async () => {
-    const { latestSessionId, project } = await getProjectDetail(Number(id))
-    console.log('zy getDetail', latestSessionId, project)
+  const getProjectDetail = async () => {
+    const { latestSessionId, project } = await getDetail(Number(id))
+    console.log('zy getProjectDetail', latestSessionId, project)
     setSessionId(latestSessionId || 0)
     if (!latestSessionId) {
       handleCreateChat()
     }
     // setProject(project)
-    setCurrentState(currentState)
+    setCurrentState(project.state)
   }
   useEffect(() => {
-    getDetail()
+    getProjectDetail()
     getScriptPageList()
     // if (!sessionId) handleCreateChat()
   }, [])
@@ -140,6 +140,7 @@ export default () => {
     messageList,
     typeRef,
     contentMessagesRef,
+    getProjectDetail,
   }
   useEffect(() => {
     setTimeout(() => {

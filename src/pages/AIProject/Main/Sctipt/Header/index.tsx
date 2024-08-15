@@ -8,7 +8,8 @@ import { useContext } from 'react'
 import { CheckCircleOutlined } from '@ant-design/icons'
 
 const leftChildren = () => {
-  const { projectName, state, disabled } = useContext(MyContext)
+  const { projectName, currentState, disabled } = useContext(MyContext)
+  console.log('currentState', currentState)
   const step = location.hash.split('/').pop()
   return (
     <>
@@ -16,9 +17,11 @@ const leftChildren = () => {
       <span style={{ fontWeight: 500, fontSize: 20, color: '#292933' }}>{projectName}</span>
       <span className={Styles['tip-shu']}> | </span>
       <span className={Styles['tip-text']}> {getHeaderTips(step)}</span>
-      <Tag style={{ width: 68, marginLeft: 12 }} icon={<CheckCircleOutlined />} color='success'>
-        已确认
-      </Tag>
+      {currentState !== 'ScriptProcessing' ? (
+        <Tag style={{ width: 68, marginLeft: 12 }} icon={<CheckCircleOutlined />} color='success'>
+          已确认
+        </Tag>
+      ) : null}
     </>
   )
 }

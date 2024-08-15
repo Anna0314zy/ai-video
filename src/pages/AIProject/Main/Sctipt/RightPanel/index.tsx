@@ -11,7 +11,7 @@ import ChatUpload from '@/pages/AIProject/Main/Sctipt/Chat/components/ChatUpload
 import Styles from './index.module.less'
 
 const RightPanel = () => {
-  const { scriptPageList, disabled, setScriptPageList, projectId, getScriptPageList } = useContext(MyContext)
+  const { scriptPageList, getProjectDetail, setScriptPageList, projectId, getScriptPageList } = useContext(MyContext)
   const [loading, setLoading] = useState(false)
   //当前被选中的剧本
   const targetScript = useMemo(() => {
@@ -51,6 +51,7 @@ const RightPanel = () => {
       })
       message.success('确认成功')
       getScriptPageList()
+      getProjectDetail()
     } finally {
       setLoading(false)
     }

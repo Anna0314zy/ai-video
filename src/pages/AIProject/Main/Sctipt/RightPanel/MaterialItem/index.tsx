@@ -22,7 +22,7 @@ interface IMaterialItem {
   // onHandleDownload
 }
 export default (props: IMaterialItem) => {
-  const { getScriptPageList } = useContext(MyContext)
+  const { getScriptPageList, getProjectDetail } = useContext(MyContext)
   const { data, actived, onChange } = props
   const previewRef = useRef<{
     open: (val: string) => void
@@ -44,6 +44,7 @@ export default (props: IMaterialItem) => {
     })
     message.success('删除成功')
     getScriptPageList()
+    getProjectDetail()
   }, [])
   const items: MenuProps['items'] = [
     {
