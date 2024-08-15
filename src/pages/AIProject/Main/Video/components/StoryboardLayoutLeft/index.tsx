@@ -3,23 +3,23 @@ import { Layout, Flex } from 'antd'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import ContentMenu from './modules/RightClick'
 import FrameItem from './modules/FrameItem'
-import { MyContext } from '../../MyContext'
+import { useDispatch, useSelector } from 'react-redux'
+import { Dispatch, RootState } from '@/store'
 export default () => {
-  const { list, setList, curId, setCurId } = useContext(MyContext)
-  const [currentSelectIndex, setCurrentSelectIndex] = useState(0)
+  const dispatch = useDispatch<Dispatch>()
+  const { shotList, currentShotId } = useSelector((state: RootState) => state.aiVideo)
   function handleOnDragEnd(result: any) {
     if (!result.destination) return
 
-    const items = Array.from(list)
+    const items = Array.from(shotList)
     const [reorderedItem] = items.splice(result.source.index, 1)
     items.splice(result.destination.index, 0, reorderedItem)
-
-    setList(
-      items.map((v: any, index) => ({
+    dispatch.aiVideo.updateData({
+      shotList: items.map((v: any, index) => ({
         ...v,
         sortIndex: index + 1,
       })),
-    )
+    })
   }
   return (
     <Layout.Sider width={'13.88vw'} className='page-storyboard-left'>
@@ -32,18 +32,22 @@ export default () => {
         <Droppable droppableId='shot'>
           {provided => (
             <Flex className='shot' {...provided.droppableProps} ref={provided.innerRef} vertical={true}>
-              {list?.map((data, index) => {
+              {shotList?.map((data, index) => {
                 return (
                   <Draggable key={data.shotId} draggableId={String(data.shotId)} index={index}>
                     {provided => (
                       <ContentMenu>
                         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                           <FrameItem
-                            onClick={() => setCurrentSelectIndex(index)}
+                            onClick={() => {
+                              dispatch.aiVideo.updateData({
+                                currentShotId: data.shotId,
+                              })
+                            }}
                             key={index}
                             index={index + 1}
                             img={data.imageUrl}
-                            active={index === currentSelectIndex}
+                            active={data.shotId === currentShotId}
                           />
                         </div>
                       </ContentMenu>
