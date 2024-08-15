@@ -3,7 +3,7 @@ import { Layout, Flex } from 'antd'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import ContentMenu from './modules/RightClick'
 import FrameItem from './modules/FrameItem'
-import { MyContext } from '../../index'
+import { MyContext } from '../../MyContext'
 export default () => {
   const { list, setList, curId, setCurId } = useContext(MyContext)
   const [currentSelectIndex, setCurrentSelectIndex] = useState(0)
