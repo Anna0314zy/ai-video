@@ -78,10 +78,15 @@ export const generateImagePrompt = (params: {
 }) => {
   return api.post<string>(`${http}/api/prompt/v1/generateImage/parse`, params)
 }
-// 获取图片资源分页列表
 
-export const getResourceList = (params: { shotId: number; size?: number; current?: number }) => {
-  return api.post<any>(`${http}/api/text2image/v1/image/resource/page`, params)
+// 获取图片资源分页列表
+export const getResourceList = (params: { shotId: number; pageSize?: number; pageIndex?: number; type: string }) => {
+  return api.get<any>(`${http}/api/resource/v1/page`, params)
+}
+
+// 根据资源id删除
+export const delResourceItem = (params: { resourceId: number; type: string }) => {
+  return api.get<any>(`${http}/api/resource/v1/delete`, params)
 }
 
 export const addResource = (params: { historyId: number; type: ResourceType }) => {

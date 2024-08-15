@@ -76,44 +76,7 @@
         gap: 12px;
         overflow-y: auto;
         margin-bottom: 10px;
-        .file-item{
-          width: 304px;
-          height: 53px;
-          // padding: 8px 12px;
-          display: flex;
-          border: 1px solid #F2F3F7;
-          align-items: center;
-          &__icon{
-            width: 36px;
-            height: 36px;
-            border: 1px solid red;
-            margin-right: 8px;
-          }
-          &__content{
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 2px 0;
-            margin-right: 15px;
-            gap: 6px;
-            span{
-              line-height: 1;
-              &:nth-child(1){
-                width: 177px;
-                font-size: 14px;
-              }
-              &:nth-child(2) {
-                font-size: 12px;
-              }
-            }
-          }
-          &__operation{
-            width: 44px;
-            height: 16px;
-            display: flex;
-            justify-content: space-between;
-          }
-        }
+
       }
       &__btn{
         width: 304px;
@@ -124,9 +87,16 @@
         background-color: #14141A;
         margin: 0 auto;
         cursor: pointer;
+        border-radius: 4px;
         span{
           color: #F5F5FF;
           font-size: 14px;
+        }
+        &.edit-btn{
+          background: #F2F3F7;
+          span{
+          color: #292933;
+          }
         }
       }
     }

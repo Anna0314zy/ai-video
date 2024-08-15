@@ -1,0 +1,53 @@
+ .resource-item {
+   width: 304px;
+   height: 53px;
+   padding: 8px 12px;
+   display: flex;
+   border: 1px solid #F2F3F7;
+   align-items: center;
+   border-radius: 4px;
+
+   &.actived {
+     border: 1px solid #27BA27;
+     background-color: #27BA270D;
+   }
+
+   &__icon {
+     margin-right: 8px;
+
+     svg {
+       width: 36px;
+       height: 36px;
+     }
+   }
+
+   &__content {
+     display: flex;
+     flex-direction: column;
+     justify-content: space-between;
+     padding: 2px 0;
+     margin-right: 15px;
+     gap: 6px;
+
+     span {
+       line-height: 1;
+
+       &:nth-child(1) {
+         width: 177px;
+         font-size: 14px;
+       }
+
+       &:nth-child(2) {
+         font-size: 12px;
+       }
+     }
+   }
+
+   &__operation {
+     width: 44px;
+     height: 16px;
+     display: flex;
+     justify-content: space-between;
+
+   }
+ }

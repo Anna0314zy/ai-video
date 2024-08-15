@@ -6,10 +6,11 @@ export default createModel<RootModel>()({
     selectedVideo: {},
     selectedImage: {},
     selectedAudio: {},
-    currentSelectType: 0,
+    currentSelectType: 'image',
   },
   reducers: {
     updateData(state, payload: any) {
+      console.log('%c 🚀 ~ [ payload ]-13', 'font-size:14px; background:green; color:#fff;', payload)
       return { ...state, ...payload }
     },
   },
