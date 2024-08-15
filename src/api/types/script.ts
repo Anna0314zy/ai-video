@@ -58,8 +58,8 @@ export enum ScriptStatus {
   'Completed' = '已完成',
 }
 
-export const getHeaderTips = (state: keyof typeof ScriptStatus) => {
-  if (state === 'ScriptProcessing') {
+export const getHeaderTips = (state?: string) => {
+  if (state === 'script') {
     return '剧本设计'
   }
   return '镜头设计'

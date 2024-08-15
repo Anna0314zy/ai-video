@@ -1,5 +1,5 @@
 import { useContext, useImperativeHandle, forwardRef, useEffect, useState, useMemo } from 'react'
-import { MyContext } from '../../index'
+import { MyContext } from '../../MyContext'
 import { ScriptDesign } from '../../../../components/config'
 import { WidgetItem } from '@/pages/AIProject/components/WidgetInputItem'
 import { Flex, Form, Space } from 'antd'

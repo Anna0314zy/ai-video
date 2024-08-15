@@ -2,7 +2,7 @@ import { useRef, useImperativeHandle, useState, forwardRef, useCallback } from '
 import MarkdownIt from 'markdown-it'
 import CommonModal, { ModalHandle } from '@/components/CommonModal'
 import { Button } from 'antd'
-import DownloadScript from '@/pages/AIProject/components/MaterialItem/DownloadScript'
+import DownloadScript from './index'
 const ScriptPreview = ({ handleDownload, handleDel, data }: any, ref: any) => {
   const modelRef = useRef<ModalHandle>(null)
   const [html, setHtml] = useState('')

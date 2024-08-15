@@ -1,6 +1,6 @@
 import { useContext, useEffect } from 'react'
 import { useRef } from 'react'
-import { MyContext } from '../index'
+import { MyContext } from '../MyContext'
 import Typed from 'typed.js'
 import MarkdownIt from 'markdown-it'
 const useTyped = () => {

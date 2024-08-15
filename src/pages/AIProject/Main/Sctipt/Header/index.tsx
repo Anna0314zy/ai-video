@@ -1,22 +1,24 @@
 import HeaderLayout from '../../../components/HeaderLayout'
 import IconWidget from '@/components/IconWidget'
-import { Button } from 'antd'
+import { Button, Tag } from 'antd'
 import Styles from '../index.module.less'
 import { getHeaderTips } from '@/api/types/script'
-import { MyContext } from '../index'
+import { MyContext } from '../MyContext'
 import { useContext } from 'react'
+import { CheckCircleOutlined } from '@ant-design/icons'
 
 const leftChildren = () => {
   const { projectName, state, disabled } = useContext(MyContext)
+  const step = location.hash.split('/').pop()
   return (
     <>
       <IconWidget name='excel' style={{ width: 22, marginLeft: 12 }} />
       <span style={{ fontWeight: 500, fontSize: 20, color: '#292933' }}>{projectName}</span>
       <span className={Styles['tip-shu']}> | </span>
-      <span className={Styles['tip-text']}> {getHeaderTips(state)}</span>
-      {/* <Tag style={{ width: 68, marginLeft: 12 }} icon={<CheckCircleOutlined />} color='success'>
+      <span className={Styles['tip-text']}> {getHeaderTips(step)}</span>
+      <Tag style={{ width: 68, marginLeft: 12 }} icon={<CheckCircleOutlined />} color='success'>
         已确认
-      </Tag> */}
+      </Tag>
     </>
   )
 }

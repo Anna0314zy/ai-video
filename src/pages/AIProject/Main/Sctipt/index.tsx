@@ -1,28 +1,16 @@
 import Header from './Header'
-import StompSocket from '@/utils/stompSocket'
-import { SEND_THOROUGH, SUBSCRIBE_THOROUGH } from '@/const/socket'
 import ChatContent from './Chat/ChatContent'
 import ChatControl from './Chat/ChatControl'
-import { Layout, Button } from 'antd'
-import { createContext, useEffect, useRef, useState, useMemo } from 'react'
-
-import { MessageList, ScriptPageList, ScriptStatus } from '@/api/types/script'
+import { Layout } from 'antd'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { getQueryParam } from '@/utils'
 import * as api from '@/api/models/main'
 import { getProjectDetail } from '@/api/models/project'
-import { setEngine } from 'crypto'
 import { convertToMarkdown } from '@/utils'
 import RightPanel from './RightPanel'
-import { ProjectList } from '@/api/models/project'
-interface Context {
-  projectId: number
-  sessionId: number
-  scriptPageList: ScriptPageList[]
-  currentState: keyof typeof ScriptStatus
-  [k: string]: any
-}
-export const MyContext = createContext<Context>({} as Context)
+import { MessageList, ScriptPageList, ScriptStatus } from '@/api/types/script'
+import { MyContext } from './MyContext'
 const { Sider, Content } = Layout
 const contentStyle: React.CSSProperties = {
   textAlign: 'center',
@@ -85,14 +73,6 @@ export default () => {
   useEffect(() => {
     getChatHistories()
   }, [sessionId])
-  // const stompSocket = new StompSocket({
-  //   baseUrl: import.meta.env.VITE_SOCKET_BASE,
-  //   sendThorough: SEND_THOROUGH,
-  //   subscribeThorough: SUBSCRIBE_THOROUGH,
-  // })
-  // stompSocket.on('onSubscribe', message => {
-  //   console.log(message)
-  // })
   // 更新信息
   const updateMessage = (data: MessageList | MessageList[]) => {
     setMessageList(messageList => {
