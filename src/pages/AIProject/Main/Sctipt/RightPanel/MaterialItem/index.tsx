@@ -12,6 +12,7 @@ import { MyContext } from '@/pages/AIProject/Main/Sctipt/MyContext'
 import ScriptPreview from './ScriptPreview'
 import DownloadScript from './DownloadScript'
 import Styles from './index.module.less'
+import AntdIcon from '@/components/IconWidget/AntdIcon'
 
 interface IMaterialItem {
   data: ScriptPageList // 素材数据
@@ -49,8 +50,8 @@ export default (props: IMaterialItem) => {
       key: '1',
       label: (
         <Flex onClick={handlePreview}>
-          {previewIcon()}
-          {/* <AntdIcon style={{ fontSize: '20px' }} icon='preview'></AntdIcon> */}
+          {/* {previewIcon()} */}
+          <AntdIcon style={{ fontSize: '20px' }} icon='preview'></AntdIcon>
           <span style={{ marginLeft: '8px' }}>预览</span>
         </Flex>
       ),
@@ -59,8 +60,8 @@ export default (props: IMaterialItem) => {
       key: '2',
       label: (
         <Flex onClick={handleDel}>
-          {deleteIcon()}
-          {/* <AntdIcon style={{ fontSize: '20px' }} icon='delete'></AntdIcon> */}
+          {/* {deleteIcon()} */}
+          <AntdIcon style={{ fontSize: '20px' }} icon='delete'></AntdIcon>
           <span style={{ marginLeft: '8px' }}>删除</span>
         </Flex>
       ),
@@ -90,7 +91,7 @@ export default (props: IMaterialItem) => {
         />
         <Flex className={Styles['material-content']} align='flex-start' flex={1} vertical={true}>
           <div className={Styles['material-content-name']}>{data.name}</div>
-          <div>{data.modified}</div>
+          <div className={Styles['material-content-name']}>{data.modified}</div>
         </Flex>
         <div className='material-item-right'>
           <DownloadScript data={data} />
