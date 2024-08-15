@@ -7,7 +7,8 @@ import IconWidget from '@/components/IconWidget'
 import { ScriptPageList } from '@/api/types/script'
 import * as api from '@/api/models/main'
 import { downloadFromServer } from '@/utils'
-import AntdIcon from '@/components/IconWidget/AntdIcon'
+// import AntdIcon from '@/components/IconWidget/AntdIcon'
+import { previewIcon, deleteIcon } from '@/components/IconWidget/Icons'
 import { MyContext } from '@/pages/AIProject/Main/Sctipt'
 import ScriptPreview from './ScriptPreview'
 import DownloadScript from './DownloadScript'
@@ -49,7 +50,8 @@ export default (props: IMaterialItem) => {
       key: '1',
       label: (
         <Flex onClick={handlePreview}>
-          <AntdIcon style={{ fontSize: '20px' }} icon='preview'></AntdIcon>
+          {previewIcon()}
+          {/* <AntdIcon style={{ fontSize: '20px' }} icon='preview'></AntdIcon> */}
           <span style={{ marginLeft: '8px' }}>预览</span>
         </Flex>
       ),
@@ -58,7 +60,8 @@ export default (props: IMaterialItem) => {
       key: '2',
       label: (
         <Flex onClick={handleDel}>
-          <AntdIcon style={{ fontSize: '20px' }} icon='delete'></AntdIcon>
+          {deleteIcon()}
+          {/* <AntdIcon style={{ fontSize: '20px' }} icon='delete'></AntdIcon> */}
           <span style={{ marginLeft: '8px' }}>删除</span>
         </Flex>
       ),
