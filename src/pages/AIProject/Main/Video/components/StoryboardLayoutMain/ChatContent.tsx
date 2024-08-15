@@ -58,7 +58,7 @@ const ChatContent = () => {
     try {
       await addChatTask({
         shotId: currentShotId,
-        option,
+        option: option.custom,
         projectId,
         requestLogId: item.id,
         type: EnumUploadType['IMAGE'],
