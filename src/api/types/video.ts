@@ -72,9 +72,9 @@ export interface Text2imageMessageOptions {
   type: number
 }
 export interface CommonMessage {
-  id?: number
+  historyId?: number
   taskId: string //列表唯一值
-  state: keyof typeof TaskState
+  taskState: keyof typeof TaskState
   type: ResourceType
   created?: string
   originUrl?: string
@@ -85,7 +85,7 @@ export interface Text2imageMessage extends CommonMessage {
   width?: number
   height?: number
   options?: Text2imageMessageOptions[]
-  isTrimming?: number // 表示该资源是否可以被添加
+  isTrimming?: number // 表示该资源是否可以被添加图片是否为修整，如果是1 则允许保存为图片资源
 }
 
 export type ChatMessageList = Text2imageMessage

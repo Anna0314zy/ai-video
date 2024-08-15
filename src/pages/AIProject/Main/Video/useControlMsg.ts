@@ -7,8 +7,6 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 
 const useControlMsg = () => {
-  const currentSelectType = useSelector((state: RootState) => state.aiVideo.currentSelectType)
-  console.log(currentSelectType, 'currentSelectType')
   const [messageList, setMessageList] = useState<ChatMessageList[]>([])
   const [hasMore, setHasMore] = useState(true) // 是否有更多数据
   const searchParams = useRef<{
@@ -25,14 +23,12 @@ const useControlMsg = () => {
     setMessageList((prev: ChatMessageList[]) => {
       if (prev.some((item: ChatMessageList) => item.taskId === data.taskId)) {
         return prev.map(item => {
-          console.log('---setMessageList---', item.taskId, data.taskId, item.taskId === data.taskId)
           if (item.taskId === data.taskId) {
             return Object.assign({}, item, data)
           }
           return item
         })
       } else {
-        console.log('updateMessage', prev, prev.concat(data))
         return [...prev, data]
       }
     })
@@ -43,15 +39,36 @@ const useControlMsg = () => {
     size: number
   }): Promise<Text2imageMessage[]> => {
     const res = await api.getText2imageHistories(params)
-    console.log(res, 'res', res.records?.length < searchParams.current.size)
     return res.records.map(v => ({
       ...v,
       type: EnumUploadType['IMAGE'],
     }))
   }
+  const getVideoHistories = async (params: {
+    shotId: number
+    current: number
+    size: number
+  }): Promise<Text2imageMessage[]> => {
+    const res = await api.getVideoHistories(params)
+    return res.records.map(v => ({
+      ...v,
+      type: EnumUploadType['VIDEO'],
+    }))
+  }
+  const getAudioHistories = async (params: {
+    shotId: number
+    current: number
+    size: number
+  }): Promise<Text2imageMessage[]> => {
+    const res = await api.getAudioHistories(params)
+    return res.records.map(v => ({
+      ...v,
+      type: EnumUploadType['AUDIO'],
+    }))
+  }
 
   const getMessageList = async (current: number, type: ResourceType, shotId: number, scroll = false) => {
-    let data = null
+    let data: ChatMessageList[] = []
     console.log(
       '%c getMessageList',
       'color:green;font-size:14px;background-color:yellow',
@@ -64,18 +81,30 @@ const useControlMsg = () => {
       data = await getText2imageHistories({
         shotId,
         current,
-        size: 5,
+        size: 20,
+      })
+    } else if (type === EnumUploadType['AUDIO']) {
+      data = await getAudioHistories({
+        shotId: 383,
+        current,
+        size: 20,
+      })
+    } else if (type === EnumUploadType['VIDEO']) {
+      data = await getVideoHistories({
+        shotId,
+        current,
+        size: 20,
       })
     }
 
-    if (data) {
-      if (scroll) {
-        setMessageList(prev => {
-          return [...data, ...prev]
-        })
-      } else {
-        setMessageList(data)
-      }
+    console.log('%c data', 'color:yellow', data)
+
+    if (scroll) {
+      setMessageList(prev => {
+        return [...data, ...prev]
+      })
+    } else {
+      setMessageList(data)
     }
     return data
   }
@@ -109,11 +138,9 @@ const useControlMsg = () => {
       updateMessage({
         taskId: res.taskId,
         type: EnumUploadType['IMAGE'],
-        state: res.state,
+        taskState: res.taskState,
         content: res.text,
       })
-
-      // message.success('添加成功')
     }
   }
   return {

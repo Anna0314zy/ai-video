@@ -11,6 +11,7 @@ import { RootState } from '@/store'
 import ActionBtn from '@/pages/AIProject/components/ActionBtn'
 import MessageLayout from './MessageLayout'
 import MaterialContent from './MaterialContent'
+import MaterialState from './MaterialState'
 import useControlMsg from '../../useControlMsg'
 import usePullToRefresh from '@/hooks/usePullToRefresh'
 const PAGE_SIZE = 5
@@ -60,7 +61,7 @@ const ChatContent = () => {
         shotId: currentShotId,
         option: option.custom,
         projectId,
-        requestLogId: item.id,
+        requestLogIdrequestLogId: item.historyId,
         type: EnumUploadType['IMAGE'],
       })
     } finally {
@@ -73,8 +74,9 @@ const ChatContent = () => {
   const handleClick = async (key: string, item: ChatMessageList) => {
     if (key === 'add') {
       console.log('add')
+      if (!item.historyId) return
       await api.addResource({
-        historyId: item.id!,
+        historyId: item.historyId,
         type: item.type,
       })
       message.success(`${ResourceTypeMap[item.type]}标记成功`)
@@ -112,6 +114,7 @@ const ChatContent = () => {
               <Flex vertical={true}>
                 <div>{item.content}</div>
                 <MaterialContent data={item} />
+                <MaterialState data={item} />
                 <Flex wrap={true} gap={10} style={{ marginTop: '10px' }} className='btns'>
                   {item.options?.map(v => {
                     return <ActionBtn key={v.label} value={v.label} onClick={() => imageBtnClick(item, v)}></ActionBtn>

@@ -97,6 +97,11 @@ const ChatControl = () => {
     console.log(file)
     return Promise.resolve(true)
   }
+  const handleSend = () => {
+    console.log('formRef', formRef.current?.form.getFieldsValue())
+    const params = formRef.current?.form.getFieldsValue()
+    console.log('%c params', 'color: #ff0000;', params)
+  }
   return (
     <Flex vertical={true} style={style}>
       <Flex align='center'>
@@ -105,7 +110,11 @@ const ChatControl = () => {
           <Button type={'primary'} style={{ marginLeft: '10px' }} onClick={handleCreatePrompt}>
             应用
           </Button>
-        ) : null}
+        ) : (
+          <Button type={'primary'} style={{ marginLeft: '10px' }} onClick={handleSend}>
+            发送
+          </Button>
+        )}
       </Flex>
       <ChatInput prompt={prompt} onChange={handleInputChange} onSend={handleInputSend}>
         <CommonUpload

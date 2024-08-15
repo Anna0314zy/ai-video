@@ -52,15 +52,12 @@ export const addText2imageTask = (params: {
   requestLogId?: number
 }) => {
   return api.post<{
-    state: keyof typeof TaskState
+    taskState: keyof typeof TaskState
     taskId: string
     text: string
   }>(`${http}/api/text2image/v1/mj/text2image/addTask`, params)
 }
 
-export const getText2imageHistories = (params: { shotId: number }) => {
-  return api.post<PageList<Text2imageMessage>>(`${http}/api/text2image/v1/mj/text2image/getHistories`, params)
-}
 //保存为图片资源
 
 export const postSaveImage = (params: { shotId: number }) => {
@@ -96,7 +93,40 @@ export const addResource = (params: { historyId: number; type: ResourceType }) =
 export const reinstateTask = (params: { historyId: number; type: ResourceType }) => {
   return api.get<any>(`${http}/api/queue/v1/task/reinstateTask`, params)
 }
-// 获取状态为【队列中】的任务列表
-export const getQueuedTaskList = (params: { shotId: number }) => {
-  return api.post<any>(`${http}/api/queue/v1/task/getQueuedTaskList?shotId=${params.shotId}`, {})
+interface HistoryParams {
+  shotId: number
+  current: number
+  size: number
+}
+// 获取图片资源历史记录
+export const getText2imageHistories = (params: HistoryParams) => {
+  return api.get<PageList<Text2imageMessage>>(`${http}/api/resource/v1/mj/image/history`, {
+    shotId: params.shotId,
+    pageIndex: params.current,
+    pageSize: params.size,
+  })
+}
+// 获取声音资源历史记录
+export const getVideoHistories = (params: HistoryParams) => {
+  return api.get<PageList<Text2imageMessage>>(`${http}/api/resource/v1/svd/video/history`, {
+    shotId: params.shotId,
+    pageIndex: params.current,
+    pageSize: params.size,
+  })
+}
+export const getAudioHistories = (params: HistoryParams) => {
+  return api.get<PageList<Text2imageMessage>>(`${http}/api/resource/v1/tts/voice/history`, {
+    shotId: params.shotId,
+    pageIndex: params.current,
+    pageSize: params.size,
+  })
+}
+// 调svd服务生成视频
+
+export const addVideoTask = (params: { shotId: number }) => {
+  return api.post<PageList<Text2imageMessage>>(`${http}/api/image2video/v1/svd/generateVideo/addTask`, params)
+}
+
+export const addAudioTask = (params: { shotId: number }) => {
+  return api.post<PageList<Text2imageMessage>>(`${http}/api/image2video/v1/svd/generateVideo/addTask`, params)
 }

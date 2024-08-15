@@ -34,8 +34,8 @@ class StompSocket extends EventEmitter {
       () => {
         console.log('connect--')
         this.subscription = this.stompClient.subscribe(this.initParam.subscribeThorough, (message: any) => {
-          console.log('onSubscribe', message)
-          this.emit('onSubscribe', message)
+          console.log('onSubscribe', message.body)
+          this.emit('onSubscribe', JSON.parse(message.body))
         })
       },
       err => {
