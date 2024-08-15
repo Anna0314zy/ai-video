@@ -1,13 +1,15 @@
 import { FC, useState, useContext } from 'react'
 import { Layout, Flex } from 'antd'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
-import ContentMenu from './modules/RightClick'
+import RightClick from './modules/RightClick'
 import FrameItem from './modules/FrameItem'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
+import { ShotList } from '@/api/types/video'
+
 export default () => {
-  const dispatch = useDispatch<Dispatch>()
   const { shotList, currentShotId } = useSelector((state: RootState) => state.aiVideo)
+  const dispatch = useDispatch<Dispatch>()
   function handleOnDragEnd(result: any) {
     if (!result.destination) return
 
@@ -19,6 +21,11 @@ export default () => {
         ...v,
         sortIndex: index + 1,
       })),
+    })
+  }
+  const handleItemClick = (item: ShotList) => {
+    dispatch.aiVideo.updateData({
+      currentShotId: item.shotId,
     })
   }
   return (
@@ -36,7 +43,7 @@ export default () => {
                 return (
                   <Draggable key={data.shotId} draggableId={String(data.shotId)} index={index}>
                     {provided => (
-                      <ContentMenu>
+                      <RightClick>
                         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                           <FrameItem
                             onClick={() => {
@@ -49,8 +56,9 @@ export default () => {
                             img={data.imageUrl}
                             active={data.shotId === currentShotId}
                           />
+                          {/* {data.name} */}
                         </div>
-                      </ContentMenu>
+                      </RightClick>
                     )}
                   </Draggable>
                 )

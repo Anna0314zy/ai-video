@@ -14,8 +14,9 @@ export default createModel<RootModel>()({
     selectedImage: {},
     selectedAudio: {},
     currentSelectType: 'image',
-    currentShotId: 0, // 当前选中的
+    currentShotId: 1, // 当前选中的
     shotList: [],
+    resourceList: {},
   } as AiVideoState,
   reducers: {
     updateData(state, payload: any) {
@@ -26,10 +27,16 @@ export default createModel<RootModel>()({
   effects: dispatch => ({
     async getShotListByProjectId(id: number) {
       const { shotBaseInfoList } = await api.getShotListByProjectId(id)
-
       dispatch.aiVideo.updateData({
         shotList: shotBaseInfoList || [],
         currentShotId: shotBaseInfoList[0].shotId,
+      })
+    },
+    async getResourceList(params: { shotId: number; pageSize?: number; pageIndex?: number; type: string }) {
+      // console.log('%c 🚀 ~ [  ]-37', 'font-size:14px; background:green; color:#fff;', state.currentSelectType)
+      const res = await api.getResourceList(params)
+      dispatch.aiVideo.updateData({
+        resourceList: res,
       })
     },
   }),

@@ -2,7 +2,8 @@ import { FC } from 'react'
 import { Descriptions } from 'antd'
 import './index.less'
 
-const Result: FC<any> = () => {
+const Result: FC<any> = (props: any) => {
+  const { data } = props
   const items = [
     {
       key: '1',

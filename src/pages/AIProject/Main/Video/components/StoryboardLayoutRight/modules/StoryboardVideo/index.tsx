@@ -20,8 +20,17 @@ export default (props: IStoryboardVideo) => {
   const scrollVideoRef = useRef(null)
 
   const [step, setStep]: any = useState(props.step || 1)
-  const { selectedImage, selectedVideo, currentSelectType } = useSelector((state: any) => state.aiVideo)
+  const { selectedImage, selectedVideo, currentSelectType, currentShotId } = useSelector((state: any) => state.aiVideo)
   const [isShowResult, setIsShowResult] = useState(false)
+  const [videoDetail, setVideoDetail] = useState({
+    videoId: 0,
+    created: '2020-01-01',
+    seed: '',
+    motionBucketId: 0,
+    fps: 25,
+    conditionFactor: 0,
+    picUrl: '',
+  })
 
   useScrollToBottomHook(scrollVideoRef, 1, () => {
     onChangeGetNewData()
@@ -40,11 +49,34 @@ export default (props: IStoryboardVideo) => {
   const onHandleJumpNextStep = () => {
     if (step === 1 && Object.keys(selectedImage).length) {
       dispatch.aiVideo.updateData({ currentSelectType: 'video' })
+      api.confirmResource({ shotId: currentShotId, resourceId: selectedImage.resourceId, type: currentSelectType })
       setStep((preData: any) => {
         return preData + 1
       })
     }
     if (step === 2 && !isShowResult && Object.keys(selectedVideo).length) {
+      api
+        .confirmResource({ shotId: currentShotId, resourceId: selectedVideo.resourceId, type: currentSelectType })
+        .then(async () => {
+          const videoEnum: any = {
+            videoId: '视频id',
+            created: '创建时间',
+            seed: '随机因子',
+            motionBucketId: '主体运动',
+            fps: '帧率',
+            conditionFactor: '背景运动',
+          }
+          const res = await api.getVideoDetail({ shotId: currentShotId })
+          const items: any = Object.keys(res).map((item: string, index: number) => {
+            return {
+              key: index,
+              label: videoEnum[item],
+              children: res[item],
+            }
+          })
+          setVideoDetail(items)
+        })
+
       setIsShowResult(true)
     } else {
       setIsShowResult(false)
@@ -84,7 +116,7 @@ export default (props: IStoryboardVideo) => {
           </div>
         )}
         {isShowResult ? (
-          <Result />
+          <Result data={videoDetail} />
         ) : (
           <div ref={scrollVideoRef} className='storyboard-image-content__list'>
             {data.map((item: any, index: number) => (
