@@ -15,7 +15,6 @@ const contentStyle: React.CSSProperties = {
   justifyContent: 'flex-start',
 }
 export default () => {
-  const { curShot } = useContext(MyContext)
   return (
     <Flex vertical={true} style={contentStyle}>
       <ChatContent />

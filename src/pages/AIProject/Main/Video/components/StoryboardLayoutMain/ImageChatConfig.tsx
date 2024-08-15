@@ -6,8 +6,10 @@ import { Flex, Form, Space } from 'antd'
 import type { FormProps } from 'antd'
 import { ImageChatParams } from '@/api/types/video'
 import * as api from '@/api/models/video'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
 const ImageChatConfig = (_: any, ref: any) => {
-  const { curShot } = useContext(MyContext)
+  const { currentSelectType, currentShotId } = useSelector((state: RootState) => state.aiVideo)
 
   const [btnList, setBtnList] = useState<
     {
@@ -19,15 +21,15 @@ const ImageChatConfig = (_: any, ref: any) => {
 
   const [typeList, setTypeList] = useState<{ value: string; label: string }[]>([])
   const getImagePromptBtnList = async () => {
-    if (!curShot) return
-    const res = await api.getImagePromptBtnList(curShot?.shotId!)
+    if (!currentShotId) return
+    const res = await api.getImagePromptBtnList(currentShotId)
     console.log('res-----', res)
     setBtnList(res)
     setTypeList(res.map(v => ({ value: v.btnName, label: v.btnName })))
   }
   useEffect(() => {
     getImagePromptBtnList()
-  }, [curShot])
+  }, [currentShotId])
   const { subjectName } = useContext(MyContext)
 
   const [form] = Form.useForm()

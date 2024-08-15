@@ -9,12 +9,16 @@ import * as api from '@/api/models/video'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import { RcFile } from 'antd/lib/upload'
 import { EnumUploadType } from '@/api/types/video'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
 const style: React.CSSProperties = {
   backgroundColor: '#fff',
   padding: '10px',
 }
 const ChatControl = () => {
-  const { selectedType, curShot, projectId, addChatTask } = useContext(MyContext)
+  const { currentSelectType, currentShotId } = useSelector((state: RootState) => state.aiVideo)
+
+  const { projectId, addChatTask } = useContext(MyContext)
   const formRef = useRef<any>()
   const [prompt, setPrompt] = useState<{
     text?: string
@@ -23,11 +27,11 @@ const ChatControl = () => {
     text: '',
   })
   const chatContentConfig = () => {
-    if (selectedType === EnumUploadType['IMAGE']) {
+    if (currentSelectType === EnumUploadType['IMAGE']) {
       return <ImageChatConfig ref={formRef}></ImageChatConfig>
-    } else if (selectedType === EnumUploadType['VIDEO']) {
+    } else if (currentSelectType === EnumUploadType['VIDEO']) {
       return <VideoChatConfig ref={formRef} />
-    } else if (selectedType === EnumUploadType['AUDIO']) {
+    } else if (currentSelectType === EnumUploadType['AUDIO']) {
       return <AudioChatConfig ref={formRef} />
     }
   }
@@ -46,7 +50,7 @@ const ChatControl = () => {
     addChatTask({
       type: EnumUploadType['IMAGE'],
       text: prompt.text,
-      shotId: curShot?.shotId!,
+      shotId: currentShotId,
       projectId: projectId!,
     })
   }
@@ -64,7 +68,7 @@ const ChatControl = () => {
     const params = formRef.current?.form.getFieldsValue()
     const btnList = formRef.current.btnList
     const res = await api.generateImagePrompt({
-      shotId: curShot?.shotId!,
+      shotId: currentShotId,
       button: {
         btnName: params.category,
         btnValue: params.btnValue,
@@ -97,7 +101,7 @@ const ChatControl = () => {
     <Flex vertical={true} style={style}>
       <Flex align='center'>
         <div>{chatContentConfig()}</div>
-        {selectedType === EnumUploadType['IMAGE'] ? (
+        {currentSelectType === EnumUploadType['IMAGE'] ? (
           <Button type={'primary'} style={{ marginLeft: '10px' }} onClick={handleCreatePrompt}>
             应用
           </Button>

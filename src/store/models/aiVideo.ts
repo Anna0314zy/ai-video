@@ -14,7 +14,7 @@ export default createModel<RootModel>()({
     selectedImage: {},
     selectedAudio: {},
     currentSelectType: 'image',
-    currentShotId: -1, // 当前选中的
+    currentShotId: 0, // 当前选中的
     shotList: [],
   } as AiVideoState,
   reducers: {

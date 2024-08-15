@@ -28,7 +28,6 @@ const VideoProcess = () => {
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
   // 当前选中的是图片 视频 还是音频
-  const [selectedType, setSelectedType] = useState<ResourceType>(EnumUploadType['IMAGE'])
 
   // 选中的id
   const [curId, setCurId] = useState<number>()
@@ -38,10 +37,6 @@ const VideoProcess = () => {
     dispatch.aiVideo.getShotListByProjectId(Number(id))
   }, [])
   const contextValue = {
-    curId,
-    setCurId,
-    selectedType,
-    setSelectedType,
     projectId: Number(id),
     messageList,
     getMessageList,

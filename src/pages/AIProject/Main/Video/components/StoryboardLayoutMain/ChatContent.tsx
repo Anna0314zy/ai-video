@@ -37,16 +37,18 @@ const style: React.CSSProperties = {
 }
 const ChatContent = () => {
   const { cdnPath } = useSelector((state: RootState) => state.common.pathConfig)
-  const { curShot, projectId, selectedType, messageList, getMessageList, addChatTask, searchParams, hasMore } =
-    useContext(MyContext)
+
+  const { currentSelectType, currentShotId } = useSelector((state: RootState) => state.aiVideo)
+
+  const { projectId, messageList, getMessageList, addChatTask, searchParams, hasMore } = useContext(MyContext)
   const [loading, setLoading] = useState({})
   const [scrollLoading, setScrollLoading] = useState<boolean>(false) // 是否正在加载
 
   const listRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    if (!curShot?.shotId) return
-    getMessageList(selectedType, curShot?.shotId)
-  }, [curShot?.shotId, selectedType])
+    if (!currentShotId) return
+    getMessageList(currentSelectType, currentShotId)
+  }, [currentShotId, currentSelectType])
   const imageBtnClick = async (item: ChatMessageList, option: Text2imageMessageOptions) => {
     console.log('imageBtnClick', item)
     setLoading(prev => ({
@@ -55,7 +57,7 @@ const ChatContent = () => {
     }))
     try {
       await addChatTask({
-        shotId: curShot?.shotId!,
+        shotId: currentShotId,
         option,
         projectId,
         requestLogId: item.id,
@@ -91,7 +93,7 @@ const ChatContent = () => {
         setScrollLoading(true)
         searchParams.current.current += 1
         try {
-          await getMessageList(selectedType, curShot?.shotId, true)
+          await getMessageList(currentSelectType, currentShotId, true)
         } finally {
           setScrollLoading(false)
         }
