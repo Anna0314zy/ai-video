@@ -2,39 +2,34 @@ import { Fragment, useState, useRef, useEffect } from 'react'
 import { Layout, message } from 'antd'
 import Styles from './index.module.less'
 import MaterialItem from '@/pages/AIProject/components/MaterialItem'
-// import { fileIcon, downIcon, moreIcon } from '@/components/IconWidget/Icons'
+import { fileIcon, downIcon, moreIcon } from '@/components/IconWidget/Icons'
+import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import Result from '../Result'
+import ResourceItem from '../ResourceItem'
 import { useSelector, useDispatch } from 'react-redux'
 
 interface IStoryboardVideo {
   data?: any
   step?: number | string // 显示第几步骤
   disabled?: boolean
+  onChangeGetNewData: () => void
 }
 
 export default (props: IStoryboardVideo) => {
-  const { data } = props
+  const { data, onChangeGetNewData }: any = props
   const dispatch = useDispatch()
-  const [step, setStep]: any = useState(props.step || 3)
+  const [step, setStep]: any = useState(props.step || 1)
   const [imgData, setImgData] = useState(data)
   const [videoData, setVideoData] = useState(data)
   const { selectedImage, selectedVideo } = useSelector((state: any) => state.aiVideo)
-  const [isScrollBottom, setIsScrollBottom] = useState(false)
+  const [isShowResult, setIsShowResult] = useState(false)
   const scrollContainerRef = useRef(null)
-  // const handleScroll = () => {
-  //   if (scrollContainerRef.current) {
-  //     const { scrollHeight, scrollTop, clientHeight } = scrollContainerRef.current
-  //     setIsScrollBottom(scrollHeight - scrollTop - clientHeight <= 100)
-  //   }
-  // }
-  useEffect(() => {
-    // const container: any = scrollContainerRef.current
-    // container.addEventListener('scroll', handleScroll)
-    // console.log('%c 🚀 ~ [  ]-32', 'font-size:14px; background:green; color:#fff;', isScrollBottom)
-    // return () => {
-    //   container.removeEventListener('scroll', handleScroll)
-    // }
-  }, [isScrollBottom])
+
+  useScrollToBottomHook(scrollContainerRef, 50, () => {
+    onChangeGetNewData()
+    console.log('%c 🚀 ~ [  ]-29', 'font-size:14px; background:green; color:#fff;', '到底部')
+  })
+
   const setpData = [
     {
       id: 1,
@@ -44,18 +39,19 @@ export default (props: IStoryboardVideo) => {
       id: 2,
       name: '视频',
     },
-    {
-      id: 3,
-      name: '结果',
-    },
   ]
   const onHandleJumpNextStep = () => {
-    if (!Object.keys(step === 1 ? selectedImage : selectedVideo).length) return message.warning('选择一个')
-    // if (step === 1) {
-    setStep((preData: any) => {
-      return preData + 1
-    })
-    // }
+    if (step === 1 && Object.keys(selectedImage).length) {
+      dispatch.aiVideo.updateData({ currentSelectType: 'video' })
+      setStep((preData: any) => {
+        return preData + 1
+      })
+    }
+    if (step === 2 && !isShowResult && Object.keys(selectedVideo).length) {
+      setIsShowResult(true)
+    } else {
+      setIsShowResult(false)
+    }
   }
   return (
     <Layout className={Styles['storyboard-image']}>
@@ -76,43 +72,37 @@ export default (props: IStoryboardVideo) => {
         ))}
       </Layout.Sider>
       <Layout.Content className='storyboard-image-content'>
-        <div className='storyboard-image-content__header'>
-          <span>{step === 1 ? '图片' : '视频'}资源</span>
-          <span>导入{step === 1 ? '图片' : '视频'}</span>
-        </div>
-        {step !== 3 ? (
+        {!isShowResult && (
+          <div className='storyboard-image-content__header'>
+            <span>{step === 1 ? '图片' : '视频'}资源</span>
+            <span>导入{step === 1 ? '图片' : '视频'}</span>
+          </div>
+        )}
+        {isShowResult ? (
+          <Result />
+        ) : (
           <div ref={scrollContainerRef} className='storyboard-image-content__list'>
-            {[...(step === 1 ? imgData : videoData)].map((item: any, index: number) => (
-              <MaterialItem
+            {data.map((item: any, index: number) => (
+              <ResourceItem
                 key={index}
                 data={item}
-                onChange={() => {
+                onHandleDeleteResourceItem={() => {
+                  // 删除某个资源
+                }}
+                onClick={() => {
                   console.log('%c 🚀 ~ [  ]-86', 'font-size:14px; background:green; color:#fff;', item)
                   dispatch.aiVideo.updateData({ [step === 1 ? 'selectedImage' : 'selectedVideo']: item })
                 }}
-                actived={item.id === (step === 1 ? selectedImage : selectedVideo)['id']}
+                actived={item.resourceId === (step === 1 ? selectedImage : selectedVideo)['resourceId']}
               />
-              // <div className='file-item'>
-              //   <div className='file-item__icon f-center'>{fileIcon()}</div>
-              //   <div className='file-item__content '>
-              //     <span className='one-line-ellipsis'>SC01-P01《高尔基与童年》</span>
-              //     <span>2024.08.20 13:20:55</span>
-              //   </div>
-              //   <div className='file-item__operation'>
-              //     <span>{downIcon()}</span>
-              //     <span>{moreIcon()}</span>
-              //   </div>
-              // </div>
             ))}
           </div>
-        ) : (
-          <Result />
         )}
-        <div className='storyboard-image-content__btn' onClick={() => onHandleJumpNextStep()}>
-          <span>{step === 1 ? '确认并开始视频设计' : '确认视频'}</span>
+        <div
+          className={`storyboard-image-content__btn ${isShowResult ? 'edit-btn' : 'un'}`}
+          onClick={() => onHandleJumpNextStep()}>
+          <span>{isShowResult ? '重新编辑' : step === 1 ? '确认并开始视频设计' : '确认视频'}</span>
         </div>
-        {/* {step === 1 && <StoryboardImage />} */}
-        {/* {step === 2 && <StoryboardVideo />} */}
       </Layout.Content>
     </Layout>
   )
