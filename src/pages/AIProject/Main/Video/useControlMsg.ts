@@ -6,6 +6,7 @@ import { message } from 'antd'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { AudioTaskParams, AddImageTaskParams } from '@/api/types/video'
+import { uniqBy } from 'lodash-es'
 const useControlMsg = () => {
   const [messageList, setMessageList] = useState<ChatMessageList[]>([])
   const [hasMore, setHasMore] = useState(true) // 是否有更多数据
@@ -29,8 +30,14 @@ const useControlMsg = () => {
           return item
         })
       } else {
-        return [...prev, data]
+        // 查看是否是同一个type
+
+        const prevType = prev[0]?.type
+        if (prevType === data.type || !prev[0]) {
+          return uniqBy([...prev, data], 'taskId')
+        }
       }
+      return prev
     })
   }
   const getText2imageHistories = async (params: {
@@ -85,7 +92,7 @@ const useControlMsg = () => {
       })
     } else if (type === EnumUploadType['AUDIO']) {
       data = await getAudioHistories({
-        shotId: 383,
+        shotId,
         current,
         size: 20,
       })
@@ -101,7 +108,7 @@ const useControlMsg = () => {
 
     if (scroll) {
       setMessageList(prev => {
-        return [...data, ...prev]
+        return uniqBy([...data, ...prev], 'taskId')
       })
     } else {
       setMessageList(data)
@@ -123,8 +130,9 @@ const useControlMsg = () => {
       updateMessage(res)
     }
   }
-  const reinstateTask = async (params: { historyId: number; type: ResourceType }) => {
-    const res = await api.reinstateTask(params)
+  const reinstateTask = async (taskId: number) => {
+    console.log('reinstateTask', taskId)
+    const res = await api.reinstateTask(taskId)
     updateMessage(res)
   }
 

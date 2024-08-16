@@ -48,8 +48,10 @@ const ChatContent = () => {
   const [scrollLoading, setScrollLoading] = useState<boolean>(false) // 是否正在加载
 
   useEffect(() => {
-    if (!currentShotId) return
-    getMessageList(1, currentSelectType, currentShotId)
+    if (currentShotId && currentSelectType) {
+      console.log('%c getMessageList', 'color:green;backgroundColor:yellow', currentShotId, currentSelectType)
+      getMessageList(1, currentSelectType, currentShotId)
+    }
   }, [currentShotId, currentSelectType])
   const imageBtnClick = async (item: ChatMessageList, option: Text2imageMessageOptions) => {
     console.log('imageBtnClick', item)
@@ -85,7 +87,13 @@ const ChatContent = () => {
     setTimeout(() => {
       if (containerRef.current) containerRef.current.scrollTop = containerRef.current.scrollHeight
     }, 100)
+    console.log('messageList', messageList)
   }, [messageList])
+
+  const [canCountScroll, setCanCountScroll] = useState(false)
+  useEffect(() => {
+    setCanCountScroll(true)
+  }, [])
 
   return (
     <Layout.Content
@@ -93,7 +101,8 @@ const ChatContent = () => {
       style={style}
       onScroll={e => {
         // 当滚动到顶部时触发加载更多
-        if (e.currentTarget.scrollTop === 0) {
+        // 如何首次不执行
+        if (e.currentTarget.scrollTop < 100 && canCountScroll) {
           loadMore()
         }
       }}>

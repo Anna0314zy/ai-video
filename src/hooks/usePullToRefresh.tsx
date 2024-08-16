@@ -8,14 +8,14 @@ const usePullToRefresh = <T,>(fetchData: (current: number) => Promise<T[]>, page
   const [current, setCurrent] = useState<number>(1) // 跟踪当前页数
 
   const loadMore = useCallback(async () => {
-    if (!hasMore) {
-      message.info('没有更多数据')
-      message.config({
-        top: 100,
-        duration: 2,
-        maxCount: 1,
-      })
-    }
+    // if (!hasMore) {
+    //   message.info('没有更多数据')
+    //   message.config({
+    //     top: 100,
+    //     duration: 2,
+    //     maxCount: 1,
+    //   })
+    // }
     if (loading || !hasMore) return
     setLoading(true)
     try {

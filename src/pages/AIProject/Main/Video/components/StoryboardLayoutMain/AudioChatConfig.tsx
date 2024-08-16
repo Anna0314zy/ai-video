@@ -64,7 +64,7 @@ const AudioChatConfig = (_: any, ref: any) => {
   }
   const getOtherAudioConfig = async () => {
     const res = await api.getOtherAudioConfig()
-    setPitchOptions(changeOptions(res.rateElementRespList))
+    setPitchOptions(changeOptions(res.pitchElementRespList))
     setRateOptions(changeOptions(res.rateElementRespList))
   }
 

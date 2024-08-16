@@ -1,5 +1,5 @@
 import { Button, Flex, message, Image } from 'antd'
-import { useContext, useState, useRef } from 'react'
+import { useContext, useState, useRef, useMemo } from 'react'
 import { MyContext } from '../../MyContext'
 import AudioChatConfig from './AudioChatConfig'
 import VideoChatConfig from './VideoChatConfig'
@@ -16,8 +16,10 @@ const style: React.CSSProperties = {
   padding: '10px',
 }
 const ChatControl = () => {
-  const { currentSelectType, currentShotId } = useSelector((state: RootState) => state.aiVideo)
-
+  const { currentSelectType, currentShotId, shotList } = useSelector((state: RootState) => state.aiVideo)
+  const currentShot = useMemo(() => {
+    return shotList.find(v => v.shotId === currentShotId)
+  }, [currentShotId, shotList])
   const { projectId, addChatTask } = useContext(MyContext)
   const formRef = useRef<any>()
   const [prompt, setPrompt] = useState<{
@@ -107,6 +109,7 @@ const ChatControl = () => {
       {
         ...params,
         shotId: currentShotId,
+        text: currentShot?.narration,
       },
       currentSelectType,
     )

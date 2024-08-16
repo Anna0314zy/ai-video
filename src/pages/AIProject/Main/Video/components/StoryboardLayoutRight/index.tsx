@@ -9,15 +9,21 @@ import { EnumUploadType } from '@/api/types/video'
 export default () => {
   // const [data, setData]: any = useState({ records: [], total: 100, size: 10, current: 1 })
   const dispatch = useDispatch()
-  const { currentSelectType, selectedImage, resourceList } = useSelector((state: any) => state.aiVideo)
+  const { currentSelectType, selectedImage, resourceList, currentShotId } = useSelector((state: any) => state.aiVideo)
 
   // 触底加载状态
   useEffect(() => {
+    if (!currentShotId) return
     getResourceList()
-  }, [currentSelectType])
+  }, [currentShotId, currentSelectType])
 
   const getResourceList = (pageIndex?: number) => {
-    dispatch.aiVideo.getResourceList({ shotId: 1, pageSize: 10, pageIndex: pageIndex || 1, type: currentSelectType })
+    dispatch.aiVideo.getResourceList({
+      shotId: currentShotId,
+      pageSize: 10,
+      pageIndex: pageIndex || 1,
+      type: currentSelectType,
+    })
   }
 
   const onChangeGetNewData = () => {
