@@ -5,7 +5,7 @@ import * as api from '@/api/models/video'
 interface AiVideoState {
   currentSelectType: ResourceType
   currentShotId: number
-  shotList: ShotList[]
+  shotList: Array<any>
   [key: string]: any
 }
 export default createModel<RootModel>()({

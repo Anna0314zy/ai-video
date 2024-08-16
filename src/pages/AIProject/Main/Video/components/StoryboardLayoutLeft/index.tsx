@@ -6,11 +6,13 @@ import FrameItem from './modules/FrameItem'
 import { useSelector, useDispatch } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 import { ShotList } from '@/api/types/video'
+import './index.less'
 
 export default () => {
   const { shotList, currentShotId } = useSelector((state: RootState) => state.aiVideo)
   const dispatch = useDispatch<Dispatch>()
   function handleOnDragEnd(result: any) {
+    console.log('%c 🚀 ~ [ result ]-15', 'font-size:14px; background:green; color:#fff;', result)
     if (!result.destination) return
 
     const items = Array.from(shotList)
@@ -22,17 +24,20 @@ export default () => {
         sortIndex: index + 1,
       })),
     })
+
+    console.log('%c 🚀 ~ [ shotList ]-27', 'font-size:14px; background:green; color:#fff;', shotList)
   }
   const handleItemClick = (item: ShotList) => {
     dispatch.aiVideo.updateData({
       currentShotId: item.shotId,
     })
   }
+
   return (
-    <Layout.Sider width={'13.88vw'} className='page-storyboard-left'>
+    <div className='page-storyboard-left'>
       <div className='page-storyboard-left__header'>
         <span>共32个镜头</span>
-        <span>新建镜头</span>
+        <span> 新建镜头</span>
       </div>
 
       <DragDropContext onDragEnd={handleOnDragEnd}>
@@ -43,7 +48,10 @@ export default () => {
                 return (
                   <Draggable key={data.shotId} draggableId={String(data.shotId)} index={index}>
                     {provided => (
-                      <RightClick>
+                      <RightClick
+                        onClick={type => {
+                          console.log('%c 🚀 ~ [  ]-50', 'font-size:14px; background:green; color:#fff;', type, index)
+                        }}>
                         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                           <FrameItem
                             onClick={() => {
@@ -56,7 +64,6 @@ export default () => {
                             img={data.imageUrl}
                             active={data.shotId === currentShotId}
                           />
-                          {/* {data.name} */}
                         </div>
                       </RightClick>
                     )}
@@ -68,6 +75,6 @@ export default () => {
           )}
         </Droppable>
       </DragDropContext>
-    </Layout.Sider>
+    </div>
   )
 }
