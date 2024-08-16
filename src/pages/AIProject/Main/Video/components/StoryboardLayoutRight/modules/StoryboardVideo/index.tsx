@@ -2,6 +2,7 @@ import { Fragment, useState, useRef, useEffect } from 'react'
 import { Layout } from 'antd'
 import { useSelector, useDispatch } from 'react-redux'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
+import IconWidget from '@/components/IconWidget'
 import Result from '../Result'
 import ResourceItem from '../ResourceItem'
 import * as api from '@/api/models/video'
@@ -22,15 +23,7 @@ export default (props: IStoryboardVideo) => {
   const [step, setStep]: any = useState(props.step || 1)
   const { selectedImage, selectedVideo, currentSelectType, currentShotId } = useSelector((state: any) => state.aiVideo)
   const [isShowResult, setIsShowResult] = useState(false)
-  const [videoDetail, setVideoDetail] = useState({
-    videoId: 0,
-    created: '2020-01-01',
-    seed: '',
-    motionBucketId: 0,
-    fps: 25,
-    conditionFactor: 0,
-    picUrl: '',
-  })
+  const [videoDetail, setVideoDetail] = useState([])
 
   useScrollToBottomHook(scrollVideoRef, 1, () => {
     onChangeGetNewData()
@@ -58,23 +51,8 @@ export default (props: IStoryboardVideo) => {
       api
         .confirmResource({ shotId: currentShotId, resourceId: selectedVideo.resourceId, type: currentSelectType })
         .then(async () => {
-          const videoEnum: any = {
-            videoId: '视频id',
-            created: '创建时间',
-            seed: '随机因子',
-            motionBucketId: '主体运动',
-            fps: '帧率',
-            conditionFactor: '背景运动',
-          }
           const res = await api.getVideoDetail({ shotId: currentShotId })
-          const items: any = Object.keys(res).map((item: string, index: number) => {
-            return {
-              key: index,
-              label: videoEnum[item],
-              children: res[item],
-            }
-          })
-          setVideoDetail(items)
+          setVideoDetail(res)
         })
 
       setIsShowResult(true)
@@ -115,30 +93,38 @@ export default (props: IStoryboardVideo) => {
             </span>
           </div>
         )}
+
         {isShowResult ? (
-          <Result data={videoDetail} />
+          Object.keys(videoDetail).length && <Result data={videoDetail} type={'video'} />
         ) : (
           <div ref={scrollVideoRef} className='storyboard-image-content__list'>
-            {data.map((item: any, index: number) => (
-              <ResourceItem
-                key={index}
-                data={item}
-                onHandlePreviewResourceItem={() => {
-                  // 预览
-                }}
-                onHandleDeleteResourceItem={() => {
-                  api.delResourceItem({ resourceId: item.resourceId, type: currentSelectType }).then(() => {
-                    onChangeGetNewData()
-                  })
-                  // 删除某个资源
-                }}
-                onClick={() => {
-                  console.log('%c 🚀 ~ [  ]-86', 'font-size:14px; background:green; color:#fff;', item)
-                  dispatch.aiVideo.updateData({ [step === 1 ? 'selectedImage' : 'selectedVideo']: item })
-                }}
-                actived={item.resourceId === (step === 1 ? selectedImage : selectedVideo)['resourceId']}
-              />
-            ))}
+            {!data.length ? (
+              <div className='empty-box'>
+                <IconWidget name='empty' />
+                <p>空空如也，快去创作{step === 1 ? '图片' : '视频'}吧～</p>
+              </div>
+            ) : (
+              data.map((item: any, index: number) => (
+                <ResourceItem
+                  key={index}
+                  data={item}
+                  onHandlePreviewResourceItem={() => {
+                    // 预览
+                  }}
+                  onHandleDeleteResourceItem={() => {
+                    api.delResourceItem({ resourceId: item.resourceId, type: currentSelectType }).then(() => {
+                      onChangeGetNewData()
+                    })
+                    // 删除某个资源
+                  }}
+                  onClick={() => {
+                    console.log('%c 🚀 ~ [  ]-86', 'font-size:14px; background:green; color:#fff;', item)
+                    dispatch.aiVideo.updateData({ [step === 1 ? 'selectedImage' : 'selectedVideo']: item })
+                  }}
+                  actived={item.resourceId === (step === 1 ? selectedImage : selectedVideo)['resourceId']}
+                />
+              ))
+            )}
           </div>
         )}
         <div

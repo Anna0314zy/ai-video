@@ -4,17 +4,39 @@ import { Dropdown, Flex, theme } from 'antd'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
 // import { scriptIcon } from '@/components/IconWidget/Icons'
 
-const RightClick = ({ onClick, children }: { onClick: (type: string) => void; children: React.ReactNode }) => {
+const RightClick = ({
+  onInster,
+  onDelete,
+  onDownload,
+  children,
+}: {
+  onInster: (type: string) => void
+  onDelete: () => void
+  onDownload: () => void
+  children: React.ReactNode
+}) => {
   const {
     token: { colorBgLayout, colorTextTertiary },
   } = theme.useToken()
 
   const MenuLabel = ({ icon, text }: { icon: string; text: string }) => {
-    // const onClick = (key: string) => {
-    //   console.log(key, 'key')
-    // }
+    const onHandleEvent = (key: string) => {
+      console.log(key, 'key')
+      switch (key) {
+        case 'up':
+        case 'down':
+          onInster(key)
+          break
+        case 'delete':
+          onDelete()
+          break
+        case 'download':
+          onDownload()
+          break
+      }
+    }
     return (
-      <Flex onClick={() => onClick(icon)}>
+      <Flex onClick={() => onHandleEvent(icon)}>
         <AntdIcon icon={icon} style={{ marginRight: '10px' }}></AntdIcon>
         <span>{text}</span>
       </Flex>
