@@ -28,7 +28,8 @@ export default () => {
 
   const onChangeGetNewData = () => {
     if (resourceList?.total / 10 === resourceList?.pageIndex) return
-    getResourceList(resourceList?.pageIndex + 1)
+    // getResourceList(resourceList?.pageIndex + 1)
+    getResourceList()
   }
   return (
     <Layout.Sider className='page-storyboard-right'>
@@ -52,7 +53,9 @@ export default () => {
           {
             label: <div>旁白</div>,
             key: EnumUploadType['AUDIO'],
-            children: <StoryboardAudio data={resourceList?.records} />,
+            children: (
+              <StoryboardAudio data={resourceList?.records || []} onChangeGetNewData={() => onChangeGetNewData()} />
+            ),
           },
         ]}
       />

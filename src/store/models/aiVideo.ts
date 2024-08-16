@@ -13,6 +13,7 @@ export default createModel<RootModel>()({
     selectedVideo: {},
     selectedImage: {},
     selectedAudio: {},
+    selectedShot: {},
     currentSelectType: 'image',
     currentShotId: 0, // 当前选中的
     shotList: [],
@@ -30,6 +31,7 @@ export default createModel<RootModel>()({
       dispatch.aiVideo.updateData({
         shotList: shotBaseInfoList || [],
         currentShotId: shotBaseInfoList[0].shotId,
+        selectedShot: shotBaseInfoList[0],
       })
     },
     async getResourceList(params: { shotId: number; pageSize?: number; pageIndex?: number; type: string }) {

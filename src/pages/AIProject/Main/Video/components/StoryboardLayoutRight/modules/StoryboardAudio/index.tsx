@@ -4,6 +4,8 @@ import { Input } from 'antd'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import ResourceItem from '../ResourceItem'
 import IconWidget from '@/components/IconWidget'
+import { EnumUploadType } from '@/api/types/video'
+import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import Result from '../Result'
 import * as api from '@/api/models/video'
 import './index.less'
@@ -13,7 +15,9 @@ export default (props: any) => {
   const { data, onChangeGetNewData } = props
   const dispatch = useDispatch()
   const scrollAudioRef = useRef(null)
-  const { selectedAudio, currentShotId, selectedVoice, currentSelectType } = useSelector((state: any) => state.aiVideo)
+  const { selectedAudio, currentShotId, selectedVoice, currentSelectType, selectedShot } = useSelector(
+    (state: any) => state.aiVideo,
+  )
   const [isShowResult, setIsShowResult] = useState(false)
   const [voiceDetail, setVoiceDetail] = useState(false)
   const onHandleJumpNext = () => {
@@ -35,24 +39,45 @@ export default (props: any) => {
   useScrollToBottomHook(scrollAudioRef, 1, () => {
     onChangeGetNewData()
   })
-  const onHandleAddResource = () => {
-    // 导入资源
-  }
 
+  const saveShotList = () => {
+    // 更新分镜头信息
+    console.log('%c 🚀 ~ [  ]-43', 'font-size:14px; background:green; color:#fff;', 'shijiaobaocun')
+  }
+  const onFinish = ({ uploadOptions }: { uploadOptions: IUploadOptions }) => {
+    // 上传音频
+    console.log('onFinish', uploadOptions, uploadOptions.cosFullPath)
+    api
+      .importResourceFile({ shotId: currentShotId, originPath: uploadOptions.cosFullPath, type: currentSelectType })
+      .then(() => {
+        onChangeGetNewData()
+      })
+  }
+  const beforeUpload = () => {
+    return Promise.resolve(true)
+  }
   return (
     <div className='storyboard-audio'>
       <div className='storyboard-audio__text'>
-        <TextArea style={{ height: 120, resize: 'none' }} />
+        <TextArea
+          style={{ height: 120, resize: 'none' }}
+          onBlur={() => saveShotList()}
+          value={selectedShot.narration}
+        />
       </div>
       {!isShowResult && (
         <div className='storyboard-audio__header'>
           <span>旁白资源</span>
-          <span
-            onClick={() => {
-              onHandleAddResource()
-            }}>
-            导入音频
-          </span>
+          <CommonUpload
+            // style={prompt.fileUrl ? { color: '#1975ff' } : {}}
+            beforeUpload={beforeUpload}
+            onFinish={onFinish}
+            // onError={onError}
+            type={EnumUploadType['AUDIO']}>
+            <span>
+              <span>导入音频</span>
+            </span>
+          </CommonUpload>
         </div>
       )}
       {isShowResult ? (

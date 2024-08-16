@@ -6,11 +6,14 @@ import FrameItem from './modules/FrameItem'
 import { useSelector, useDispatch } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 import { ShotList } from '@/api/types/video'
+import * as api from '@/api/models/video'
+import { useParams } from 'react-router-dom'
 import './index.less'
 
 export default () => {
   const { shotList, currentShotId } = useSelector((state: RootState) => state.aiVideo)
   const dispatch = useDispatch<Dispatch>()
+  const { id } = useParams() // 获取路由参数 userId
   function handleOnDragEnd(result: any) {
     console.log('%c 🚀 ~ [ result ]-15', 'font-size:14px; background:green; color:#fff;', result)
     if (!result.destination) return
@@ -32,12 +35,25 @@ export default () => {
       currentShotId: item.shotId,
     })
   }
-
+  const onInsterShot = (type: string, index: number) => {
+    const items = Array.from(shotList)
+    items.splice(type === 'up' ? (index === 0 ? 0 : index - 1) : index + 1, 0, {})
+    dispatch.aiVideo.updateData({
+      shotList: items.map((v: any, index) => ({
+        ...v,
+        sortIndex: index + 1,
+      })),
+    })
+    api.saveShotList({ shotId: currentShotId, narration: '', sort: index })
+    // .then(() => {
+    //   dispatch.aiVideo.getShotListByProjectId(Number(id))
+    // })
+  }
   return (
     <div className='page-storyboard-left'>
       <div className='page-storyboard-left__header'>
         <span>共32个镜头</span>
-        <span> 新建镜头</span>
+        <span onClick={() => onInsterShot('up', 0)}> 新建镜头</span>
       </div>
 
       <DragDropContext onDragEnd={handleOnDragEnd}>
@@ -50,14 +66,7 @@ export default () => {
                     {provided => (
                       <RightClick
                         onInster={type => {
-                          const items = Array.from(shotList)
-                          items.splice(type === 'up' ? (index === 0 ? 0 : index - 1) : index + 1, 0, {})
-                          dispatch.aiVideo.updateData({
-                            shotList: items.map((v: any, index) => ({
-                              ...v,
-                              sortIndex: index + 1,
-                            })),
-                          })
+                          onInsterShot(type, index)
                         }}
                         onDelete={() => {
                           // 删除资源
@@ -82,6 +91,7 @@ export default () => {
                             onClick={() => {
                               dispatch.aiVideo.updateData({
                                 currentShotId: data.shotId,
+                                selectedShot: data,
                               })
                             }}
                             key={index}

@@ -142,3 +142,12 @@ export const packageBatch = (shotIds: number[]) => {
     shotIds,
   })
 }
+//  导入资源
+export const importResourceFile = (params: { shotId: number; originPath: string; type: string }) => {
+  return api.post<any>(`${http}/api/resource/v1/import/voice/detail`, params)
+}
+
+//  分镜头信息保存
+export const saveShotList = (params: { shotId: number; narration: string; sort: number }) => {
+  return api.post<any>(`${http}/api/scriptShot/v1/saveShotList`, params)
+}

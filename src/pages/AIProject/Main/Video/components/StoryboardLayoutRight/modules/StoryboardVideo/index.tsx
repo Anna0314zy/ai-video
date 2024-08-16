@@ -2,7 +2,9 @@ import { Fragment, useState, useRef, useEffect } from 'react'
 import { Layout } from 'antd'
 import { useSelector, useDispatch } from 'react-redux'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
+import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import IconWidget from '@/components/IconWidget'
+import { EnumUploadType } from '@/api/types/video'
 import Result from '../Result'
 import ResourceItem from '../ResourceItem'
 import * as api from '@/api/models/video'
@@ -63,6 +65,17 @@ export default (props: IStoryboardVideo) => {
   const onHandleAddResource = () => {
     // 导入资源
   }
+  const onFinish = ({ uploadOptions }: { uploadOptions: IUploadOptions }) => {
+    console.log('onFinish', uploadOptions, uploadOptions.cosFullPath)
+    api
+      .importResourceFile({ shotId: currentShotId, originPath: uploadOptions.cosFullPath, type: currentSelectType })
+      .then(() => {
+        onChangeGetNewData()
+      })
+  }
+  const beforeUpload = () => {
+    return Promise.resolve(true)
+  }
   return (
     <Layout className={Styles['storyboard-image']}>
       <Layout.Sider className='storyboard-image-step'>
@@ -85,12 +98,12 @@ export default (props: IStoryboardVideo) => {
         {!isShowResult && (
           <div className='storyboard-image-content__header'>
             <span>{step === 1 ? '图片' : '视频'}资源</span>
-            <span
-              onClick={() => {
-                onHandleAddResource()
-              }}>
-              导入{step === 1 ? '图片' : '视频'}
-            </span>
+            <CommonUpload
+              beforeUpload={beforeUpload}
+              onFinish={onFinish}
+              type={EnumUploadType[step === 1 ? 'IMAGE' : 'VIDEO']}>
+              <span>导入{step === 1 ? '图片' : '视频'}</span>
+            </CommonUpload>
           </div>
         )}
 
