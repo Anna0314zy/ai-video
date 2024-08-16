@@ -1,41 +1,46 @@
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Descriptions } from 'antd'
 import './index.less'
 
 const Result: FC<any> = (props: any) => {
-  const { data } = props
-  const items = [
-    {
-      key: '1',
-      label: 'UserName',
-      children: 'Zhou Maomao',
-    },
-    {
-      key: '2',
-      label: 'Telephone',
-      children: '1810000000',
-    },
-    {
-      key: '3',
-      label: 'Live',
-      children: 'Hangzhou, Zhejiang',
-    },
-    {
-      key: '4',
-      label: 'Remark',
-      children: 'empty',
-    },
-    {
-      key: '5',
-      label: 'Address',
-      children: 'No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China',
-    },
-  ]
+  const { data, type } = props
+  const [detail, setDetail] = useState([])
+  useEffect(() => {
+    const videoEnum: any = {
+      videoId: '视频id',
+      created: '创建时间',
+      seed: '随机因子',
+      motionBucketId: '主体运动',
+      fps: '帧率',
+      conditionFactor: '背景运动',
+    }
+    const voiceEnum: any = {
+      voiceId: '旁白音频id',
+      created: '创建时间',
+      language: '语言',
+      shortName: '声音',
+      style: '情感',
+      rate: '语速',
+      pitch: '词调',
+    }
+    const items: any = Object.keys(data).map((item: any, index: number) => {
+      const keys = type === 'video' ? videoEnum : voiceEnum
+      if (!keys[item] || !keys[item]) return {}
+      return {
+        key: index,
+        label: keys[item],
+        children: data[item],
+      }
+    })
+    setDetail(items)
+  }, [data])
+
+  console.log('%c 🚀 ~ [ data ]-7', 'font-size:14px; background:green; color:#fff;', data)
   return (
     <div className='result'>
-      <div className='result__video'>视频</div>
+      <div className='result__video'>{data.picUrl && <img src={data.picUrl || ''} alt='' />}</div>
       <div className='result__content'>
-        <Descriptions items={items} column={1} />
+        <Descriptions items={detail} column={1} />
       </div>
     </div>
   )

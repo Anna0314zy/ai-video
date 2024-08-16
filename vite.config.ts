@@ -8,7 +8,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import basicSsl from '@vitejs/plugin-basic-ssl'
-import postcsspxtoviewport from 'postcss-px-to-viewport'
+// zy老师要求移除适配
+// import postcsspxtoviewport from 'postcss-px-to-viewport'
 import packageJson from './package.json'
 import svgr from '@svgr/rollup'
 // https://vitejs.dev/config/
