@@ -9,11 +9,18 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 import { useParams } from 'react-router-dom'
-import { IMAGE_TO_VIDEO_THOROUGH, TEXT_TO_IMAGE_THOROUGH, TTS_THOROUGH } from '@/const/socket'
+import {
+  IMAGE_TO_VIDEO_THOROUGH,
+  TEXT_TO_IMAGE_THOROUGH,
+  TTS_THOROUGH,
+  PACKAGE_DOWNLOAD_THOROUGH,
+} from '@/const/socket'
 import useControlMsg from './useControlMsg'
 import { MyContext } from './MyContext'
 import useStompSocket from '@/hooks/useStompSocket'
+import { packageBatch } from '@/api/models/video'
 const VideoProcess = () => {
+  const currentShotId = useSelector((state: RootState) => state.aiVideo.currentShotId)
   const { messageList, getMessageList, addChatTask, updateMessage, reinstateTask } = useControlMsg()
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
@@ -38,11 +45,23 @@ const VideoProcess = () => {
   useStompSocket(TEXT_TO_IMAGE_THOROUGH, socketCallback)
   useStompSocket(IMAGE_TO_VIDEO_THOROUGH, socketCallback)
   useStompSocket(TTS_THOROUGH, socketCallback)
+
+  const packSocketCallback = (message: any) => {
+    console.log('packSocketCallback', message)
+  }
+  useStompSocket(PACKAGE_DOWNLOAD_THOROUGH, packSocketCallback)
+  const handlePack = () => {
+    console.log('打包')
+    if (!currentShotId) return
+    packageBatch([currentShotId])
+  }
   return (
     <MyContext.Provider value={contextValue}>
       <Layout className={Styles['page-storyboard']}>
         <PageHeader icon='excel' status={<img src={confirm} width={68}></img>}>
-          <Button type='primary'>打包导出</Button>
+          <Button type='primary' onClick={handlePack}>
+            打包导出
+          </Button>
         </PageHeader>
         <Layout className='page-storyboard-content'>
           <StoryboardLayoutLeft />
