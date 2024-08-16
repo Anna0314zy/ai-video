@@ -5,7 +5,7 @@ import { ResourceType, EnumUploadType } from '@/api/types/video'
 import { message } from 'antd'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
-import { AudioTaskParams, AddImageTaskParams } from '@/api/types/video'
+import { AudioTaskParams, AddImageTaskParams, VideoTaskParams } from '@/api/types/video'
 import { uniqBy } from 'lodash-es'
 const useControlMsg = () => {
   const [messageList, setMessageList] = useState<ChatMessageList[]>([])
@@ -115,7 +115,7 @@ const useControlMsg = () => {
     }
     return data
   }
-  const addChatTask = async (params: AudioTaskParams | AddImageTaskParams, type: ResourceType) => {
+  const addChatTask = async (params: AudioTaskParams | AddImageTaskParams | VideoTaskParams, type: ResourceType) => {
     let res = null
 
     if (type === EnumUploadType['IMAGE']) {
@@ -123,7 +123,7 @@ const useControlMsg = () => {
     } else if (type === EnumUploadType['AUDIO']) {
       res = await api.addAudioTask(params as AudioTaskParams)
     } else if (type === EnumUploadType['VIDEO']) {
-      // res = await api.addVideoTask(params as AudioTaskParams)
+      res = await api.addVideoTask(params as VideoTaskParams)
     }
     console.log('addChatTask----', res)
     if (res) {

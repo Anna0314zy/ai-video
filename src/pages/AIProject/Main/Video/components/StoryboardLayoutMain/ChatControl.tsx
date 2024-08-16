@@ -105,14 +105,13 @@ const ChatControl = () => {
     console.log('formRef', formRef.current?.form.getFieldsValue())
     const params = formRef.current?.form.getFieldsValue()
     console.log('%c params', 'color: #ff0000;', params)
-    addChatTask(
-      {
-        ...params,
-        shotId: currentShotId,
-        text: currentShot?.narration,
-      },
-      currentSelectType,
-    )
+    let base = {
+      ...params,
+      shotId: currentShotId,
+    }
+    if (currentSelectType === 'voice') base.text = currentShot?.narration
+    if (currentSelectType === 'video') base.conditionFactor = Number((base.conditionFactor / 100).toFixed(1))
+    addChatTask(base, currentSelectType)
   }
   return (
     <Flex vertical={true} style={style}>

@@ -102,3 +102,6 @@ export interface AddImageTaskParams {
 export interface AudioTaskParams extends AudioChatParams {
   shotId: number
 }
+export interface VideoTaskParams extends VideoChatParams {
+  shotId: number
+}

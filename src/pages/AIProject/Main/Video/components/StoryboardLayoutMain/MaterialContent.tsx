@@ -11,7 +11,12 @@ const MaterialContent = ({ data }: { data: ChatMessageList }) => {
     if (data.type === EnumUploadType['IMAGE']) {
       return <Image src={cdnPath + data.originUrl} preview={false}></Image>
     } else if (data.type === EnumUploadType['VIDEO']) {
-      return <video src={cdnPath + data.originUrl}></video>
+      return (
+        <video controls style={{ width: '500px' }}>
+          <source src={cdnPath + data.compressUrl} type='video/mp4' />
+          Your browser does not support the video tag.
+        </video>
+      )
     } else if (data.type === EnumUploadType['AUDIO']) {
       return (
         <audio controls style={{ backgroundColor: '#fff', padding: '5px', borderRadius: '4px' }}>
