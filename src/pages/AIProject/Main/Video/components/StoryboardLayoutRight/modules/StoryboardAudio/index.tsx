@@ -1,10 +1,13 @@
 import { useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { Input } from 'antd'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import ResourceItem from '../ResourceItem'
+import IconWidget from '@/components/IconWidget'
 import Result from '../Result'
 import * as api from '@/api/models/video'
 import './index.less'
+const { TextArea } = Input
 
 export default (props: any) => {
   const { data, onChangeGetNewData } = props
@@ -20,24 +23,10 @@ export default (props: any) => {
         api
           .confirmResource({ shotId: currentShotId, resourceId: selectedAudio.resourceId, type: currentSelectType })
           .then(async () => {
-            const videoEnum: any = {
-              voiceId: '旁白音频id',
-              created: '创建时间',
-              language: '语言',
-              shortName: '声音',
-              style: '情感',
-              rate: '语速',
-              pitch: '词调',
-            }
             const res = await api.getVoiceDetail({ shotId: currentShotId })
-            const items: any = Object.keys(res).map((item: string, index: number) => {
-              return {
-                key: index,
-                label: videoEnum[item],
-                children: res[item],
-              }
-            })
-            setVoiceDetail(items)
+
+            console.log('%c 🚀 ~ [  ]-28', 'font-size:14px; background:green; color:#fff;', res)
+            setVoiceDetail(res)
           })
       }
       setIsShowResult(!isShowResult)
@@ -53,38 +42,46 @@ export default (props: any) => {
   return (
     <div className='storyboard-audio'>
       <div className='storyboard-audio__text'>
-        温暖的背景音乐开始，慢慢淡入一张19世纪末俄罗斯的老照片，画面中是一间欧洲风格的书房，金黄的阳光从窗户照进来，书房中有一张发黄的高尔基照片，一本封面写着童年的书。
-        温暖的背景音乐开始，慢慢淡入一张19世纪末俄罗斯的老照片，画面中是一间欧洲风格的书房，金黄的阳光从窗户照进来，书房中有一张发黄的高尔基照片，一本封面写着童年的书。
+        <TextArea style={{ height: 120, resize: 'none' }} />
       </div>
-      <div className='storyboard-audio__header'>
-        <span>旁白资源</span>
-        <span
-          onClick={() => {
-            onHandleAddResource()
-          }}>
-          导入音频
-        </span>
-      </div>
+      {!isShowResult && (
+        <div className='storyboard-audio__header'>
+          <span>旁白资源</span>
+          <span
+            onClick={() => {
+              onHandleAddResource()
+            }}>
+            导入音频
+          </span>
+        </div>
+      )}
       {isShowResult ? (
-        <Result data={voiceDetail} />
+        <Result data={voiceDetail} type={'voice'} />
       ) : (
         <div ref={scrollAudioRef} className='storyboard-audio__list'>
-          {data.map((item: any, index: number) => (
-            <ResourceItem
-              key={index}
-              data={item}
-              onHandlePreviewResourceItem={() => {
-                // 预览
-              }}
-              onHandleDeleteResourceItem={() => {
-                // 删除某个资源
-              }}
-              onClick={() => {
-                dispatch.aiVideo.updateData({ selectedAudio: item })
-              }}
-              actived={item.resourceId === selectedAudio['resourceId']}
-            />
-          ))}
+          {!data.length ? (
+            <div className='empty-box'>
+              <IconWidget name='empty' />
+              <p>空空如也，快去创作音频吧～</p>
+            </div>
+          ) : (
+            data.map((item: any, index: number) => (
+              <ResourceItem
+                key={index}
+                data={item}
+                onHandlePreviewResourceItem={() => {
+                  // 预览
+                }}
+                onHandleDeleteResourceItem={() => {
+                  // 删除某个资源
+                }}
+                onClick={() => {
+                  dispatch.aiVideo.updateData({ selectedAudio: item })
+                }}
+                actived={item.resourceId === selectedAudio['resourceId']}
+              />
+            ))
+          )}
         </div>
       )}
       <div className={`storyboard-audio__btn ${isShowResult ? 'edit-btn' : 'un'}`} onClick={() => onHandleJumpNext()}>

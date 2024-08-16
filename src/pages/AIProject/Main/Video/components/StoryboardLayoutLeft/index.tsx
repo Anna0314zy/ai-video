@@ -1,5 +1,5 @@
 import { FC, useState, useContext } from 'react'
-import { Layout, Flex } from 'antd'
+import { Layout, Flex, Modal } from 'antd'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import RightClick from './modules/RightClick'
 import FrameItem from './modules/FrameItem'
@@ -49,8 +49,33 @@ export default () => {
                   <Draggable key={data.shotId} draggableId={String(data.shotId)} index={index}>
                     {provided => (
                       <RightClick
-                        onClick={type => {
-                          console.log('%c 🚀 ~ [  ]-50', 'font-size:14px; background:green; color:#fff;', type, index)
+                        onInster={type => {
+                          const items = Array.from(shotList)
+                          items.splice(type === 'up' ? (index === 0 ? 0 : index - 1) : index + 1, 0, {})
+                          dispatch.aiVideo.updateData({
+                            shotList: items.map((v: any, index) => ({
+                              ...v,
+                              sortIndex: index + 1,
+                            })),
+                          })
+                        }}
+                        onDelete={() => {
+                          // 删除资源
+                          Modal.warning({
+                            title: '是否删除当前镜头？',
+                            content: (
+                              <div>
+                                <p>删除后，该镜头内容将不可见。</p>
+                              </div>
+                            ),
+                            okText: '删除',
+                            cancelText: '取消',
+                            onOk() {},
+                            onCancel() {},
+                          })
+                        }}
+                        onDownload={() => {
+                          // 下载资源
                         }}>
                         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                           <FrameItem
