@@ -22,6 +22,7 @@ export const ScriptDesign: IConfig[] = [
     label: '类型',
     prop: 'scriptType',
     type: 'select',
+    width: 200,
     options: projectTypes.map(v => ({ label: v, value: v })),
   },
   {

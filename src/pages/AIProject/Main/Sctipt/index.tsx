@@ -1,7 +1,7 @@
 import Header from './Header'
 import ChatContent from './Chat/ChatContent'
 import ChatControl from './Chat/ChatControl'
-import { Layout } from 'antd'
+import { Layout, Button } from 'antd'
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { getQueryParam } from '@/utils'
@@ -11,6 +11,10 @@ import { convertToMarkdown } from '@/utils'
 import RightPanel from './RightPanel'
 import { MessageList, ScriptPageList, ScriptStatus } from '@/api/types/script'
 import { MyContext } from './MyContext'
+import useStompSocket from '@/hooks/useStompSocket'
+import { SCRIPT_SUBSCRIBE_THOROUGH, SCRIPT_SEND_THOROUGH, SCRIPT_END_SUBSCRIBE_THOROUGH } from '@/const/socket'
+import useTyped from './hooks/useTyped'
+import { throttle } from 'lodash-es'
 const { Sider, Content } = Layout
 const contentStyle: React.CSSProperties = {
   textAlign: 'center',
@@ -118,10 +122,47 @@ export default () => {
   useEffect(() => {
     getProjectDetail()
     getScriptPageList()
-    // if (!sessionId) handleCreateChat()
   }, [])
+  const { typedText } = useTyped()
+  const [chatIngText, setChatIngText] = useState<string>('')
+
+  const socketCallback = (message: any) => {
+    console.log('socketCallback', message, typeRef)
+    setChatIngText(prev => {
+      const newText = convertToMarkdown(prev + message.payload)
+      return newText
+    })
+  }
+
+  const chatEndSocketCallback = (message: any) => {
+    console.log('%c SCRIPT_END_SUBSCRIBE_THOROUGH socketCallback', 'color:red', message)
+    setChatIng(false)
+    setChatIngText('')
+    setMessageList(prevList => {
+      // 删除最后一条消息
+      const updatedList = prevList.slice(0, -1)
+
+      // 添加新消息
+      updatedList.push({
+        ...message.payload,
+        messageContent: convertToMarkdown(message.payload.messageContent || ''),
+      })
+
+      return updatedList
+    })
+  }
+  const { stompSocket } = useStompSocket([
+    {
+      path: SCRIPT_SUBSCRIBE_THOROUGH,
+      callback: socketCallback,
+    },
+    {
+      path: SCRIPT_END_SUBSCRIBE_THOROUGH,
+      callback: chatEndSocketCallback,
+    },
+  ])
+
   const contextValue = {
-    // form,
     containerRef,
     updateMessage,
     projectName,
@@ -141,13 +182,20 @@ export default () => {
     typeRef,
     contentMessagesRef,
     getProjectDetail,
+    stompSocket,
   }
   useEffect(() => {
     setTimeout(() => {
       if (contentMessagesRef.current) contentMessagesRef.current.scrollTop = contentMessagesRef.current.scrollHeight
+    }, 300)
+  }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      containerRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, 100)
-  }, [messageList])
-  console.log('zy 上下文 contextValue', contextValue)
+  }, [messageList]) // 依赖于 messages，当 messages 更新时触发
+
   return (
     <MyContext.Provider value={contextValue}>
       <Layout style={layoutStyle}>
@@ -158,6 +206,8 @@ export default () => {
               containerRef={containerRef}
               messageList={messageList}
               contentMessagesRef={contentMessagesRef}
+              chatIngText={chatIngText}
+              chatIng={chatIng}
             />
             <ChatControl containerRef={containerRef} />
           </Content>

@@ -12,6 +12,8 @@ export const TEXT_TO_IMAGE_THOROUGH = `/user/queue/task/text2img`
 // /user/queue/shots/download/{account_id}   打包下载通知
 //  生成剧本
 export const SCRIPT_SUBSCRIBE_THOROUGH = `/user/queue/session/chat/reply`
+// 重新生成
+export const SCRIPT_SUBSCRIBE_RESEND_THOROUGH = `/app/ai/stream/session/resend`
 export const SCRIPT_SEND_THOROUGH = `/app/ai/stream/session/chat`
 
 export const IMAGE_TO_VIDEO_THOROUGH = `/user/queue/task/img2video`

@@ -2,20 +2,24 @@ import { MessageList } from '@/api/types/script'
 import MarkdownIt from 'markdown-it'
 import MessageItem from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageItem'
 import GptMessage from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageItem/GptMessage'
-
-import { useMemo, useRef, useEffect } from 'react'
+import { useMemo } from 'react'
 const style = {
   color: '#000',
   height: '100%',
   overflow: 'auto',
   padding: '10px',
 }
-const ChatContent = (props: { containerRef: any; messageList: MessageList[]; contentMessagesRef: any }) => {
+const ChatContent = (props: {
+  containerRef: any
+  messageList: MessageList[]
+  contentMessagesRef: any
+  chatIngText: any
+  chatIng: boolean
+}) => {
   let md: MarkdownIt | null = null
   if (!md) md = new MarkdownIt()
 
   const lastMessage = useMemo(() => {
-    console.log('zy lastMessage', props.messageList.slice(-1)?.[0])
     return props.messageList.find(v => v.requesting || v.sending) || {}
   }, [props.messageList])
   return (
@@ -33,7 +37,12 @@ const ChatContent = (props: { containerRef: any; messageList: MessageList[]; con
           )
         })}
         {/* 最后一个聊天的信息 */}
-        <GptMessage md={md} messageInfo={lastMessage as MessageList} containerRef={props.containerRef}></GptMessage>
+        <GptMessage
+          chatIngText={props.chatIngText}
+          md={md}
+          chatIng={props.chatIng}
+          messageInfo={lastMessage as MessageList}
+          containerRef={props.containerRef}></GptMessage>
       </div>
     </div>
   )

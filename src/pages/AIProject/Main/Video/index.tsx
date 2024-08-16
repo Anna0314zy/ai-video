@@ -41,15 +41,27 @@ const VideoProcess = () => {
     // 增加信息
     updateMessage(message.payload)
   }
-
-  useStompSocket(TEXT_TO_IMAGE_THOROUGH, socketCallback)
-  useStompSocket(IMAGE_TO_VIDEO_THOROUGH, socketCallback)
-  useStompSocket(TTS_THOROUGH, socketCallback)
-
   const packSocketCallback = (message: any) => {
     console.log('packSocketCallback', message)
   }
-  useStompSocket(PACKAGE_DOWNLOAD_THOROUGH, packSocketCallback)
+  useStompSocket([
+    {
+      path: TEXT_TO_IMAGE_THOROUGH,
+      callback: socketCallback,
+    },
+    {
+      path: IMAGE_TO_VIDEO_THOROUGH,
+      callback: socketCallback,
+    },
+    {
+      path: TTS_THOROUGH,
+      callback: socketCallback,
+    },
+    {
+      path: PACKAGE_DOWNLOAD_THOROUGH,
+      callback: packSocketCallback,
+    },
+  ])
   const handlePack = () => {
     console.log('打包')
     if (!currentShotId) return

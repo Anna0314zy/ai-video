@@ -1,35 +1,22 @@
-import { useContext, useEffect } from 'react'
-import { useRef } from 'react'
-import { MyContext } from '../MyContext'
 import Typed from 'typed.js'
 import MarkdownIt from 'markdown-it'
-const useTyped = () => {
-  const { containerRef, getChatHistories, typeRef } = useContext(MyContext)
+import { convertToMarkdown } from '@/utils/index'
 
-  const handleComplete = async () => {
-    console.log('zy 完成打字')
-    await getChatHistories()
-    typeRef.current?.destroy()
-    console.log('Typing complete!')
-  }
-  function typedText(text: string) {
-    console.log('zy typedText', text, containerRef.current)
+const useTyped = () => {
+  function typedText(text: string, containerRef: any, typeRef: any) {
+    console.log('zy typedText', text, containerRef?.current)
     const md = new MarkdownIt()
-    const html = md.render(typeof text === 'string' ? text : '')
     if (typeRef.current) typeRef.current.destroy()
+    if (!containerRef?.current) return
+    const html = md.render(convertToMarkdown(text))
     typeRef.current = new Typed(containerRef.current, {
       strings: [html],
       typeSpeed: 0,
-      onComplete: handleComplete,
-      onStop: (arrayPos, self) => {
-        console.log('打字被暂停下来了', arrayPos, self)
-      },
     })
     return typeRef.current
   }
   return {
     typedText,
-    typeRef,
   }
 }
 export default useTyped

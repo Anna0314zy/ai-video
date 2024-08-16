@@ -12,11 +12,11 @@ import Home from '../pages/Home'
 import Edit from '../pages/Edit'
 import Image from '@/pages/Edit/components/Image'
 // import Video from '@/pages/Edit/components/Video'
-import HmePage from '@/pages/AIProject/Main/Sctipt'
-import HomePage from '../pages/AIProject/Main/Sctipt'
-// import Chat from '../pages/Chat'
+import ScriptPage from '@/pages/AIProject/Main/Sctipt'
 import VideoProcess from '../pages/AIProject/Main/Video'
-
+import CheckLogin from '@/components/CheckLogin'
+const ProtectedHomePage = CheckLogin(ScriptPage)
+const ProtectedVideoProcess = CheckLogin(VideoProcess)
 const router = createHashRouter([
   {
     path: '/',
@@ -39,16 +39,12 @@ const router = createHashRouter([
       {
         path: 'script',
         // index: true,
-        element: <HmePage />,
+        element: <ProtectedHomePage />,
       },
       {
         path: 'video',
 
-        element: <VideoProcess />,
-      },
-      {
-        path: 'image',
-        element: <Image />,
+        element: <ProtectedVideoProcess />,
       },
     ],
   },

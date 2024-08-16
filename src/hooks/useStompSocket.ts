@@ -5,28 +5,36 @@ import { useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 const useStompSocket = (
-  subscribeThorough = TEXT_TO_IMAGE_THOROUGH,
-  callback: Function,
+  subscribeThorough: {
+    path: string
+    callback: Function
+  }[],
   sendThorough = SEND_THOROUGH,
 ) => {
   let stompSocket = useRef<any>(null)
   const { accountId } = useSelector((state: RootState) => state.auth.userInfo)
 
   useEffect(() => {
-    if (!accountId) return
     stompSocket.current = new StompSocket({
       baseUrl: import.meta.env.VITE_SOCKET_BASE,
       sendThorough: SEND_THOROUGH,
-      subscribeThorough: `${subscribeThorough}/${accountId}`,
+      subscribeThorough: subscribeThorough.map(v => `${v.path}/${accountId}`),
     })
-    console.log('subscribeThorough', `${TEXT_TO_IMAGE_THOROUGH}/${accountId}`)
-    stompSocket.current.on('onSubscribe', (message: any) => {
-      console.log('onSubscribe', message)
-      callback(message)
+    console.log('>> ws subscribeThorough', subscribeThorough)
+
+    subscribeThorough.forEach(item => {
+      stompSocket.current.on(`${item.path}/${accountId}`, (message: any) => {
+        console.log(`>> ws onSubscribe ${item.path}`, message)
+        item.callback(message)
+      })
     })
+
     return () => {
       stompSocket.current.unsubscribe()
     }
-  }, [accountId])
+  }, [])
+  return {
+    stompSocket: stompSocket.current,
+  }
 }
 export default useStompSocket

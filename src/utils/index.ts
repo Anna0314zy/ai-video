@@ -64,7 +64,7 @@ export function convertToMarkdown(text: string) {
   // .split('\\n') // 按 \n 分隔行
 
   // 生成 Markdown 表格
-  console.log(replacedText.replace(/(\\S)\\n/g, '$1  \n'))
+  // console.log(replacedText.replace(/(\\S)\\n/g, '$1  \n'))
 
   return replacedText.replace(/(\S)\\n/g, '$1  \n').replace(/\\n/g, '  \n')
 }

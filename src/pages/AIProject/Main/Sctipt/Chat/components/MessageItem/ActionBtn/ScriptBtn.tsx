@@ -7,7 +7,9 @@ import { MessageList, Role } from '@/api/types/script'
 import { v4 as uuidv4 } from 'uuid'
 import useTyped from '@/pages/AIProject/Main/Sctipt/hooks/useTyped'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
-import { sendChatRequest } from '@/api/models/chat'
+import { SCRIPT_SUBSCRIBE_RESEND_THOROUGH } from '@/const/socket'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
 interface IProps {
   name: string
   onClick: (item: MessageList) => void
@@ -21,11 +23,11 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
     sessionId,
     updateMessage,
     scriptPageList,
-    getChatHistories,
+    stompSocket,
     messageList,
-    typeRef,
   } = useContext(MyContext)
   const { typedText } = useTyped()
+  const accountId = useSelector((state: RootState) => state.auth.userInfo.accountId)
   const [chatContentLoading, setChatContentLoading] = useState<{
     [key: string]: {
       [key: string]: boolean
@@ -75,28 +77,14 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
 
   const handleRefresh = async () => {
     console.log(shouldRefresh, 'shouldRefresh')
-    if (shouldRefresh) await getChatHistories()
     setChatIng(true)
-    const created = Date.now()
-    const id = uuidv4()
-    console.log('%c zy 请求接口', 'color:red', Date.now(), updateMessage)
-    updateMessage({ requesting: true, created, role: Role.Gpt, id })
-    try {
-      await sendChatRequest(
-        {
-          sessionId,
-          sessionChatId: messageInfo.id as number,
-        },
-        async val => {
-          typedText(val)
-        },
-        typeRef,
-        uuidv4(),
-      )
-      updateMessage({ sending: true, created, role: Role.Gpt, id, requesting: false })
-    } finally {
-      setChatIng(false)
+    let params: any = {
+      sessionId,
+      sessionChatId: messageInfo.id,
+      accountId,
     }
+    updateMessage([{ requesting: true, created: Date.now(), role: Role.Gpt, id: uuidv4() }])
+    stompSocket.send(SCRIPT_SUBSCRIBE_RESEND_THOROUGH, JSON.stringify(params))
   }
   const shouldRefresh = useMemo(() => {
     return messageList?.some((v: any) => v.sending)

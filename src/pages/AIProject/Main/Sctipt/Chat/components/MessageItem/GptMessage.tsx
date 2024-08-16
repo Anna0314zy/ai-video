@@ -5,8 +5,11 @@ interface IProps {
   messageInfo: MessageList
   containerRef?: any
   md: any
+  typeRef?: any
+  chatIngText?: string
+  chatIng?: boolean
 }
-export default ({ messageInfo, containerRef, md }: IProps) => {
+export default ({ messageInfo, md, containerRef, chatIngText, chatIng }: IProps) => {
   return (
     <div style={{ display: messageInfo?.requesting || messageInfo?.sending ? 'block' : 'none' }} className='answering'>
       <HeadLayout messageInfo={messageInfo || {}}>
@@ -18,12 +21,17 @@ export default ({ messageInfo, containerRef, md }: IProps) => {
               __html: md.render(typeof messageInfo?.messageContent === 'string' ? messageInfo.messageContent : ''),
             }}></div>
         ) : null}
-        {messageInfo.requesting ? (
+        {!chatIngText ? (
           <div>
             <Spin size='small' />
           </div>
         ) : null}
-        <div ref={containerRef} className='typed-text'></div>
+        <div
+          ref={containerRef}
+          style={{ display: !chatIng ? 'none' : 'block' }}
+          dangerouslySetInnerHTML={{
+            __html: md.render(chatIngText || ''),
+          }}></div>
       </HeadLayout>
     </div>
   )
