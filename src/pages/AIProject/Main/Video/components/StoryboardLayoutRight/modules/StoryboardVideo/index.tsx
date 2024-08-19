@@ -1,11 +1,13 @@
 import { Fragment, useState, useRef, useEffect } from 'react'
-import { Layout } from 'antd'
+import { Layout, Modal, Button } from 'antd'
 import { useSelector, useDispatch } from 'react-redux'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import IconWidget from '@/components/IconWidget'
 import { EnumUploadType } from '@/api/types/video'
 import { nickIcon } from '@/components/IconWidget/Icons'
+import { downloadFromServer } from '@/utils'
+import PreViewModal from '../PreViewModal'
 import Result from '../Result'
 import ResourceItem from '../ResourceItem'
 import * as api from '@/api/models/video'
@@ -25,8 +27,22 @@ export default (props: IStoryboardVideo) => {
 
   const [step, setStep]: any = useState(props.step || 1)
   const { selectedImage, selectedVideo, currentSelectType, currentShotId } = useSelector((state: any) => state.aiVideo)
+  const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
   const [isShowResult, setIsShowResult] = useState(false)
   const [videoDetail, setVideoDetail] = useState([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const showModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleOk = () => {
+    setIsModalOpen(false)
+  }
+
+  const handleCancel = () => {
+    setIsModalOpen(false)
+  }
 
   useScrollToBottomHook(scrollVideoRef, 1, () => {
     onChangeGetNewData()
@@ -77,6 +93,12 @@ export default (props: IStoryboardVideo) => {
   const beforeUpload = () => {
     return Promise.resolve(true)
   }
+  // onHandleDeleteResourceItem 删除某一项
+  const onHandleDeleteResourceItem = (item: any) => {
+    api.delResourceItem({ resourceId: item.resourceId, type: currentSelectType }).then(() => {
+      onChangeGetNewData()
+    })
+  }
   return (
     <Layout className={Styles['storyboard-image']}>
       <Layout.Sider className='storyboard-image-step'>
@@ -90,7 +112,7 @@ export default (props: IStoryboardVideo) => {
               }}>
               <div className='btn-step-index f-center'>{item.id}</div>
               {/* Object.keys(selectedImage).length ? nickIcon() :  */}
-              <div className='btn-step-text'>{item.name}</div>
+              <div className='btn-s ep-text'>{item.name}</div>
             </button>
 
             {setpData.length - 1 !== index && <div className='step-divider'></div>}
@@ -125,12 +147,54 @@ export default (props: IStoryboardVideo) => {
                   key={index}
                   data={item}
                   onHandlePreviewResourceItem={() => {
+                    // PreViewModal({
+                    //   step,
+                    //   item,
+                    //   onHandleDeleteResourceItem,
+                    // })
+                    // Modal.warning({
+                    //   title: '图片预览',
+                    //   closeIcon: true,
+                    //   width: 1080,
+                    //   height: 679,
+                    //   content: (
+                    //     <div>
+                    //       {step === 1 ? (
+                    //         <img
+                    //           style={{ width: 1000 }}
+                    //           className='preview-img'
+                    //           src={`${cdnPath}${item.compressUrl}`}
+                    //           alt=''
+                    //         />
+                    //       ) : (
+                    //         <video controls style={{ width: 1000 }}>
+                    //           <source src={cdnPath + item.compressUrl} type='video/mp4' />
+                    //           Your browser does not support the video tag.
+                    //         </video>
+                    //       )}
+                    //     </div>
+                    //   ),
+                    //   okText: '删除',
+                    //   cancelText: '取消',
+                    //   footer: (
+                    //     <div>
+                    //       <Button key={'cancel'} onClick={() => {}}>
+                    //         取消
+                    //       </Button>
+                    //       <Button key={'del'} onClick={() => onHandleDeleteResourceItem(item)}>
+                    //         删除
+                    //       </Button>
+                    //       <Button type={'primary'}>下载</Button>
+                    //     </div>
+                    //   ),
+                    //   onOk() {},
+                    //   onCancel() {},
+                    // })
+                    // showModal()
                     // 预览
                   }}
                   onHandleDeleteResourceItem={() => {
-                    api.delResourceItem({ resourceId: item.resourceId, type: currentSelectType }).then(() => {
-                      onChangeGetNewData()
-                    })
+                    onHandleDeleteResourceItem(item)
                     // 删除某个资源
                   }}
                   onClick={() => {
