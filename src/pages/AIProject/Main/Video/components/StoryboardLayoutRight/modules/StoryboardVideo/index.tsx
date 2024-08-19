@@ -5,6 +5,7 @@ import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import IconWidget from '@/components/IconWidget'
 import { EnumUploadType } from '@/api/types/video'
+import { nickIcon } from '@/components/IconWidget/Icons'
 import Result from '../Result'
 import ResourceItem from '../ResourceItem'
 import * as api from '@/api/models/video'
@@ -87,9 +88,11 @@ export default (props: IStoryboardVideo) => {
               onClick={() => {
                 // setStep(item.id)
               }}>
-              <div className='btn-step-index'>{item.id}</div>
+              <div className='btn-step-index f-center'>{item.id}</div>
+              {/* Object.keys(selectedImage).length ? nickIcon() :  */}
               <div className='btn-step-text'>{item.name}</div>
             </button>
+
             {setpData.length - 1 !== index && <div className='step-divider'></div>}
           </Fragment>
         ))}

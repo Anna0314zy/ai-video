@@ -1,13 +1,17 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Input } from 'antd'
+import { useParams } from 'react-router-dom'
+import { cloneDeep } from 'lodash-es'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import ResourceItem from '../ResourceItem'
 import IconWidget from '@/components/IconWidget'
+
 import { EnumUploadType } from '@/api/types/video'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import Result from '../Result'
 import * as api from '@/api/models/video'
+
 import './index.less'
 const { TextArea } = Input
 
@@ -15,11 +19,17 @@ export default (props: any) => {
   const { data, onChangeGetNewData } = props
   const dispatch = useDispatch()
   const scrollAudioRef = useRef(null)
-  const { selectedAudio, currentShotId, selectedVoice, currentSelectType, selectedShot } = useSelector(
+  const { id } = useParams() // 获取路由参数 userId
+  const { shotList, selectedAudio, currentShotId, selectedVoice, currentSelectType, selectedShot } = useSelector(
     (state: any) => state.aiVideo,
   )
+
   const [isShowResult, setIsShowResult] = useState(false)
   const [voiceDetail, setVoiceDetail] = useState(false)
+  const [narration, setNarration] = useState('')
+  useEffect(() => {
+    setNarration('')
+  }, [currentShotId])
   const onHandleJumpNext = () => {
     console.log('%c 🚀 ~ [  ]-18', 'font-size:14px; background:green; color:#fff;', selectedVoice)
     if (Object.keys(selectedAudio).length) {
@@ -42,7 +52,21 @@ export default (props: any) => {
 
   const saveShotList = () => {
     // 更新分镜头信息
-    console.log('%c 🚀 ~ [  ]-43', 'font-size:14px; background:green; color:#fff;', 'shijiaobaocun')
+    api.saveShotList({
+      projectId: Number(id),
+      shotInfoDtoList: [{ shotId: currentShotId, narration: narration, sort: selectedShot.sort }],
+    })
+    const cloneShotList = cloneDeep(shotList)
+    const res = cloneShotList.map((item: any) => {
+      if (item.shotId === currentShotId) {
+        return {
+          ...item,
+          narration,
+        }
+      }
+      return item
+    })
+    dispatch.aiVideo.updateData({ shotList: res })
   }
   const onFinish = ({ uploadOptions }: { uploadOptions: IUploadOptions }) => {
     // 上传音频
@@ -56,13 +80,20 @@ export default (props: any) => {
   const beforeUpload = () => {
     return Promise.resolve(true)
   }
+  const onChangeNarration = (event: any) => {
+    setNarration(event.target.value)
+    console.log('%c 🚀 ~ [ value ]-60', 'font-size:14px; background:green; color:#fff;', event)
+  }
   return (
     <div className='storyboard-audio'>
       <div className='storyboard-audio__text'>
         <TextArea
           style={{ height: 120, resize: 'none' }}
           onBlur={() => saveShotList()}
-          value={selectedShot.narration}
+          value={narration || selectedShot.narration}
+          onChange={(event: any) => {
+            onChangeNarration(event)
+          }}
         />
       </div>
       {!isShowResult && (

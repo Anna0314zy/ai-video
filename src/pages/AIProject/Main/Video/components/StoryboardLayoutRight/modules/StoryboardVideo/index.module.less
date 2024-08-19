@@ -14,7 +14,7 @@
     .btn-step {
       display: block;
       width: 100%;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 400;
       color: #a1a1b2;
       border: none;
@@ -22,17 +22,21 @@
       outline: none;
       cursor: pointer;
       &[data-actived='true'] {
-        color: #000;
+        .btn-step-index{
+          color: #fff;
+          background-color: #000;
+        }
+
       }
       &:disabled {
         cursor: not-allowed;
       }
     }
     .btn-step-index {
-      width: 30px;
-      height: 30px;
-      text-align: center;
-      line-height: 30px;
+      width: 18px;
+      height: 18px;
+      // text-align: center;
+      // line-height: 1;
       border-radius: 50%;
       border: 1px solid currentColor;
     }

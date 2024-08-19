@@ -26,6 +26,13 @@ const Result: FC<any> = (props: any) => {
     const items: any = Object.keys(data).map((item: any, index: number) => {
       const keys = type === 'video' ? videoEnum : voiceEnum
       if (!keys[item] || !keys[item]) return {}
+      if (item === 'fps') {
+        return {
+          key: index,
+          label: keys[item],
+          children: `${data[item]}帧/S`,
+        }
+      }
       return {
         key: index,
         label: keys[item],
@@ -40,7 +47,7 @@ const Result: FC<any> = (props: any) => {
     <div className='result'>
       <div className='result__video'>{data.picUrl && <img src={data.picUrl || ''} alt='' />}</div>
       <div className='result__content'>
-        <Descriptions items={detail} column={1} />
+        <Descriptions items={detail} column={1} colon={false} />
       </div>
     </div>
   )

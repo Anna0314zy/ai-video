@@ -44,7 +44,10 @@ export default () => {
         sortIndex: index + 1,
       })),
     })
-    api.saveShotList({ shotId: currentShotId, narration: '', sort: index })
+    api.saveShotList({
+      projectId: Number(id),
+      shotInfoDtoList: [{ shotId: currentShotId, narration: '', sort: index + 1 }],
+    })
     // .then(() => {
     //   dispatch.aiVideo.getShotListByProjectId(Number(id))
     // })
