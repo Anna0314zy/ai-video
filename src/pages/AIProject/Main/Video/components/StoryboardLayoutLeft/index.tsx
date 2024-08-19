@@ -96,7 +96,7 @@ export default () => {
                             }}
                             key={index}
                             index={index + 1}
-                            img={data.imageUrl}
+                            img={`https://ai-tool-static-test.ledupeiyou.com${data.previewImage}`}
                             active={data.shotId === currentShotId}
                           />
                         </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Image } from 'antd'
 import Styles from './index.module.less'
+import fallback from '@/components/IconWidget/images/fallback.png'
 console.log('Styles', Styles)
 interface IStoryboardCard {
   index: number
@@ -10,26 +11,14 @@ interface IStoryboardCard {
 }
 export default (props: IStoryboardCard) => {
   const { index, img, active: active, onClick } = props
-  const [fail, setFail] = useState(false)
-  useEffect(() => {
-    setFail(false)
-  }, [props])
+  console.log('%c 🚀 ~ [ img ]-13', 'font-size:14px; background:green; color:#fff;', img)
+  useEffect(() => {}, [props])
 
   return (
     <div className={Styles['storyboard-card']} data-active={active} onClick={onClick}>
       <span className='storyboard-card-index'>{index}.&nbsp;</span>
       <div className='storyboard-card-img'>
-        {!fail && (
-          <Image
-            src={img}
-            width={'9.86vw'}
-            height={'5.55vw'}
-            preview={false}
-            onError={() => {
-              setFail(true)
-            }}
-          />
-        )}
+        <Image src={img} width={149} height={86} preview={false} fallback={fallback} />
       </div>
     </div>
   )
