@@ -20,7 +20,7 @@ import { MyContext } from './MyContext'
 import useStompSocket from '@/hooks/useStompSocket'
 import { packageBatch } from '@/api/models/aiVideo'
 const VideoProcess = () => {
-  const { currentShotId, currentSelectType } = useSelector((state: RootState) => state.aiVideo)
+  const { currentSelectType, shotList } = useSelector((state: RootState) => state.aiVideo)
   const { messageList, getMessageList, addChatTask, updateMessage, reinstateTask } = useControlMsg()
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
@@ -67,8 +67,11 @@ const VideoProcess = () => {
   ])
   const handlePack = () => {
     console.log('打包')
-    if (!currentShotId) return
-    packageBatch([currentShotId])
+    if (!shotList.length) return
+    const shotIds = shotList.map(item => {
+      return item.shotId
+    })
+    packageBatch(shotIds)
   }
   return (
     <MyContext.Provider value={contextValue}>

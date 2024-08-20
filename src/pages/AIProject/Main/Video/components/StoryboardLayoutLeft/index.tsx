@@ -37,16 +37,22 @@ export default () => {
   }
   const onInsterShot = async (type: string, index: number) => {
     const items = Array.from(shotList)
-    items.splice(type === 'up' ? (index === 0 ? 0 : index - 1) : index + 1, 0, {})
-    dispatch.aiVideo.updateData({
-      shotList: items.map((v: any, index) => ({
-        ...v,
-        sortIndex: index + 1,
-      })),
+    items.splice(type === 'up' ? (index === 0 ? 0 : index - 1) : index + 1, 0, {
+      narration: '',
+      sort: type === 'up' ? (index === 0 ? 0 : index - 1) : index + 1,
     })
-    await api.saveShotList({
+    const _shotList = items.map((v: any, index) => ({
+      ...v,
+      sortIndex: index + 1,
+    }))
+    dispatch.aiVideo.updateData({
+      shotList: _shotList,
+    })
+
+    console.log('%c 🚀 ~ [  ]-49', 'font-size:14px; background:green; color:#fff;', _shotList)
+    api.saveShotList({
       projectId: Number(id),
-      shotInfoDtoList: [{ shotId: currentShotId, narration: '', sort: index + 1 }],
+      shotInfoDtoList: _shotList,
     })
     dispatch.aiVideo.getShotListByProjectId(Number(id))
   }
@@ -85,6 +91,7 @@ export default () => {
                           })
                         }}
                         onDownload={() => {
+                          api.packageBatch([currentShotId])
                           // 下载资源
                         }}>
                         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
