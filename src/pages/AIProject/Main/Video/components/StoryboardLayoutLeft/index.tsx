@@ -24,7 +24,7 @@ export default () => {
     dispatch.aiVideo.updateData({
       shotList: items.map((v: any, index) => ({
         ...v,
-        sortIndex: index + 1,
+        sort: index + 1,
       })),
     })
 
@@ -43,7 +43,7 @@ export default () => {
     })
     const _shotList = items.map((v: any, index) => ({
       ...v,
-      sortIndex: index + 1,
+      sort: index + 1,
     }))
     dispatch.aiVideo.updateData({
       shotList: _shotList,
@@ -55,6 +55,21 @@ export default () => {
       shotInfoDtoList: _shotList,
     })
     dispatch.aiVideo.getShotListByProjectId(Number(id))
+  }
+  const onDelete = (index: number) => {
+    const items = Array.from(shotList)
+    items.splice(index, 1)
+    const _shotList = items.map((v: any, index) => ({
+      ...v,
+      sort: index + 1,
+    }))
+    dispatch.aiVideo.updateData({
+      shotList: _shotList,
+    })
+    api.saveShotList({
+      projectId: Number(id),
+      shotInfoDtoList: _shotList,
+    })
   }
   return (
     <div className='page-storyboard-left'>
@@ -86,7 +101,9 @@ export default () => {
                             ),
                             okText: '删除',
                             cancelText: '取消',
-                            onOk() {},
+                            onOk() {
+                              onDelete(index)
+                            },
                             onCancel() {},
                           })
                         }}
