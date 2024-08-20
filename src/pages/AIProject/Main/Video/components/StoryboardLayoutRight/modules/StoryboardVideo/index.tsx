@@ -1,6 +1,7 @@
 import { Fragment, useState, useRef, useContext, useEffect } from 'react'
 import { Layout, Modal, Button } from 'antd'
 import { useSelector, useDispatch } from 'react-redux'
+import { useParams } from 'react-router-dom'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import IconWidget from '@/components/IconWidget'
@@ -24,7 +25,7 @@ export default (props: IStoryboardVideo) => {
   const { deleteMessageByResourceId } = useContext(MyContext)
   const dispatch = useDispatch()
   const scrollVideoRef = useRef(null)
-
+  const { id } = useParams() // 获取路由参数 userId
   const [step, setStep]: any = useState(props.step || 1)
   const { selectedImage, selectedVideo, currentSelectType, currentShotId, selectedShot } = useSelector(
     (state: any) => state.aiVideo,
@@ -58,7 +59,11 @@ export default (props: IStoryboardVideo) => {
   const onHandleJumpNextStep = () => {
     if (step === 1 && Object.keys(selectedImage).length) {
       dispatch.aiVideo.updateData({ currentSelectType: 'video' })
-      api.confirmResource({ shotId: currentShotId, resourceId: selectedImage.resourceId, type: currentSelectType })
+      api
+        .confirmResource({ shotId: currentShotId, resourceId: selectedImage.resourceId, type: currentSelectType })
+        .then(() => {
+          dispatch.aiVideo.getShotListByProjectId(Number(id))
+        })
       setStep((preData: any) => {
         return preData + 1
       })
