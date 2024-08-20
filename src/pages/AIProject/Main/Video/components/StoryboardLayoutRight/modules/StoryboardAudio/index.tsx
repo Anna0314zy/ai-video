@@ -1,9 +1,13 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Input } from 'antd'
+import { Input, Modal, Button } from 'antd'
+import { useParams } from 'react-router-dom'
+import { cloneDeep } from 'lodash-es'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import ResourceItem from '../ResourceItem'
+import { downloadFromServer } from '@/utils'
 import IconWidget from '@/components/IconWidget'
+
 import { EnumUploadType } from '@/api/types/video'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import Result from '../Result'
@@ -15,11 +19,17 @@ export default (props: any) => {
   const { data, onChangeGetNewData } = props
   const dispatch = useDispatch()
   const scrollAudioRef = useRef(null)
-  const { selectedAudio, currentShotId, selectedVoice, currentSelectType, selectedShot } = useSelector(
+  const { id } = useParams() // 获取路由参数 userId
+  const { shotList, selectedAudio, currentShotId, selectedVoice, currentSelectType, selectedShot } = useSelector(
     (state: any) => state.aiVideo,
   )
+  const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
   const [isShowResult, setIsShowResult] = useState(false)
   const [voiceDetail, setVoiceDetail] = useState(false)
+  const [narration, setNarration] = useState('')
+  useEffect(() => {
+    setNarration('')
+  }, [currentShotId])
   const onHandleJumpNext = () => {
     console.log('%c 🚀 ~ [  ]-18', 'font-size:14px; background:green; color:#fff;', selectedVoice)
     if (Object.keys(selectedAudio).length) {
@@ -42,8 +52,23 @@ export default (props: any) => {
 
   const saveShotList = () => {
     // 更新分镜头信息
-    console.log('%c 🚀 ~ [  ]-43', 'font-size:14px; background:green; color:#fff;', 'shijiaobaocun')
+    api.saveShotList({
+      projectId: Number(id),
+      shotInfoDtoList: [{ shotId: currentShotId, narration: narration, sort: selectedShot.sort }],
+    })
+    const cloneShotList = cloneDeep(shotList)
+    const res = cloneShotList.map((item: any) => {
+      if (item.shotId === currentShotId) {
+        return {
+          ...item,
+          narration,
+        }
+      }
+      return item
+    })
+    dispatch.aiVideo.updateData({ shotList: res })
   }
+
   const onFinish = ({ uploadOptions }: { uploadOptions: IUploadOptions }) => {
     // 上传音频
     console.log('onFinish', uploadOptions, uploadOptions.cosFullPath)
@@ -56,13 +81,81 @@ export default (props: any) => {
   const beforeUpload = () => {
     return Promise.resolve(true)
   }
+  const onChangeNarration = (event: any) => {
+    setNarration(event.target.value)
+    console.log('%c 🚀 ~ [ value ]-60', 'font-size:14px; background:green; color:#fff;', event)
+  }
+  // onHandleDeleteResourceItem 删除某一项
+  const onHandleDeleteResourceItem = (item: any) => {
+    api.delResourceItem({ resourceId: item.resourceId, type: currentSelectType }).then(() => {
+      onChangeGetNewData()
+    })
+  }
+
+  const modalBox = (item: any) => {
+    const destroy = () => {
+      modalInstance.destroy()
+      // modalInstance = null
+    }
+
+    const modalInstance = Modal.warning({
+      title: '音频预览',
+      closeIcon: true,
+      icon: null,
+      width: 500,
+      height: 679,
+      content: (
+        <div style={{ margin: '0 auto' }}>
+          <audio controls style={{ backgroundColor: '#fff', padding: '5px', borderRadius: '4px' }}>
+            <source src={cdnPath + item.compressUrl} type='audio/mpeg' />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      ),
+      footer: (
+        <div style={{ float: 'right' }}>
+          <Button
+            key={'cancel'}
+            onClick={() => {
+              destroy()
+            }}>
+            取消
+          </Button>
+          <Button
+            key={'del'}
+            onClick={() => {
+              onHandleDeleteResourceItem(item)
+              destroy()
+            }}>
+            删除
+          </Button>
+          <Button
+            type={'primary'}
+            onClick={() => {
+              downloadFromServer(
+                cdnPath +
+                  item.compressUrl +
+                  `?id=${item.resourceId}&fileName=${item.name}
+                &ext=${'mp3'}`,
+                `${item.name}.${'mp3'}`,
+              )
+            }}>
+            下载
+          </Button>
+        </div>
+      ),
+    })
+  }
   return (
     <div className='storyboard-audio'>
       <div className='storyboard-audio__text'>
         <TextArea
           style={{ height: 120, resize: 'none' }}
           onBlur={() => saveShotList()}
-          value={selectedShot.narration}
+          value={narration || selectedShot.narration}
+          onChange={(event: any) => {
+            onChangeNarration(event)
+          }}
         />
       </div>
       {!isShowResult && (
@@ -94,10 +187,15 @@ export default (props: any) => {
               <ResourceItem
                 key={index}
                 data={item}
+                cdnPath={cdnPath}
+                ext={'mp3'}
                 onHandlePreviewResourceItem={() => {
+                  console.log('%c 🚀 ~ [  ]-195', 'font-size:14px; background:green; color:#fff;', '1111')
+                  modalBox(item)
                   // 预览
                 }}
                 onHandleDeleteResourceItem={() => {
+                  onHandleDeleteResourceItem(item)
                   // 删除某个资源
                 }}
                 onClick={() => {

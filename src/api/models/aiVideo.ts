@@ -148,6 +148,6 @@ export const importResourceFile = (params: { shotId: number; originPath: string;
 }
 
 //  分镜头信息保存
-export const saveShotList = (params: { shotId: number; narration: string; sort: number }) => {
+export const saveShotList = (params: { projectId: number; shotInfoDtoList: Array<any> }) => {
   return api.post<any>(`${http}/api/scriptShot/v1/saveShotList`, params)
 }

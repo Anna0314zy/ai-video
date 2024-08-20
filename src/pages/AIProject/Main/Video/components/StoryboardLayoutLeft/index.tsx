@@ -44,7 +44,10 @@ export default () => {
         sortIndex: index + 1,
       })),
     })
-    api.saveShotList({ shotId: currentShotId, narration: '', sort: index })
+    api.saveShotList({
+      projectId: Number(id),
+      shotInfoDtoList: [{ shotId: currentShotId, narration: '', sort: index + 1 }],
+    })
     // .then(() => {
     //   dispatch.aiVideo.getShotListByProjectId(Number(id))
     // })
@@ -96,7 +99,7 @@ export default () => {
                             }}
                             key={index}
                             index={index + 1}
-                            img={data.imageUrl}
+                            img={`https://ai-tool-static-test.ledupeiyou.com${data.previewImage}`}
                             active={data.shotId === currentShotId}
                           />
                         </div>
