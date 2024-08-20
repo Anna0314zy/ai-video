@@ -136,7 +136,7 @@ export const getVideoDetail = (params: { shotId: number }) => {
 export const getVoiceDetail = (params: { shotId: number }) => {
   return api.get<any>(`${http}/api/resource/v1/final/voice/detail`, params)
 }
-
+// 分镜头打包
 export const packageBatch = (shotIds: number[]) => {
   return api.post<any>(`${http}/api/scriptShot/v1/packageBatch`, {
     shotIds,

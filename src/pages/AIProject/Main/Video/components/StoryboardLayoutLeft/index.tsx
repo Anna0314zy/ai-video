@@ -87,6 +87,7 @@ export default () => {
                           })
                         }}
                         onDownload={() => {
+                          api.packageBatch([currentShotId])
                           // 下载资源
                         }}>
                         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
