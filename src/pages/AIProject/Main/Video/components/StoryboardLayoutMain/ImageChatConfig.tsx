@@ -30,7 +30,6 @@ const ImageChatConfig = (_: any, ref: any) => {
   useEffect(() => {
     getImagePromptBtnList()
   }, [currentShotId])
-  const { subjectName } = useContext(MyContext)
 
   const [form] = Form.useForm()
 
