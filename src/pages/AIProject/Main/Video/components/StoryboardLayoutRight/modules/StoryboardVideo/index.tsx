@@ -26,14 +26,22 @@ export default (props: IStoryboardVideo) => {
   const scrollVideoRef = useRef(null)
 
   const [step, setStep]: any = useState(props.step || 1)
-  const { selectedImage, selectedVideo, currentSelectType, currentShotId } = useSelector((state: any) => state.aiVideo)
+  const { selectedImage, selectedVideo, currentSelectType, currentShotId, selectedShot } = useSelector(
+    (state: any) => state.aiVideo,
+  )
   const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
   const [isShowResult, setIsShowResult] = useState(false)
   const [videoDetail, setVideoDetail] = useState([])
-
   useScrollToBottomHook(scrollVideoRef, 1, () => {
     onChangeGetNewData()
   })
+  useEffect(() => {
+    if (selectedShot.previewImage) {
+      setStep(2)
+    } else {
+      setStep(1)
+    }
+  }, [selectedShot.previewImage])
 
   const setpData = [
     {
