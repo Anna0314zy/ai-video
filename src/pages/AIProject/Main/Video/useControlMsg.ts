@@ -20,6 +20,20 @@ const useControlMsg = () => {
   useEffect(() => {
     console.log('%czy messageList', 'color:red;backgroundColor:green', messageList)
   }, [messageList])
+  const deleteMessageByResourceId = (data: { resourceId: number }) => {
+    setMessageList((prev: ChatMessageList[]) => {
+      const newData = prev.map(item => {
+        if (item.resourceId === data.resourceId) {
+          return Object.assign({}, item, {
+            resourceId: 0,
+            resourceName: '',
+          })
+        }
+        return item
+      })
+      return newData
+    })
+  }
   const updateMessage = (data: ChatMessageList) => {
     if (data.type !== currentSelectType) return
     setMessageList((prev: ChatMessageList[]) => {
@@ -141,6 +155,7 @@ const useControlMsg = () => {
     getMessageList,
     addChatTask,
     reinstateTask,
+    deleteMessageByResourceId,
   }
 }
 export default useControlMsg

@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useContext } from 'react'
 import type { MenuProps } from 'antd'
 import { Flex, Dropdown } from 'antd'
 import { useSelector } from 'react-redux'
@@ -7,10 +7,12 @@ import { fileIcon, videoIcon, voiceIcon, downIcon, moreIcon } from '@/components
 
 import AntdIcon from '@/components/IconWidget/AntdIcon'
 import './index.less'
-
+import { MyContext } from '../../../../MyContext'
 const ResourceItem: FC<any> = props => {
+  const { deleteMessageByResourceId } = useContext(MyContext)
   const { cdnPath, ext, actived, onClick, data, onHandleDeleteResourceItem, onHandlePreviewResourceItem } = props
   const { currentSelectType } = useSelector((state: any) => state.aiVideo)
+
   const imageIconEnum: any = {
     image: fileIcon,
     video: videoIcon,
@@ -35,6 +37,9 @@ const ResourceItem: FC<any> = props => {
         <Flex
           onClick={() => {
             onHandleDeleteResourceItem()
+            deleteMessageByResourceId({
+              resourceId: data.resourceId,
+            })
             console.log('%c 🚀 ~ [  ]-23', 'font-size:14px; background:green; color:#fff;', '删除资源')
           }}>
           <AntdIcon style={{ fontSize: '20px' }} icon={'delete'}></AntdIcon>

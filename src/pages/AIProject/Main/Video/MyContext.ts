@@ -11,6 +11,7 @@ interface Context {
     size?: number
   }) => Promise<any[]>
   updateMessage: (data: ChatMessageList) => void
+  deleteMessageByResourceId: (data: { resourceId: number }) => void
   addChatTask: (params: AudioTaskParams | AddImageTaskParams | VideoTaskParams, type: ResourceType) => void
   reinstateTask: (taskId: string) => void
   [k: string]: any

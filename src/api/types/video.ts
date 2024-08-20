@@ -80,6 +80,8 @@ export interface CommonMessage {
   originUrl?: string
   compressUrl?: string
   text?: string
+  resourceId?: number
+  resourceName?: string
 }
 export interface Text2imageMessage extends CommonMessage {
   content?: string
@@ -95,7 +97,7 @@ export interface AddImageTaskParams {
   shotId: number
   text?: string
   projectId: number
-  option?: Text2imageMessageOptions
+  option?: Text2imageMessageOptions | string
   requestLogId?: number
 }
 
@@ -105,4 +107,4 @@ export interface AudioTaskParams extends AudioChatParams {
 export interface VideoTaskParams extends VideoChatParams {
   shotId: number
 }
-export const PAGE_SIZE = 50
+export const PAGE_SIZE = 200

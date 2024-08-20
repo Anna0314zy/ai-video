@@ -1,12 +1,15 @@
-import { message, Flex } from 'antd'
+import { message, Flex, Tag } from 'antd'
 import * as api from '@/api/models/aiVideo'
 import { useContext, useMemo, useState } from 'react'
 import { ChatMessageList, ResourceTypeMap } from '@/api/types/video'
 import { MyContext } from '../../MyContext'
 import ActionBtn from '@/pages/AIProject/components/ActionBtn'
-import { key } from 'localforage'
-
+import AntdIcon from '@/components/IconWidget/AntdIcon'
+import { useDispatch, useSelector } from 'react-redux'
+import { Dispatch, RootState } from '@/store'
 const ContentActionBtn = ({ item }: { item: ChatMessageList }) => {
+  const dispatch = useDispatch<Dispatch>()
+  const { currentShotId } = useSelector((state: RootState) => state.aiVideo)
   const { reinstateTask, updateMessage } = useContext(MyContext)
   // 记录按钮的状态
   const [btnLoading, setBtnLoading] = useState<{
@@ -24,9 +27,19 @@ const ContentActionBtn = ({ item }: { item: ChatMessageList }) => {
       if (key === 'add') {
         console.log('add')
         if (!item.historyId) return
-        await api.addResource({
+        const { resourceId, name } = await api.addResource({
           historyId: item.historyId,
           type: item.type,
+        })
+        updateMessage({
+          ...item,
+          resourceId,
+          resourceName: name,
+        })
+        dispatch.aiVideo.getResourceList({
+          shotId: currentShotId,
+          type: item.type,
+          pageIndex: 1,
         })
         message.success(`${ResourceTypeMap[item.type]}标记成功`)
       } else if (key === 'refresh') {
@@ -72,9 +85,17 @@ const ContentActionBtn = ({ item }: { item: ChatMessageList }) => {
       },
     ]
   }, [item])
+  const showData = useMemo(() => {
+    return item.resourceId ? config.slice(1) : config
+  }, [item])
   return (
     <Flex wrap={true} gap={10} style={{ marginTop: '10px' }} className='btns'>
-      {config.map(
+      {item.resourceId ? (
+        <Tag style={{ color: '#FF7A2F' }} color='rgba(254, 126, 7, 0.1)' icon={<AntdIcon icon='script' />}>
+          {item.resourceName || ResourceTypeMap[item.type]}
+        </Tag>
+      ) : null}
+      {showData.map(
         v =>
           v.show && (
             <ActionBtn

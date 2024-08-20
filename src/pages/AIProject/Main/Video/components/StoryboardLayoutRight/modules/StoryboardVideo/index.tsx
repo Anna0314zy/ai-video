@@ -1,4 +1,4 @@
-import { Fragment, useState, useRef, useEffect } from 'react'
+import { Fragment, useState, useRef, useContext } from 'react'
 import { Layout, Modal, Button } from 'antd'
 import { useSelector, useDispatch } from 'react-redux'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
@@ -11,7 +11,7 @@ import Result from '../Result'
 import ResourceItem from '../ResourceItem'
 import * as api from '@/api/models/aiVideo'
 import Styles from './index.module.less'
-
+import { MyContext } from '../../../../MyContext'
 interface IStoryboardVideo {
   data?: any
   step?: number | string // 显示第几步骤
@@ -21,6 +21,7 @@ interface IStoryboardVideo {
 
 export default (props: IStoryboardVideo) => {
   const { data, onChangeGetNewData }: any = props
+  const { deleteMessageByResourceId } = useContext(MyContext)
   const dispatch = useDispatch()
   const scrollVideoRef = useRef(null)
 
@@ -84,6 +85,9 @@ export default (props: IStoryboardVideo) => {
     api.delResourceItem({ resourceId: item.resourceId, type: currentSelectType }).then(() => {
       onChangeGetNewData()
     })
+    deleteMessageByResourceId({
+      resourceId: item.resourceId,
+    })
   }
 
   const modalBox = (item: any) => {
@@ -123,6 +127,9 @@ export default (props: IStoryboardVideo) => {
             key={'del'}
             onClick={() => {
               onHandleDeleteResourceItem(item)
+              deleteMessageByResourceId({
+                resourceId: data.resourceId,
+              })
               destroy()
             }}>
             删除

@@ -1,18 +1,14 @@
-import { Layout, message } from 'antd'
-import { Flex, Image } from 'antd'
-import * as api from '@/api/models/aiVideo'
-import { useContext, useEffect, useState, useRef, useCallback } from 'react'
+import { Layout } from 'antd'
+import { Flex } from 'antd'
+import { useContext, useEffect, useState, useRef } from 'react'
 import { ChatMessageList, EnumUploadType, Text2imageMessageOptions, PAGE_SIZE } from '@/api/types/video'
-
 import { MyContext } from '../../MyContext'
-import dayjs from 'dayjs'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import ActionBtn from '@/pages/AIProject/components/ActionBtn'
 import MessageLayout from './MessageLayout'
 import MaterialContent from './MaterialContent'
 import MaterialState from './MaterialState'
-import useControlMsg from '../../useControlMsg'
 import useScrollGetData from '@/hooks/usePullToRefresh'
 import ContentActionBtn from './ContentActionBtn'
 
@@ -116,7 +112,8 @@ const ChatContent = () => {
             <MessageLayout key={item.taskId} data={item}>
               <Flex vertical={true}>
                 <div>
-                  {item.taskId} | {item.content || item.text}
+                  {item.historyId}
+                  {item.content || item.text}
                 </div>
                 <MaterialContent data={item} />
                 <MaterialState data={item} />

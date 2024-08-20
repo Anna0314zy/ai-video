@@ -36,7 +36,11 @@ export default createModel<RootModel>()({
     },
     async getResourceList(params: { shotId: number; pageSize?: number; pageIndex?: number; type: string }) {
       // console.log('%c 🚀 ~ [  ]-37', 'font-size:14px; background:green; color:#fff;', state.currentSelectType)
-      const res = await api.getResourceList(params)
+      const res = await api.getResourceList({
+        ...params,
+        pageIndex: params.pageIndex || 1,
+        pageSize: params.pageSize || 50,
+      })
       dispatch.aiVideo.updateData({
         resourceList: res,
       })
