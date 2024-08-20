@@ -108,7 +108,7 @@ const ChatControl = (props: any) => {
   useEffect(() => {
     chatRef.current?.form?.setFieldsValue({
       duration: 120, // 总时长，单位秒
-      shotNum: 4, // 镜头数量
+      shotNum: 14, // 镜头数量
       wordNum: 600, //剧本字数
     })
   }, [])
