@@ -23,10 +23,20 @@ const ChatControl = (props: any) => {
     const data = await api.createChat({
       projectId: projectId,
     })
-    dispatch.aiScript.updateData({
-      currentSessionId: data,
+    dispatch.aiScript.getProjectDetail({
+      projectId: projectId,
     })
   }
+  const init = async () => {
+    const latestSessionId = await dispatch.aiScript.getProjectDetail({
+      projectId: projectId,
+    })
+    if (!latestSessionId) handleCreateChat()
+  }
+
+  useEffect(() => {
+    init()
+  }, [])
   const [prompt, setPrompt] = useState<{
     text?: string
     fileId?: number

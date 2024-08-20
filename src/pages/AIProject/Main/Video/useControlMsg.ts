@@ -1,13 +1,13 @@
-import { useContext, useEffect, useState, useRef } from 'react'
-import { ChatMessageList, Text2imageMessageOptions, Text2imageMessage } from '@/api/types/video'
+import { useEffect, useState, useRef } from 'react'
+import { ChatMessageList, Text2imageMessage } from '@/api/types/video'
 import * as api from '@/api/models/aiVideo'
 import { ResourceType, EnumUploadType, PAGE_SIZE } from '@/api/types/video'
-import { message } from 'antd'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { AudioTaskParams, AddImageTaskParams, VideoTaskParams } from '@/api/types/video'
 import { uniqBy } from 'lodash-es'
 const useControlMsg = () => {
+  const { currentShotId, currentSelectType } = useSelector((state: RootState) => state.aiVideo)
   const [messageList, setMessageList] = useState<ChatMessageList[]>([])
   const [hasMore, setHasMore] = useState(true) // 是否有更多数据
   const searchParams = useRef<{
@@ -21,6 +21,7 @@ const useControlMsg = () => {
     console.log('%czy messageList', 'color:red;backgroundColor:green', messageList)
   }, [messageList])
   const updateMessage = (data: ChatMessageList) => {
+    if (data.type !== currentSelectType) return
     setMessageList((prev: ChatMessageList[]) => {
       if (prev.some((item: ChatMessageList) => item.taskId === data.taskId)) {
         return prev.map(item => {
@@ -31,13 +32,8 @@ const useControlMsg = () => {
         })
       } else {
         // 查看是否是同一个type
-
-        const prevType = prev[0]?.type
-        if (prevType === data.type || !prev[0]) {
-          return uniqBy([...prev, data], 'taskId')
-        }
+        return [...prev, data]
       }
-      return prev
     })
   }
   const getText2imageHistories = async (params: {
@@ -108,6 +104,7 @@ const useControlMsg = () => {
         size,
       })
     }
+    if (data && data[0]?.type && data[0]?.type !== currentSelectType) return []
     if (scroll) {
       setMessageList(prev => {
         return uniqBy([...data, ...prev], 'taskId')
@@ -132,7 +129,7 @@ const useControlMsg = () => {
       updateMessage(res)
     }
   }
-  const reinstateTask = async (taskId: number) => {
+  const reinstateTask = async (taskId: string) => {
     console.log('reinstateTask', taskId)
     const res = await api.reinstateTask(taskId)
     updateMessage(res)

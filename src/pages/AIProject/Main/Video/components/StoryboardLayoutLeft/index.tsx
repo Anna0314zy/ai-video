@@ -35,7 +35,7 @@ export default () => {
       currentShotId: item.shotId,
     })
   }
-  const onInsterShot = (type: string, index: number) => {
+  const onInsterShot = async (type: string, index: number) => {
     const items = Array.from(shotList)
     items.splice(type === 'up' ? (index === 0 ? 0 : index - 1) : index + 1, 0, {})
     dispatch.aiVideo.updateData({
@@ -44,13 +44,11 @@ export default () => {
         sortIndex: index + 1,
       })),
     })
-    api.saveShotList({
+    await api.saveShotList({
       projectId: Number(id),
       shotInfoDtoList: [{ shotId: currentShotId, narration: '', sort: index + 1 }],
     })
-    // .then(() => {
-    //   dispatch.aiVideo.getShotListByProjectId(Number(id))
-    // })
+    dispatch.aiVideo.getShotListByProjectId(Number(id))
   }
   return (
     <div className='page-storyboard-left'>

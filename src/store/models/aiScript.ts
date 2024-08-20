@@ -123,6 +123,7 @@ export default createModel<RootModel>()({
         currentProjectDetail: project,
         currentSessionId: latestSessionId || 0,
       })
+      return latestSessionId
     },
   }),
 })

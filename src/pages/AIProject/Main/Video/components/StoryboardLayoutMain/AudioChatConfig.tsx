@@ -108,7 +108,7 @@ const AudioChatConfig = (_: any, ref: any) => {
         <Space style={{ display: 'flex', flexWrap: 'wrap' }}>
           {config.map(item => {
             return (
-              <Form.Item<AudioChatParams> label={item.label} name={item.prop} key={item.prop}>
+              <Form.Item<AudioChatParams> label={item.label} name={item.prop} key={item.prop} rules={item.rules}>
                 {WidgetItem({ data: item })}
               </Form.Item>
             )

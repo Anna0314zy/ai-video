@@ -7,7 +7,7 @@ import ActionBtn from '@/pages/AIProject/components/ActionBtn'
 import { key } from 'localforage'
 
 const ContentActionBtn = ({ item }: { item: ChatMessageList }) => {
-  const { reinstateTask } = useContext(MyContext)
+  const { reinstateTask, updateMessage } = useContext(MyContext)
   // 记录按钮的状态
   const [btnLoading, setBtnLoading] = useState<{
     [key: string]: {

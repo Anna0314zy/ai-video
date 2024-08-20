@@ -20,7 +20,7 @@ import { MyContext } from './MyContext'
 import useStompSocket from '@/hooks/useStompSocket'
 import { packageBatch } from '@/api/models/aiVideo'
 const VideoProcess = () => {
-  const currentShotId = useSelector((state: RootState) => state.aiVideo.currentShotId)
+  const { currentShotId, currentSelectType } = useSelector((state: RootState) => state.aiVideo)
   const { messageList, getMessageList, addChatTask, updateMessage, reinstateTask } = useControlMsg()
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
@@ -35,10 +35,13 @@ const VideoProcess = () => {
     getMessageList,
     addChatTask,
     reinstateTask,
+    updateMessage,
   }
   const socketCallback = (message: any) => {
     console.log('%c socketCallback', 'color:red', message)
     // 增加信息
+    const type = message.payload.type
+    if (type !== currentSelectType) return
     updateMessage(message.payload)
   }
   const packSocketCallback = (message: any) => {

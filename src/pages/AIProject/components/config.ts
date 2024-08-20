@@ -1,5 +1,6 @@
 import { projectTypes } from '@/pages/AIProject/List/config'
 import { ScriptPrompt } from '@/api/types/script'
+import { Rule } from 'antd/lib/form'
 import { AudioChatParams, VideoChatParams, ImageChatParams } from '@/api/types/video'
 export interface IConfig {
   label: string
@@ -12,6 +13,7 @@ export interface IConfig {
   max?: number
   formatter?: any
   disabled?: boolean
+  rules?: Rule[]
 }
 
 export type WidgetType = 'input' | 'inputNumber' | 'select' | 'textArea' | 'slider'
@@ -75,27 +77,32 @@ export const AudioDesign: AudioConfig[] = [
     prop: 'languagesName',
     type: 'select',
     width: 200,
+    rules: [{ required: true, message: '不能为空' }],
   },
   {
     label: '声音',
     prop: 'shortName',
     type: 'select',
+    rules: [{ required: true, message: '不能为空' }],
   },
   {
     label: '情感',
     prop: 'style',
     type: 'select',
+    rules: [{ required: true, message: '不能为空' }],
   },
 
   {
     label: '声调',
     prop: 'pitch',
     type: 'select',
+    rules: [{ required: true, message: '不能为空' }],
   },
   {
     label: '语速',
     prop: 'rate',
     type: 'select',
+    rules: [{ required: true, message: '不能为空' }],
   },
 ]
 export interface VideoConfig extends Omit<IConfig, 'prop'> {

@@ -39,19 +39,17 @@ export default () => {
   const dispatch = useDispatch<Dispatch>()
   const { currentSessionId: sessionId, messageList } = useSelector((state: RootState) => state.aiScript)
   const [chatIng, setChatIng] = useState(false)
+  const [chatIngText, setChatIngText] = useState<string>('')
+
   useEffect(() => {
     console.log('%c zy messageList', 'color:blue', messageList)
   }, [messageList])
 
   useEffect(() => {
-    dispatch.aiScript.getProjectDetail({
-      projectId: Number(id),
-    })
     dispatch.aiScript.getScriptPageList({
       projectId: Number(id),
     })
   }, [])
-  const [chatIngText, setChatIngText] = useState<string>('')
   const socketCallback = (message: any) => {
     setChatIngText(prev => {
       const newText = convertToMarkdown(prev + message.payload)
@@ -60,9 +58,11 @@ export default () => {
   }
 
   const chatEndSocketCallback = (message: any) => {
+    // TODO
     console.log('%c SCRIPT_END_SUBSCRIBE_THOROUGH socketCallback', 'color:red', message)
     setChatIng(false)
-    setChatIngText('')
+    //  如果信息失败
+    if (message.payload.isSuccess === true) return
 
     const data = messageList.filter(v => !v.requesting)
     dispatch.aiScript.deleteLastMessage({})

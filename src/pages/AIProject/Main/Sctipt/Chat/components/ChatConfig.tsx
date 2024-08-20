@@ -74,16 +74,14 @@ const ChatConfig = (_: any, ref: any) => {
       onFinishFailed={onFinishFailed}
       onValuesChange={onValuesChange}
       autoComplete='off'>
-      <Flex wrap={true}>
-        <Space style={{ display: 'flex', flexWrap: 'wrap' }}>
-          {config.map(item => {
-            return (
-              <Form.Item<ScriptPrompt> label={item.label} name={item.prop} key={item.prop}>
-                {WidgetItem({ data: item })}
-              </Form.Item>
-            )
-          })}
-        </Space>
+      <Flex wrap={true} gap={10}>
+        {config.map(item => {
+          return (
+            <Form.Item<ScriptPrompt> label={item.label} name={item.prop} key={item.prop}>
+              {WidgetItem({ data: item })}
+            </Form.Item>
+          )
+        })}
       </Flex>
     </Form>
   )

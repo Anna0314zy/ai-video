@@ -26,7 +26,7 @@ const ChatControl = () => {
     text?: string
     fileUrl?: string
   }>({
-    text: 'imagine Fantasy landscape, a serene lake surrounded by towering mountains, lush green forests, and vibrant wildflowers in full bloom. A majestic castle sits atop one of the mountains, with its spires piercing through fluffy clouds. The sky is painted with hues of pink, orange, and purple from a setting sun, casting a magical glow over the scene. --v 5 --ar 16:9 --q 2',
+    text: '',
   })
   const chatContentConfig = () => {
     if (currentSelectType === EnumUploadType['IMAGE']) {
@@ -101,15 +101,21 @@ const ChatControl = () => {
     console.log(file)
     return Promise.resolve(true)
   }
-  const handleSend = () => {
-    console.log('formRef', formRef.current?.form.getFieldsValue())
+  const handleSend = async () => {
+    console.log('formRef', formRef.current?.form.getFieldsValue(), currentShot?.narration)
     const params = formRef.current?.form.getFieldsValue()
     console.log('%c params', 'color: #ff0000;', params)
     let base = {
       ...params,
       shotId: currentShotId,
     }
-    if (currentSelectType === 'voice') base.text = currentShot?.narration
+    if (currentSelectType === 'voice') {
+      base.text = currentShot?.narration
+      if (!currentShot?.narration) {
+        return message.error('旁白不能为空')
+      }
+      await formRef.current?.form.validateFields()
+    }
     if (currentSelectType === 'video') base.conditionFactor = Number((base.conditionFactor / 100).toFixed(1))
     addChatTask(base, currentSelectType)
   }
@@ -127,15 +133,17 @@ const ChatControl = () => {
           </Button>
         )}
       </Flex>
-      <ChatInput prompt={prompt} onChange={handleInputChange} onSend={handleInputSend}>
-        <CommonUpload
-          style={prompt.fileUrl ? { color: '#1975ff' } : {}}
-          beforeUpload={beforeUpload}
-          onFinish={onFinish}
-          onError={onError}
-          type={EnumUploadType['MJIMAGE']}></CommonUpload>
-        {prompt.fileUrl ? <Image src={prompt.fileUrl} style={{ width: '100px', objectFit: 'contain' }} /> : null}
-      </ChatInput>
+      {currentSelectType === EnumUploadType['IMAGE'] && (
+        <ChatInput prompt={prompt} onChange={handleInputChange} onSend={handleInputSend}>
+          <CommonUpload
+            style={prompt.fileUrl ? { color: '#1975ff' } : {}}
+            beforeUpload={beforeUpload}
+            onFinish={onFinish}
+            onError={onError}
+            type={EnumUploadType['MJIMAGE']}></CommonUpload>
+          {prompt.fileUrl ? <Image src={prompt.fileUrl} style={{ width: '100px', objectFit: 'contain' }} /> : null}
+        </ChatInput>
+      )}
     </Flex>
   )
 }

@@ -12,7 +12,9 @@ import Styles from './index.module.less'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 import IconWidget from '@/components/IconWidget'
+import { useNavigate } from 'react-router-dom'
 const RightPanel = () => {
+  const navigate = useNavigate()
   const dispatch = useDispatch<Dispatch>()
   const scrollRef = useRef<HTMLDivElement>(null)
   const { scriptPageList } = useSelector((state: RootState) => state.aiScript)
@@ -57,21 +59,23 @@ const RightPanel = () => {
         scriptId: targetScript?.scriptId!,
       })
       message.success('确认成功')
-      dispatch.aiScript.updateData({
-        scriptPageList: scriptPageList.map(item => {
-          if (item.scriptId === targetScript?.scriptId) {
-            return Object.assign({}, item, {
-              isFinal: 1,
-            })
-          }
-          return Object.assign({}, item, {
-            isFinal: 0,
-          })
-        }),
-      })
-      dispatch.aiScript.getProjectDetail({
-        projectId,
-      })
+
+      navigate(`/project/${targetScript?.projectId!}/video`)
+      // dispatch.aiScript.updateData({
+      //   scriptPageList: scriptPageList.map(item => {
+      //     if (item.scriptId === targetScript?.scriptId) {
+      //       return Object.assign({}, item, {
+      //         isFinal: 1,
+      //       })
+      //     }
+      //     return Object.assign({}, item, {
+      //       isFinal: 0,
+      //     })
+      //   }),
+      // })
+      // dispatch.aiScript.getProjectDetail({
+      //   projectId,
+      // })
     } finally {
       setLoading(false)
     }
@@ -101,20 +105,20 @@ const RightPanel = () => {
         </ChatUpload>
       </Flex>
       <Flex className='content' vertical={true} wrap={true} gap={10} style={{ overflow: 'hidden' }} flex={1}>
-        <div style={{ overflow: 'auto', width: '100%' }} ref={scrollRef} id='scrollableDiv'>
-          <Space style={{ display: 'flex', flexDirection: 'column' }} className={Styles['space-item']}>
-            {!scriptPageList?.length ? (
-              <>
-                <IconWidget name='empty' />
+        <Flex style={{ overflow: 'auto', width: '100%' }} ref={scrollRef} id='scrollableDiv' gap={10}>
+          {!scriptPageList?.length ? (
+            <>
+              <Flex vertical={true} align='center' justify='center' style={{ width: '100%' }}>
+                <IconWidget name='empty' style={{ maxWidth: '100%', objectFit: 'contain' }} />
                 <p>空空如也，快去创造剧本吧~</p>
-              </>
-            ) : (
-              scriptPageList?.map(v => {
-                return <ScriptText key={v.scriptId} data={v} handleChoose={handleChoose}></ScriptText>
-              })
-            )}
-          </Space>
-        </div>
+              </Flex>
+            </>
+          ) : (
+            scriptPageList?.map(v => {
+              return <ScriptText key={v.scriptId} data={v} handleChoose={handleChoose}></ScriptText>
+            })
+          )}
+        </Flex>
       </Flex>
 
       {scriptPageList?.length > 0 && (

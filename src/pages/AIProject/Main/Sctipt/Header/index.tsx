@@ -13,7 +13,7 @@ const rightChildren = (project: ProjectList) => {
   return (
     <>
       <Button onClick={onClick}>跳过</Button>
-      <Button type='primary' onClick={onClick} disabled={project.state === 'VideoProcessing'}>
+      <Button type='primary' onClick={onClick} disabled={project.state === 'ScriptProcessing'}>
         下一步
       </Button>
     </>

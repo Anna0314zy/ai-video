@@ -23,6 +23,7 @@ interface headerProps {
 const HeaderLayout = (props: headerProps) => {
   const { leftChildren, rightChildren } = props
   const { currentProjectDetail } = useSelector((state: RootState) => state.aiScript)
+  console.log('currentProjectDetail', currentProjectDetail)
   return (
     <Header style={headerStyle}>
       <Flex style={{ height: '100%', width: '100%' }} align='center' justify='space-between'>

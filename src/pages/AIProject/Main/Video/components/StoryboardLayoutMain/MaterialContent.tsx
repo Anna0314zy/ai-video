@@ -9,7 +9,9 @@ const MaterialContent = ({ data }: { data: ChatMessageList }) => {
   const { cdnPath } = useSelector((state: RootState) => state.common.pathConfig)
   if (data.originUrl) {
     if (data.type === EnumUploadType['IMAGE']) {
-      return <Image src={cdnPath + data.originUrl} preview={false} style={{ width: '80%' }}></Image>
+      return (
+        <Image src={cdnPath + (data.compressUrl || data.originUrl)} preview={false} style={{ width: '80%' }}></Image>
+      )
     } else if (data.type === EnumUploadType['VIDEO']) {
       return (
         <video controls style={{ width: '80%' }}>

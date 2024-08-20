@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 import { ResourceType, ChatMessageList } from '@/api/types/video'
-
+import { AudioTaskParams, AddImageTaskParams, VideoTaskParams } from '@/api/types/video'
 interface Context {
   messageList: ChatMessageList[]
   getMessageList: (params: {
@@ -10,6 +10,9 @@ interface Context {
     scroll?: boolean
     size?: number
   }) => Promise<any[]>
+  updateMessage: (data: ChatMessageList) => void
+  addChatTask: (params: AudioTaskParams | AddImageTaskParams | VideoTaskParams, type: ResourceType) => void
+  reinstateTask: (taskId: string) => void
   [k: string]: any
 }
 export const MyContext = createContext<Context>({} as Context)

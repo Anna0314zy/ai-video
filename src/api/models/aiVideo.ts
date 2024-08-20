@@ -81,7 +81,7 @@ export const addResource = (params: { historyId: number; type: ResourceType }) =
 }
 
 // 重新生成
-export const reinstateTask = (taskId: number) => {
+export const reinstateTask = (taskId: string) => {
   return api.post<ChatMessageList>(`${http}/api/queue/v1/task/reinstateTask?taskId=${taskId}`)
 }
 interface HistoryParams {
