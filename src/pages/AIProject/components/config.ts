@@ -14,6 +14,7 @@ export interface IConfig {
   formatter?: any
   disabled?: boolean
   rules?: Rule[]
+  required?: boolean
 }
 
 export type WidgetType = 'input' | 'inputNumber' | 'select' | 'textArea' | 'slider'
@@ -89,7 +90,18 @@ export const AudioDesign: AudioConfig[] = [
     label: '情感',
     prop: 'style',
     type: 'select',
-    rules: [{ required: true, message: '不能为空' }],
+    required: true,
+    rules: [
+      {
+        required: false, // 允许空字符串
+        validator: (_, value) => {
+          if (value === undefined) {
+            return Promise.reject(new Error('不能为空'))
+          }
+          return Promise.resolve()
+        },
+      },
+    ],
   },
 
   {
@@ -138,6 +150,17 @@ export const VideoDesign: VideoConfig[] = [
     prop: 'seed',
     type: 'inputNumber',
     width: 200,
+    rules: [
+      {
+        required: true, // 允许空字符串
+        validator: (_, value) => {
+          if (!/^[1-9]\d{17}$/.test(value)) {
+            return Promise.reject(new Error('seed为(18位整数)'))
+          }
+          return Promise.resolve()
+        },
+      },
+    ],
   },
 ]
 

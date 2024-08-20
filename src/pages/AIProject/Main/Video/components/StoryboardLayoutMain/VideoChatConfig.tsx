@@ -1,17 +1,10 @@
-import { useContext, useImperativeHandle, forwardRef, useEffect, useState, useMemo } from 'react'
-import { MyContext } from '../../MyContext'
+import { useImperativeHandle, forwardRef, useEffect } from 'react'
 import { VideoDesign } from '@/pages/AIProject/components/config'
 import { WidgetItem } from '@/pages/AIProject/components/WidgetInputItem'
 import { Flex, Form, Space } from 'antd'
 import type { FormProps } from 'antd'
 import { VideoChatParams } from '@/api/types/video'
-import * as api from '@/api/models/aiVideo'
-const changeOptions = (options: { description: string; value: string }[]) => {
-  return options.map(v => ({ label: v.description, value: v.value }))
-}
-const AudioChatConfig = (_: any, ref: any) => {
-  const { subjectName } = useContext(MyContext)
-
+const VideoChatConfig = (_: any, ref: any) => {
   const [form] = Form.useForm()
 
   const onFinish: FormProps<VideoChatParams>['onFinish'] = values => {
@@ -54,7 +47,7 @@ const AudioChatConfig = (_: any, ref: any) => {
         <Space style={{ display: 'flex', flexWrap: 'wrap' }}>
           {VideoDesign.map(item => {
             return (
-              <Form.Item<VideoChatParams> label={item.label} name={item.prop} key={item.prop}>
+              <Form.Item<VideoChatParams> label={item.label} name={item.prop} key={item.prop} rules={item.rules}>
                 {WidgetItem({ data: item })}
               </Form.Item>
             )
@@ -64,4 +57,4 @@ const AudioChatConfig = (_: any, ref: any) => {
     </Form>
   )
 }
-export default forwardRef(AudioChatConfig)
+export default forwardRef(VideoChatConfig)

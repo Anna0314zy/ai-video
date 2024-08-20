@@ -2,7 +2,7 @@ import Header from './Header'
 import ChatContent from './Chat/ChatContent'
 import ChatControl from './Chat/ChatControl'
 import { Layout } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { getQueryParam } from '@/utils'
 import { convertToMarkdown } from '@/utils'
@@ -61,16 +61,17 @@ export default () => {
     // TODO
     console.log('%c SCRIPT_END_SUBSCRIBE_THOROUGH socketCallback', 'color:red', message)
     setChatIng(false)
+    setChatIngText('')
     //  如果信息失败
-    if (message.payload.isSuccess === true) return
-
-    const data = messageList.filter(v => !v.requesting)
-    dispatch.aiScript.deleteLastMessage({})
-    console.log(data, messageList, 'data----')
-    dispatch.aiScript.updateMessageList({
-      ...message.payload,
-      messageContent: convertToMarkdown(message.payload.messageContent || ''),
-    })
+    if (message.payload.isSuccess === true) {
+      const data = messageList.filter(v => !v.requesting)
+      dispatch.aiScript.deleteLastMessage({})
+      console.log(data, messageList, 'data----')
+      dispatch.aiScript.updateMessageList({
+        ...message.payload,
+        messageContent: convertToMarkdown(message.payload.messageContent || ''),
+      })
+    }
   }
   const { stompSocket } = useStompSocket([
     {
@@ -82,7 +83,10 @@ export default () => {
       callback: chatEndSocketCallback,
     },
   ])
-
+  const contentMessagesRef = useRef<HTMLDivElement>(null)
+  const handleScrollBottom = () => {
+    if (contentMessagesRef.current) contentMessagesRef.current.scrollTop = contentMessagesRef.current.scrollHeight
+  }
   const contextValue = {
     projectName,
     projectId: Number(id),
@@ -90,6 +94,8 @@ export default () => {
     chatIng,
     setChatIng,
     stompSocket,
+    contentMessagesRef,
+    handleScrollBottom,
   }
 
   return (

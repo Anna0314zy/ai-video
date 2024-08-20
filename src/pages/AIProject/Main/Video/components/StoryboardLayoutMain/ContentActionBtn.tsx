@@ -31,11 +31,14 @@ const ContentActionBtn = ({ item }: { item: ChatMessageList }) => {
           historyId: item.historyId,
           type: item.type,
         })
-        updateMessage({
-          ...item,
-          resourceId,
-          resourceName: name,
-        })
+        updateMessage(
+          {
+            ...item,
+            resourceId,
+            resourceName: name,
+          },
+          false,
+        )
         dispatch.aiVideo.getResourceList({
           shotId: currentShotId,
           type: item.type,

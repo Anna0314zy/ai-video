@@ -7,6 +7,7 @@ import { RootState } from '@/store'
 import { AudioTaskParams, AddImageTaskParams, VideoTaskParams } from '@/api/types/video'
 import { uniqBy } from 'lodash-es'
 const useControlMsg = () => {
+  const containerRef = useRef<HTMLDivElement>(null)
   const { currentShotId, currentSelectType } = useSelector((state: RootState) => state.aiVideo)
   const [messageList, setMessageList] = useState<ChatMessageList[]>([])
   const [hasMore, setHasMore] = useState(true) // 是否有更多数据
@@ -34,8 +35,10 @@ const useControlMsg = () => {
       return newData
     })
   }
-  const updateMessage = (data: ChatMessageList) => {
+  const updateMessage = (data: ChatMessageList, auto: boolean = true) => {
     if (data.type !== currentSelectType) return
+    if (data.shotId && currentShotId && data.shotId !== currentShotId) return
+
     setMessageList((prev: ChatMessageList[]) => {
       if (prev.some((item: ChatMessageList) => item.taskId === data.taskId)) {
         return prev.map(item => {
@@ -46,9 +49,18 @@ const useControlMsg = () => {
         })
       } else {
         // 查看是否是同一个type
-        return [...prev, data]
+        const prevType = prev[0]?.type
+        if (prevType && prevType === data.type) {
+          return [...prev, data]
+        }
+        return prev
       }
     })
+    if (auto) {
+      setTimeout(() => {
+        handleScrollBottom()
+      }, 100)
+    }
   }
   const getText2imageHistories = async (params: {
     shotId: number
@@ -78,6 +90,7 @@ const useControlMsg = () => {
     size: number
   }): Promise<Text2imageMessage[]> => {
     const res = await api.getAudioHistories(params)
+
     return res.records.map(v => ({
       ...v,
       type: EnumUploadType['AUDIO'],
@@ -126,6 +139,9 @@ const useControlMsg = () => {
     } else {
       setMessageList(data)
     }
+    setTimeout(() => {
+      handleScrollBottom()
+    }, 100)
     return data
   }
   const addChatTask = async (params: AudioTaskParams | AddImageTaskParams | VideoTaskParams, type: ResourceType) => {
@@ -138,7 +154,6 @@ const useControlMsg = () => {
     } else if (type === EnumUploadType['VIDEO']) {
       res = await api.addVideoTask(params as VideoTaskParams)
     }
-    console.log('addChatTask----', res)
     if (res) {
       updateMessage(res)
     }
@@ -149,6 +164,10 @@ const useControlMsg = () => {
     updateMessage(res)
   }
 
+  const handleScrollBottom = () => {
+    if (containerRef.current) containerRef.current.scrollTop = containerRef.current.scrollHeight
+  }
+
   return {
     messageList,
     updateMessage,
@@ -156,6 +175,8 @@ const useControlMsg = () => {
     addChatTask,
     reinstateTask,
     deleteMessageByResourceId,
+    containerRef,
+    handleScrollBottom,
   }
 }
 export default useControlMsg

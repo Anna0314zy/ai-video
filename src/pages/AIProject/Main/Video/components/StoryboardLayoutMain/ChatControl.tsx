@@ -49,7 +49,7 @@ const ChatControl = () => {
   }
   const handleInputSend = async () => {
     if (!prompt?.text) return
-    addChatTask(
+    await addChatTask(
       {
         text: prompt.text,
         shotId: currentShotId,
@@ -116,8 +116,12 @@ const ChatControl = () => {
       }
       await formRef.current?.form.validateFields()
     }
-    if (currentSelectType === 'video') base.conditionFactor = Number((base.conditionFactor / 100).toFixed(1))
-    addChatTask(base, currentSelectType)
+    if (currentSelectType === 'video') {
+      base.conditionFactor = base.conditionFactor ? Number((base.conditionFactor / 100).toFixed(1)) : 0
+      base.motionBucketId = base.motionBucketId || 0
+      await formRef.current?.form.validateFields()
+    }
+    await addChatTask(base, currentSelectType)
   }
   return (
     <Flex vertical={true} style={style}>

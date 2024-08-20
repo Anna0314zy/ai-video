@@ -19,10 +19,19 @@ import useControlMsg from './useControlMsg'
 import { MyContext } from './MyContext'
 import useStompSocket from '@/hooks/useStompSocket'
 import { packageBatch } from '@/api/models/aiVideo'
+import { downloadFromServer } from '@/utils'
 const VideoProcess = () => {
   const { currentSelectType, shotList } = useSelector((state: RootState) => state.aiVideo)
-  const { messageList, getMessageList, addChatTask, updateMessage, reinstateTask, deleteMessageByResourceId } =
-    useControlMsg()
+  const {
+    messageList,
+    getMessageList,
+    addChatTask,
+    updateMessage,
+    reinstateTask,
+    deleteMessageByResourceId,
+    containerRef,
+    handleScrollBottom,
+  } = useControlMsg()
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
   useEffect(() => {
@@ -38,16 +47,19 @@ const VideoProcess = () => {
     reinstateTask,
     updateMessage,
     deleteMessageByResourceId,
+    containerRef,
+    handleScrollBottom,
   }
   const socketCallback = (message: any) => {
     console.log('%c socketCallback', 'color:red', message)
     // 增加信息
     const type = message.payload.type
     if (type !== currentSelectType) return
-    updateMessage(message.payload)
+    updateMessage(message.payload, false)
   }
   const packSocketCallback = (message: any) => {
-    console.log('packSocketCallback', message)
+    console.log('packSocketCallback', message.payload)
+    downloadFromServer(message.payload, '打包资源')
   }
   useStompSocket([
     {

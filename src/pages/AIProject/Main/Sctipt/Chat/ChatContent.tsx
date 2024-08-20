@@ -5,9 +5,11 @@ import GptMessage from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageIte
 import { useMemo, useEffect, useRef } from 'react'
 import { PAGE_SIZE } from '@/api/types/script'
 import { usePrevious } from 'ahooks'
-import { useState } from 'react'
+import { useContext } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
+import { isEqual } from 'lodash-es'
+import { MyContext } from '../MyContext'
 const style = {
   color: '#000',
   height: '100%',
@@ -18,19 +20,20 @@ const ChatContent = (props: { messageList: MessageList[]; chatIngText: any; chat
   let md: MarkdownIt | null = null
   if (!md) md = new MarkdownIt()
   const dispatch = useDispatch<Dispatch>()
+  const { contentMessagesRef, handleScrollBottom } = useContext(MyContext)
   const lastMessage = useMemo(() => {
     return props.messageList.find(v => v.requesting || v.sending) || {}
   }, [props.messageList])
-  const contentMessagesRef = useRef<HTMLDivElement>(null)
+  // const contentMessagesRef = useRef<HTMLDivElement>(null)
   const lastMessageRef = useRef<HTMLDivElement>(null)
-  const previous = usePrevious(props.messageList)
+  const init = async () => {
+    await dispatch.aiScript.getChatHistories({ current: 1, size: PAGE_SIZE })
+    setTimeout(() => {
+      handleScrollBottom()
+    }, 100)
+  }
   useEffect(() => {
-    if (previous?.length === 0) {
-      if (contentMessagesRef.current) contentMessagesRef.current.scrollTop = contentMessagesRef.current.scrollHeight
-    }
-  }, [previous])
-  useEffect(() => {
-    dispatch.aiScript.getChatHistories({ current: 1, size: PAGE_SIZE })
+    init()
   }, [props.sessionId])
   return (
     <div style={{ flex: 1, overflow: 'hidden', backgroundColor: '#F2F3F7', color: '#000000' }} className='chat-content'>

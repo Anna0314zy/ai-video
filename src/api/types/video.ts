@@ -82,6 +82,7 @@ export interface CommonMessage {
   text?: string
   resourceId?: number
   resourceName?: string
+  shotId: number
 }
 export interface Text2imageMessage extends CommonMessage {
   content?: string

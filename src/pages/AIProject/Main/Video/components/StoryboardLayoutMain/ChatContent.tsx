@@ -11,23 +11,6 @@ import MaterialContent from './MaterialContent'
 import MaterialState from './MaterialState'
 import useScrollGetData from '@/hooks/usePullToRefresh'
 import ContentActionBtn from './ContentActionBtn'
-
-const config: {
-  key: 'add' | 'refresh'
-  value: string
-  icon: string
-}[] = [
-  {
-    key: 'add',
-    value: '标记为剧本',
-    icon: 'add',
-  },
-  {
-    key: 'refresh',
-    value: '重新生成',
-    icon: 'refresh',
-  },
-]
 const style: React.CSSProperties = {
   backgroundColor: '#F2F3F7',
   flex: '1',
@@ -35,28 +18,34 @@ const style: React.CSSProperties = {
   height: '100px',
 }
 const ChatContent = () => {
-  const { cdnPath } = useSelector((state: RootState) => state.common.pathConfig)
-
   const { currentSelectType, currentShotId } = useSelector((state: RootState) => state.aiVideo)
 
-  const { projectId, messageList, getMessageList, addChatTask, reinstateTask } = useContext(MyContext)
-  const [loading, setLoading] = useState({})
+  const { projectId, messageList, getMessageList, addChatTask, containerRef } = useContext(MyContext)
+  const [loading, setLoading] = useState<{
+    [key: string]: {
+      [key: string]: boolean
+    }
+  }>({})
   const [scrollLoading, setScrollLoading] = useState<boolean>(false) // 是否正在加载
-
-  useEffect(() => {
+  const init = async () => {
     if (currentShotId && currentSelectType) {
-      getMessageList({
+      await getMessageList({
         current: 1,
         type: currentSelectType,
         shotId: currentShotId,
       })
     }
+  }
+  useEffect(() => {
+    init()
   }, [currentShotId, currentSelectType])
   const imageBtnClick = async (item: ChatMessageList, option: Text2imageMessageOptions) => {
     console.log('imageBtnClick', item)
     setLoading(prev => ({
       ...prev,
-      [item.taskId]: true,
+      [item.taskId]: {
+        [option.custom]: true,
+      },
     }))
     try {
       await addChatTask(
@@ -71,7 +60,9 @@ const ChatContent = () => {
     } finally {
       setLoading(prev => ({
         ...prev,
-        [item.taskId]: false,
+        [item.taskId]: {
+          [option.custom]: false,
+        },
       }))
     }
   }
@@ -86,15 +77,6 @@ const ChatContent = () => {
       }),
     PAGE_SIZE,
   )
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    setTimeout(() => {
-      if (containerRef.current) containerRef.current.scrollTop = containerRef.current.scrollHeight
-    }, 100)
-    console.log('messageList', messageList)
-  }, [messageList])
-
   return (
     <Layout.Content
       ref={containerRef}
@@ -112,14 +94,21 @@ const ChatContent = () => {
             <MessageLayout key={item.taskId} data={item}>
               <Flex vertical={true}>
                 <div>
-                  {item.historyId}
+                  {/* {item.historyId} */}
                   {item.content || item.text}
                 </div>
                 <MaterialContent data={item} />
                 <MaterialState data={item} />
                 <Flex wrap={true} gap={10} style={{ marginTop: '10px' }} className='btns'>
                   {item.options?.map(v => {
-                    return <ActionBtn key={v.label} value={v.label} onClick={() => imageBtnClick(item, v)}></ActionBtn>
+                    return (
+                      <ActionBtn
+                        key={v.label}
+                        value={v.label}
+                        onClick={() => imageBtnClick(item, v)}
+                        disabled={loading[item.taskId]?.[v.custom]}
+                        loading={loading[item.taskId]?.[v.custom]}></ActionBtn>
+                    )
                   })}
                 </Flex>
                 <ContentActionBtn item={item} />

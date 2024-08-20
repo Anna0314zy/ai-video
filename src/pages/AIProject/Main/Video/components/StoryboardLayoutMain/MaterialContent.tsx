@@ -1,9 +1,7 @@
-import { Flex, Image } from 'antd'
+import { Image } from 'antd'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
-import { ChatMessageList, EnumUploadType, TaskState } from '@/api/types/video'
-import AntdIcon from '@/components/IconWidget/AntdIcon'
-import MaterialState from './MaterialState'
+import { ChatMessageList, EnumUploadType } from '@/api/types/video'
 // 配置颜色
 const MaterialContent = ({ data }: { data: ChatMessageList }) => {
   const { cdnPath } = useSelector((state: RootState) => state.common.pathConfig)

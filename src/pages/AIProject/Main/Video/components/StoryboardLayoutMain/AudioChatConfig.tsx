@@ -1,5 +1,4 @@
-import { useContext, useImperativeHandle, forwardRef, useEffect, useState, useMemo } from 'react'
-import { MyContext } from '../../MyContext'
+import { useImperativeHandle, forwardRef, useEffect, useState, useMemo } from 'react'
 import { AudioDesign } from '@/pages/AIProject/components/config'
 import { WidgetItem } from '@/pages/AIProject/components/WidgetInputItem'
 import { Flex, Form, Space } from 'antd'
@@ -10,7 +9,6 @@ const changeOptions = (options: { description: string; value: string }[]) => {
   return options.map(v => ({ label: v.description, value: v.value }))
 }
 const AudioChatConfig = (_: any, ref: any) => {
-  const { subjectName } = useContext(MyContext)
   const [languagesOptions, setLanguagesOptions] = useState<{ label: string; value: string }[]>([])
   const [stylesOptions, setStylesOptions] = useState<{ label: string; value: string }[]>([])
   const [voicesOptions, setVoicesOptions] = useState<{ label: string; value: string }[]>([])
@@ -108,7 +106,12 @@ const AudioChatConfig = (_: any, ref: any) => {
         <Space style={{ display: 'flex', flexWrap: 'wrap' }}>
           {config.map(item => {
             return (
-              <Form.Item<AudioChatParams> label={item.label} name={item.prop} key={item.prop} rules={item.rules}>
+              <Form.Item<AudioChatParams>
+                label={item.label}
+                name={item.prop}
+                key={item.prop}
+                rules={item.rules}
+                required={item.required}>
                 {WidgetItem({ data: item })}
               </Form.Item>
             )

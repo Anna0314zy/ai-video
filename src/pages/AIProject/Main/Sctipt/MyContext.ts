@@ -8,5 +8,7 @@ interface Context {
   chatIng: boolean
   setChatIng: React.Dispatch<React.SetStateAction<boolean>>
   stompSocket: any
+  contentMessagesRef: React.RefObject<HTMLDivElement>
+  handleScrollBottom: () => void
 }
 export const MyContext = createContext<Context>({} as Context)
