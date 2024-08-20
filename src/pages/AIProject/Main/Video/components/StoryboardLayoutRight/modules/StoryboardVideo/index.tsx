@@ -36,6 +36,9 @@ export default (props: IStoryboardVideo) => {
     onChangeGetNewData()
   })
   useEffect(() => {
+    setIsShowResult(false)
+  }, [currentShotId])
+  useEffect(() => {
     if (selectedShot.previewImage) {
       setStep(2)
     } else {
