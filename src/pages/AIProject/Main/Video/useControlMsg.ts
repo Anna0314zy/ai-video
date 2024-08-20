@@ -49,6 +49,7 @@ const useControlMsg = () => {
         })
       } else {
         // 查看是否是同一个type
+        if (prev.length === 0) return [...prev, data]
         const prevType = prev[0]?.type
         const prevShotId = prev[0]?.shotId
         if (prevType && prevType !== data.type) return prev
@@ -132,9 +133,10 @@ const useControlMsg = () => {
       })
     }
     if (data && data[0]?.type && data[0]?.type !== currentSelectType) return []
+    if (data && data[0]?.shotId && data[0]?.shotId !== currentShotId) return []
     if (scroll) {
       setMessageList(prev => {
-        return uniqBy([...data, ...prev], 'taskId')
+        return [...prev, ...data]
       })
     } else {
       setMessageList(data)
