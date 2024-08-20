@@ -7,11 +7,12 @@ interface IProps {
   icon?: string
   loading?: boolean
   disabled?: boolean
+  style?: React.CSSProperties
 }
-const ActionBtn = ({ value = '标记为剧本', onClick, icon, loading, disabled }: IProps) => {
+const ActionBtn = ({ value = '标记为剧本', onClick, icon, loading, disabled, style = {} }: IProps) => {
   return (
     <div onClick={onClick}>
-      <span className={Style['chat-btn-bg']}>
+      <span className={Style['chat-btn-bg']} style={style}>
         {icon ? <Icon icon={icon} style={{ paddingRight: '5px' }}></Icon> : null}
         <Button disabled={disabled} loading={loading} type='link' style={{ height: 'auto', padding: 0, color: '#000' }}>
           {value}
