@@ -105,3 +105,4 @@ export interface AudioTaskParams extends AudioChatParams {
 export interface VideoTaskParams extends VideoChatParams {
   shotId: number
 }
+export const PAGE_SIZE = 50

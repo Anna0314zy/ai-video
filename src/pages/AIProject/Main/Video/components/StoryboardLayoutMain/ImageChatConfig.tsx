@@ -5,7 +5,7 @@ import { WidgetItem } from '@/pages/AIProject/components/WidgetInputItem'
 import { Flex, Form, Space } from 'antd'
 import type { FormProps } from 'antd'
 import { ImageChatParams } from '@/api/types/video'
-import * as api from '@/api/models/video'
+import * as api from '@/api/models/aiVideo'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 const ImageChatConfig = (_: any, ref: any) => {

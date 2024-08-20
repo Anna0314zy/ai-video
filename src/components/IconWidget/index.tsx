@@ -7,5 +7,5 @@ interface IIconWidget {
 export default (props: IIconWidget) => {
   const { name = '', ...argProps } = props
   const src = IconConfig[name as 'arrowBottom']
-  return src ? <img src={src} {...(argProps || {})} /> : ''
+  return src ? <img src={src} {...(argProps || {})} style={{ maxWidth: '100%', objectFit: 'contain' }} /> : ''
 }

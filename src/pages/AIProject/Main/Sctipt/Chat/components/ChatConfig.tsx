@@ -5,7 +5,7 @@ import { WidgetItem } from '@/pages/AIProject/components/WidgetInputItem'
 import { Flex, Form, Space } from 'antd'
 import type { FormProps } from 'antd'
 import { ScriptPrompt } from '@/api/types/script'
-import * as api from '@/api/models/main'
+import * as api from '@/api/models/aiScript'
 const ChatConfig = (_: any, ref: any) => {
   const { subjectName } = useContext(MyContext)
   const [listScripType, setListScripType] = useState<{ label: string; value: string }[]>([])

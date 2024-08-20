@@ -1,8 +1,8 @@
 import { Layout, message } from 'antd'
 import { Flex, Image } from 'antd'
-import * as api from '@/api/models/video'
+import * as api from '@/api/models/aiVideo'
 import { useContext, useEffect, useState, useRef, useCallback } from 'react'
-import { ChatMessageList, EnumUploadType, Text2imageMessageOptions, ResourceTypeMap } from '@/api/types/video'
+import { ChatMessageList, EnumUploadType, Text2imageMessageOptions, PAGE_SIZE } from '@/api/types/video'
 
 import { MyContext } from '../../MyContext'
 import dayjs from 'dayjs'
@@ -13,9 +13,9 @@ import MessageLayout from './MessageLayout'
 import MaterialContent from './MaterialContent'
 import MaterialState from './MaterialState'
 import useControlMsg from '../../useControlMsg'
-import usePullToRefresh from '@/hooks/usePullToRefresh'
+import useScrollGetData from '@/hooks/usePullToRefresh'
 import ContentActionBtn from './ContentActionBtn'
-const PAGE_SIZE = 5
+
 const config: {
   key: 'add' | 'refresh'
   value: string
@@ -49,8 +49,11 @@ const ChatContent = () => {
 
   useEffect(() => {
     if (currentShotId && currentSelectType) {
-      console.log('%c getMessageList', 'color:green;backgroundColor:yellow', currentShotId, currentSelectType)
-      getMessageList(1, currentSelectType, currentShotId)
+      getMessageList({
+        current: 1,
+        type: currentSelectType,
+        shotId: currentShotId,
+      })
     }
   }, [currentShotId, currentSelectType])
   const imageBtnClick = async (item: ChatMessageList, option: Text2imageMessageOptions) => {
@@ -77,8 +80,14 @@ const ChatContent = () => {
     }
   }
 
-  const { hasMore, loadMore } = usePullToRefresh(
-    (current: number) => getMessageList(current, currentSelectType, currentShotId, true),
+  const { loadMore } = useScrollGetData(
+    (current: number) =>
+      getMessageList({
+        current,
+        type: currentSelectType,
+        shotId: currentShotId,
+        scroll: true,
+      }),
     PAGE_SIZE,
   )
   const containerRef = useRef<HTMLDivElement>(null)
@@ -90,11 +99,6 @@ const ChatContent = () => {
     console.log('messageList', messageList)
   }, [messageList])
 
-  const [canCountScroll, setCanCountScroll] = useState(false)
-  useEffect(() => {
-    setCanCountScroll(true)
-  }, [])
-
   return (
     <Layout.Content
       ref={containerRef}
@@ -102,7 +106,7 @@ const ChatContent = () => {
       onScroll={e => {
         // 当滚动到顶部时触发加载更多
         // 如何首次不执行
-        if (e.currentTarget.scrollTop < 100 && canCountScroll) {
+        if (e.currentTarget.scrollTop < 100) {
           loadMore()
         }
       }}>

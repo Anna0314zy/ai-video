@@ -6,7 +6,7 @@ import FrameItem from './modules/FrameItem'
 import { useSelector, useDispatch } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 import { ShotList } from '@/api/types/video'
-import * as api from '@/api/models/video'
+import * as api from '@/api/models/aiVideo'
 import { useParams } from 'react-router-dom'
 import './index.less'
 

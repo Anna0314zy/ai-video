@@ -9,7 +9,7 @@ import { nickIcon } from '@/components/IconWidget/Icons'
 import { downloadFromServer } from '@/utils'
 import Result from '../Result'
 import ResourceItem from '../ResourceItem'
-import * as api from '@/api/models/video'
+import * as api from '@/api/models/aiVideo'
 import Styles from './index.module.less'
 
 interface IStoryboardVideo {

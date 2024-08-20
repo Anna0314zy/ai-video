@@ -2,7 +2,7 @@ import { useRef, useImperativeHandle, useState, forwardRef, useCallback } from '
 import MarkdownIt from 'markdown-it'
 import CommonModal, { ModalHandle } from '@/components/CommonModal'
 import { Button } from 'antd'
-import DownloadScript from './index'
+import DownloadScript from '../DownloadScript'
 const ScriptPreview = ({ handleDownload, handleDel, data }: any, ref: any) => {
   const modelRef = useRef<ModalHandle>(null)
   const [html, setHtml] = useState('')
@@ -55,7 +55,7 @@ const ScriptPreview = ({ handleDownload, handleDel, data }: any, ref: any) => {
           <Button key={'del'} onClick={() => handleClick('del')}>
             删除
           </Button>
-          <DownloadScript data={data}>
+          <DownloadScript data={data} key={'download'}>
             <Button type={'primary'}>下载</Button>
           </DownloadScript>
         </>

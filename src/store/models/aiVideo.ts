@@ -1,7 +1,7 @@
 import { createModel } from '@rematch/core'
 import { RootModel } from '.'
 import { ResourceType, ShotList } from '@/api/types/video'
-import * as api from '@/api/models/video'
+import * as api from '@/api/models/aiVideo'
 interface AiVideoState {
   currentSelectType: ResourceType
   currentShotId: number
@@ -30,7 +30,7 @@ export default createModel<RootModel>()({
       const { shotBaseInfoList } = await api.getShotListByProjectId(id)
       dispatch.aiVideo.updateData({
         shotList: shotBaseInfoList || [],
-        currentShotId: shotBaseInfoList[0].shotId,
+        currentShotId: shotBaseInfoList[0]?.shotId,
         selectedShot: shotBaseInfoList[0],
       })
     },

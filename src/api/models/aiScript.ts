@@ -1,3 +1,4 @@
+import { ScriptPageList } from '@/api/types/script'
 import { ProjectList } from '@/api/models/project'
 import api from '../index'
 import { ScriptPrompt, MessageList } from '../types/script'
@@ -17,8 +18,11 @@ export const createChat = (params: { projectId: number }) => {
 }
 // 获取会话的历史记录
 
-export const getChatHistories = (params: { sessionId: number }) => {
-  return api.post<{ records: MessageList[] }>(`${http}/api/session/chat/getHistories`, params)
+export const getChatHistories = (params: { sessionId: number; current: number; size: number }) => {
+  return api.post<{ records: MessageList[]; size: number; total: number; pages: number }>(
+    `${http}/api/session/chat/getHistories`,
+    params,
+  )
 }
 // 剧本Prompt
 export const getScriptPrompt = (params: ScriptPrompt) => {
@@ -59,13 +63,14 @@ interface SaveScriptParams {
 }
 //将对话内容保存为剧本及镜头
 export const saveScript = (params: SaveScriptParams) => {
-  return api.post<string[]>(`${http}/api/text/v1/saveScript`, params)
+  return api.post<ScriptPageList>(`${http}/api/text/v1/saveScript`, params)
 }
 
 //剧本分页查询
-export const getPageScript = (params: { projectId: number }) => {
+export const getPageScript = (params: { projectId: number; current: number; size: number }) => {
   return api.post<{
     records: any[]
+    total: number
   }>(`${http}/api/text/v1/pageScript`, params)
 }
 //剧本预览

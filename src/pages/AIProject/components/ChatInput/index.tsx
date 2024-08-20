@@ -16,10 +16,9 @@ const ChatInput = ({
   prompt,
   onChange,
   onSend,
-  chatIng,
   children,
+  sendDisabled,
 }: {
-  chatIng?: boolean
   prompt: {
     text?: string
     fileId?: number
@@ -28,9 +27,10 @@ const ChatInput = ({
   onChange: (val: string) => void
   onSend: (val: string) => void
   children: React.ReactNode
+  sendDisabled?: boolean
 }) => {
   const handleSend = () => {
-    if (chatIng || !prompt.text) return
+    if (sendDisabled) return
     if (prompt.text?.trim()) {
       onSend(prompt.text)
       onChange('')
@@ -49,7 +49,6 @@ const ChatInput = ({
   return (
     <div className={Styles['chat-input-container']} style={wrapperStyle}>
       {children}
-
       <Input.TextArea
         value={prompt.text}
         onChange={handleChange}
@@ -61,8 +60,8 @@ const ChatInput = ({
       <SendOutlined
         onClick={handleSend}
         style={{
-          cursor: !prompt.text || chatIng ? 'not-allowed' : 'pointer',
-          opacity: !prompt.text || chatIng ? '0.25' : 1,
+          cursor: sendDisabled ? 'not-allowed' : 'pointer',
+          opacity: sendDisabled ? '0.25' : 1,
         }}
       />
     </div>

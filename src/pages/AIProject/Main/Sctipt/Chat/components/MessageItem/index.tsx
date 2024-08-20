@@ -7,7 +7,6 @@ import './index.less'
 interface IProps {
   messageInfo: MessageList
   md: any
-  containerRef?: any
 }
 export default ({ messageInfo, md }: IProps) => {
   return (

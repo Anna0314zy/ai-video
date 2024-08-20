@@ -1,5 +1,5 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source'
-import { CHAT_URL, CHAT_URL_AGAIN, chat } from '@/api/models/main'
+import { CHAT_URL, CHAT_URL_AGAIN, chat } from '@/api/models/aiScript'
 import { convertToMarkdown } from '@/utils'
 import { v4 as uuidV4 } from 'uuid'
 // 是否接受消息

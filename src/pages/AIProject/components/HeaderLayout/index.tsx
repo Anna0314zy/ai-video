@@ -1,5 +1,7 @@
 import { Layout, Flex } from 'antd'
 import { LeftOutlined } from '@ant-design/icons'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
 
 const { Header } = Layout
 const headerStyle: React.CSSProperties = {
@@ -13,21 +15,23 @@ const headerStyle: React.CSSProperties = {
   justifyContent: 'space-between',
 }
 interface headerProps {
-  leftChildren: any
-  rightChildren: any
+  leftChildren: (project: any, showHeaderTips?: boolean) => React.ReactNode
+  rightChildren: (project: any) => React.ReactNode
+  showHeaderTips?: boolean
 }
 
 const HeaderLayout = (props: headerProps) => {
   const { leftChildren, rightChildren } = props
+  const { currentProjectDetail } = useSelector((state: RootState) => state.aiScript)
   return (
     <Header style={headerStyle}>
       <Flex style={{ height: '100%', width: '100%' }} align='center' justify='space-between'>
         <Flex align='center'>
           <LeftOutlined style={{ fontSize: 16, color: 'rgba(87, 87, 102, 1)' }} />
-          {leftChildren()}
+          {leftChildren(currentProjectDetail, props.showHeaderTips)}
         </Flex>
         <Flex align='center' gap='small'>
-          {rightChildren()}
+          {rightChildren(currentProjectDetail)}
         </Flex>
       </Flex>
     </Header>

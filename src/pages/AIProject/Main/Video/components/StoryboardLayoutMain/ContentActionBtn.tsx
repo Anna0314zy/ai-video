@@ -1,5 +1,5 @@
 import { message, Flex } from 'antd'
-import * as api from '@/api/models/video'
+import * as api from '@/api/models/aiVideo'
 import { useContext, useMemo, useState } from 'react'
 import { ChatMessageList, ResourceTypeMap } from '@/api/types/video'
 import { MyContext } from '../../MyContext'
