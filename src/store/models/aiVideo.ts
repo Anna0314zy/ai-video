@@ -21,7 +21,7 @@ export default createModel<RootModel>()({
   } as AiVideoState,
   reducers: {
     updateData(state, payload: any) {
-      console.log('%c 🚀 ~ [ payload ]-13', 'font-size:14px; background:green; color:#fff;', payload)
+      console.log('%c 🚀 ~ [ payload ]-24', 'font-size:14px; background:green; color:#fff;', state.currentSelectType)
       return { ...state, ...payload }
     },
   },

@@ -5,7 +5,7 @@ import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import IconWidget from '@/components/IconWidget'
 import { EnumUploadType } from '@/api/types/video'
-import { nickIcon } from '@/components/IconWidget/Icons'
+// import { nickIcon } from '@/components/IconWidget/Icons'
 import { downloadFromServer } from '@/utils'
 import Result from '../Result'
 import ResourceItem from '../ResourceItem'
@@ -41,6 +41,8 @@ export default (props: IStoryboardVideo) => {
   useEffect(() => {
     setStep(Number(Boolean(selectedShot.previewImage)) + 1)
     dispatch.aiVideo.updateData({ currentSelectType: selectedShot.previewImage ? 'video' : 'image' })
+
+    console.log('%c 🚀 ~ [  ]-45', 'font-size:14px; background:green; color:#fff;', selectedShot.previewImage)
   }, [selectedShot.previewImage])
 
   const setpData = [
