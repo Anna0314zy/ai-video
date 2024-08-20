@@ -50,10 +50,10 @@ const useControlMsg = () => {
       } else {
         // 查看是否是同一个type
         const prevType = prev[0]?.type
-        if (prevType && prevType === data.type) {
-          return [...prev, data]
-        }
-        return prev
+        const prevShotId = prev[0]?.shotId
+        if (prevType && prevType !== data.type) return prev
+        if (data.shotId && prevShotId && prevShotId !== data.shotId) return prev
+        return [...prev, data]
       }
     })
     if (auto) {
