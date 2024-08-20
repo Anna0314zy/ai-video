@@ -7,7 +7,7 @@ import IconWidget from '@/components/IconWidget'
 import { EnumUploadType } from '@/api/types/video'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import Result from '../Result'
-import * as api from '@/api/models/video'
+import * as api from '@/api/models/aiVideo'
 import './index.less'
 const { TextArea } = Input
 

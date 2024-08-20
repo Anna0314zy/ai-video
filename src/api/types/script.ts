@@ -32,7 +32,8 @@ export interface MessageList {
     fileId?: number
     fileName?: string
   }
-  scriptId?: number // 对应剧本id
+  scriptId?: number | string // 对应剧本id
+  scriptName?: string
   loading?: boolean // 标记为剧本中
 }
 export interface ScriptPageList {
@@ -64,3 +65,4 @@ export const getHeaderTips = (state?: string) => {
   }
   return '镜头设计'
 }
+export const PAGE_SIZE = 50

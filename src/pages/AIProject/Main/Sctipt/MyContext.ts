@@ -3,9 +3,10 @@ import { createContext } from 'react'
 import { MessageList, ScriptPageList, ScriptStatus } from '@/api/types/script'
 interface Context {
   projectId: number
-  sessionId: number
-  scriptPageList: ScriptPageList[]
-  currentState: keyof typeof ScriptStatus
-  [k: string]: any
+  projectName: string
+  subjectName: string
+  chatIng: boolean
+  setChatIng: React.Dispatch<React.SetStateAction<boolean>>
+  stompSocket: any
 }
 export const MyContext = createContext<Context>({} as Context)

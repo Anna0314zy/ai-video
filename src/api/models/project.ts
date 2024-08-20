@@ -33,7 +33,7 @@ export const projectSave = (params: any) => {
   return api.post(`${http}/api/project/save`, params)
 }
 
-interface ProjectDetailRes {
+export interface ProjectDetailRes {
   latestSessionId?: number
   project: ProjectList
 }

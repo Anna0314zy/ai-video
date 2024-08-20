@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from 'react'
 import { Layout, Tabs } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
-import * as api from '@/api/models/video'
+import * as api from '@/api/models/aiVideo'
 import StoryboardVideo from './modules/StoryboardVideo'
 import StoryboardAudio from './modules/StoryboardAudio'
 import Styles from './index.module.less'

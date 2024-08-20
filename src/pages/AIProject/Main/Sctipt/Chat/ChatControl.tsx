@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useRef } from 'react'
+import { useContext, useEffect, useState, useRef, useMemo } from 'react'
 import Style from '../index.module.less'
 import ChatConfig from './components/ChatConfig'
 import { Flex, Button, Space } from 'antd'
@@ -7,18 +7,26 @@ import { v4 as uuidv4 } from 'uuid'
 import { MyContext } from '../MyContext'
 import ChatInput from '../../../components/ChatInput'
 import ChatUpload from './components/ChatUpload'
-import * as api from '@/api/models/main'
+import * as api from '@/api/models/aiScript'
 import { Role } from '@/api/types/script'
 import { FormInstance } from 'antd'
 import { convertToMarkdown } from '@/utils'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/store'
 import { SCRIPT_SEND_THOROUGH } from '@/const/socket'
+import { useDispatch, useSelector } from 'react-redux'
+import { Dispatch, RootState } from '@/store'
 const ChatControl = (props: any) => {
+  const dispatch = useDispatch<Dispatch>()
   const { accountId } = useSelector((state: RootState) => state.auth.userInfo)
-  const { updateMessage, sessionId, chatIng, setChatIng, projectId, subjectName, handleCreateChat, stompSocket } =
-    useContext(MyContext)
-
+  const sessionId = useSelector((state: RootState) => state.aiScript.currentSessionId)
+  const { chatIng, setChatIng, projectId, subjectName, stompSocket } = useContext(MyContext)
+  const handleCreateChat = async () => {
+    const data = await api.createChat({
+      projectId: projectId,
+    })
+    dispatch.aiScript.updateData({
+      currentSessionId: data,
+    })
+  }
   const [prompt, setPrompt] = useState<{
     text?: string
     fileId?: number
@@ -62,7 +70,8 @@ const ChatControl = (props: any) => {
       accountId,
     }
     if (prompt.fileId) params.attachmentFileId = prompt.fileId
-    updateMessage([
+    // 如果有requesting 删除requesting
+    dispatch.aiScript.updateMessageList([
       {
         messageContent: convertToMarkdown(prompt.text || ''),
         role: Role.user,
@@ -72,8 +81,9 @@ const ChatControl = (props: any) => {
         },
         id: uuidv4(),
         created: Date.now(),
+        sessionId: sessionId!,
       },
-      { requesting: true, created: Date.now(), role: Role.Gpt, id: uuidv4() },
+      { requesting: true, created: Date.now(), role: Role.Gpt, id: uuidv4(), sessionId: sessionId! },
     ])
     stompSocket.send(SCRIPT_SEND_THOROUGH, JSON.stringify(params))
     setPrompt(prev => {
@@ -94,7 +104,6 @@ const ChatControl = (props: any) => {
   }, [])
   // 上传文件
   const handleUploadSuccess = (val: { fileId: number; fileName: string }) => {
-    // handleApply(val)
     setPrompt(prev => {
       return {
         ...prev,
@@ -104,7 +113,6 @@ const ChatControl = (props: any) => {
     })
   }
   const handleInputSend = () => {
-    if (!prompt?.text || chatIng) return
     handleSendMessage()
   }
   const handleInputChange = (val: string) => {
@@ -115,6 +123,10 @@ const ChatControl = (props: any) => {
       }
     })
   }
+
+  const sendDisabled = useMemo(() => {
+    return !prompt?.text || chatIng
+  }, [prompt?.text, chatIng])
   return (
     <div className={Style['chat-control']}>
       <Flex justify='space-between' wrap={false} align='center'>
@@ -128,13 +140,12 @@ const ChatControl = (props: any) => {
         </Flex>
         <Flex justify='center' wrap={false} align='center' style={{ marginLeft: '10px' }} onClick={handleCreateChat}>
           <IconWidget name='chatClear' />
-          {/* <AntdIcon icon='createIcon' /> */}
           <Button type='link' className='chat-create'>
             新建对话
           </Button>
         </Flex>
       </Flex>
-      <ChatInput prompt={prompt} onChange={handleInputChange} onSend={handleInputSend} chatIng={chatIng}>
+      <ChatInput sendDisabled={sendDisabled} prompt={prompt} onChange={handleInputChange} onSend={handleInputSend}>
         <ChatUpload onSuccess={handleUploadSuccess}></ChatUpload>
         {prompt.fileName ? (
           <div

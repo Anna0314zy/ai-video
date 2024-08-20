@@ -1,5 +1,5 @@
 import { Layout, Button } from 'antd'
-import PageHeader from '@/components/PageHeader'
+import Header from './components/Header'
 import confirm from '@/assets/images/img_confirm.png'
 import StoryboardLayoutLeft from './components/StoryboardLayoutLeft'
 import StoryboardLayoutRight from './components/StoryboardLayoutRight'
@@ -18,7 +18,7 @@ import {
 import useControlMsg from './useControlMsg'
 import { MyContext } from './MyContext'
 import useStompSocket from '@/hooks/useStompSocket'
-import { packageBatch } from '@/api/models/video'
+import { packageBatch } from '@/api/models/aiVideo'
 const VideoProcess = () => {
   const currentShotId = useSelector((state: RootState) => state.aiVideo.currentShotId)
   const { messageList, getMessageList, addChatTask, updateMessage, reinstateTask } = useControlMsg()
@@ -70,11 +70,11 @@ const VideoProcess = () => {
   return (
     <MyContext.Provider value={contextValue}>
       <Layout className={Styles['page-storyboard']}>
-        <PageHeader icon='excel' status={<img src={confirm} width={68}></img>}>
+        <Header>
           <Button type='primary' onClick={handlePack}>
             打包导出
           </Button>
-        </PageHeader>
+        </Header>
         <Layout className='page-storyboard-content'>
           <StoryboardLayoutLeft />
           <StoryboardLayoutMain />

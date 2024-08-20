@@ -2,7 +2,7 @@ import { UploadOutlined } from '@ant-design/icons'
 import type { UploadProps } from 'antd'
 import { Button, message, Upload } from 'antd'
 import { LinkOutlined, SendOutlined } from '@ant-design/icons'
-import * as api from '@/api/models/main'
+import * as api from '@/api/models/aiScript'
 import { Children } from 'react'
 interface IProps {
   onSuccess?: (val: { fileId: number; fileName: string }) => void

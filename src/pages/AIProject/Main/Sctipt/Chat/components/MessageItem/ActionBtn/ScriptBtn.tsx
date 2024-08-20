@@ -2,31 +2,22 @@ import { Space, message, Tag } from 'antd'
 import ActionBtn from '@/pages/AIProject/components/ActionBtn'
 import { MyContext } from '@/pages/AIProject/Main/Sctipt/MyContext'
 import { useContext, useMemo, useState } from 'react'
-import * as api from '@/api/models/main'
+import * as api from '@/api/models/aiScript'
 import { MessageList, Role } from '@/api/types/script'
 import { v4 as uuidv4 } from 'uuid'
-import useTyped from '@/pages/AIProject/Main/Sctipt/hooks/useTyped'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
 import { SCRIPT_SUBSCRIBE_RESEND_THOROUGH } from '@/const/socket'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/store'
+import { useDispatch, useSelector } from 'react-redux'
+import { Dispatch, RootState } from '@/store'
 interface IProps {
   name: string
   onClick: (item: MessageList) => void
 }
 const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
-  const {
-    getScriptPageList,
-    chatIng,
-    setChatIng,
-    projectId,
-    sessionId,
-    updateMessage,
-    scriptPageList,
-    stompSocket,
-    messageList,
-  } = useContext(MyContext)
-  const { typedText } = useTyped()
+  const dispatch = useDispatch<Dispatch>()
+  const { currentSessionId: sessionId, messageList, scriptPageList } = useSelector((state: RootState) => state.aiScript)
+
+  const { chatIng, setChatIng, projectId, stompSocket } = useContext(MyContext)
   const accountId = useSelector((state: RootState) => state.auth.userInfo.accountId)
   const [chatContentLoading, setChatContentLoading] = useState<{
     [key: string]: {
@@ -60,19 +51,21 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
     }
   }
   const handleAdd = async () => {
-    await api.saveScript({
+    const { scriptId, name } = await api.saveScript({
       projectId,
-      sessionId,
+      sessionId: sessionId!,
       sessionChatId: messageInfo.id as number,
     })
-    updateMessage({
-      id: messageInfo.id,
-      loading: false,
-    })
     message.success('标记成功')
-
     //刷新剧本列表
-    getScriptPageList()
+    dispatch.aiScript.getScriptPageList({
+      projectId,
+    })
+    dispatch.aiScript.updateMessageList({
+      ...messageInfo,
+      scriptId: scriptId,
+      scriptName: name,
+    })
   }
 
   const handleRefresh = async () => {
@@ -83,7 +76,13 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
       sessionChatId: messageInfo.id,
       accountId,
     }
-    updateMessage([{ requesting: true, created: Date.now(), role: Role.Gpt, id: uuidv4() }])
+    dispatch.aiScript.updateMessageList({
+      requesting: true,
+      created: Date.now(),
+      role: Role.Gpt,
+      id: uuidv4(),
+      sessionId: sessionId!,
+    })
     stompSocket.send(SCRIPT_SUBSCRIBE_RESEND_THOROUGH, JSON.stringify(params))
   }
   const shouldRefresh = useMemo(() => {
@@ -105,21 +104,16 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
       icon: 'refresh',
     },
   ]
-  // 查看当前是否已经添加到剧本
-  const hasAdd = useMemo(() => {
-    const index = (scriptPageList || []).findIndex(v => v.scriptId === messageInfo.scriptId)
-    return index > -1
-  }, [scriptPageList])
 
   const showData = useMemo(() => {
-    return hasAdd ? config.slice(1) : config
-  }, [hasAdd])
+    return messageInfo.scriptId ? config.slice(1) : config
+  }, [messageInfo])
   return (
     <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
       <Space>
-        {hasAdd ? (
+        {messageInfo.scriptId ? (
           <Tag style={{ color: '#FF7A2F' }} color='rgba(254, 126, 7, 0.1)' icon={<AntdIcon icon='script' />}>
-            剧本
+            {messageInfo.scriptName || '剧本'}
           </Tag>
         ) : null}
         {showData.map(item => (

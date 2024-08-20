@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState, useRef } from 'react'
 import { ChatMessageList, Text2imageMessageOptions, Text2imageMessage } from '@/api/types/video'
-import * as api from '@/api/models/video'
-import { ResourceType, EnumUploadType } from '@/api/types/video'
+import * as api from '@/api/models/aiVideo'
+import { ResourceType, EnumUploadType, PAGE_SIZE } from '@/api/types/video'
 import { message } from 'antd'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
@@ -74,38 +74,40 @@ const useControlMsg = () => {
     }))
   }
 
-  const getMessageList = async (current: number, type: ResourceType, shotId: number, scroll = false) => {
+  const getMessageList = async ({
+    current,
+    type,
+    shotId,
+    scroll = false,
+    size = PAGE_SIZE,
+  }: {
+    current: number
+    type: ResourceType
+    shotId: number
+    scroll?: boolean
+    size?: number
+  }): Promise<ChatMessageList[]> => {
     let data: ChatMessageList[] = []
-    console.log(
-      '%c getMessageList',
-      'color:green;font-size:14px;background-color:yellow',
-      current,
-      type,
-      shotId,
-      scroll,
-    )
+
     if (type === EnumUploadType['IMAGE']) {
       data = await getText2imageHistories({
         shotId,
         current,
-        size: 20,
+        size,
       })
     } else if (type === EnumUploadType['AUDIO']) {
       data = await getAudioHistories({
         shotId,
         current,
-        size: 20,
+        size,
       })
     } else if (type === EnumUploadType['VIDEO']) {
       data = await getVideoHistories({
         shotId,
         current,
-        size: 20,
+        size,
       })
     }
-
-    console.log('%c data', 'color:yellow', data)
-
     if (scroll) {
       setMessageList(prev => {
         return uniqBy([...data, ...prev], 'taskId')

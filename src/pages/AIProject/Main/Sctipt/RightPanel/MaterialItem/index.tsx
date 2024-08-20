@@ -1,35 +1,31 @@
-import { useCallback, useContext, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { MoreOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Flex, Button, Dropdown, message } from 'antd'
 import classNames from 'classnames'
 import IconWidget from '@/components/IconWidget'
 import { ScriptPageList } from '@/api/types/script'
-import * as api from '@/api/models/main'
+import * as api from '@/api/models/aiScript'
 import { downloadFromServer } from '@/utils'
-import { previewIcon, deleteIcon } from '@/components/IconWidget/Icons'
-import { MyContext } from '@/pages/AIProject/Main/Sctipt/MyContext'
 import ScriptPreview from './ScriptPreview'
 import DownloadScript from './DownloadScript'
 import Styles from './index.module.less'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { Dispatch, RootState } from '@/store'
 interface IMaterialItem {
   data: ScriptPageList // 素材数据
   icon?: string // 素材icon
-  actived?: boolean // 选中状态
   onChange: (val: ScriptPageList) => void
-  // onHandleDownload
 }
 export default (props: IMaterialItem) => {
-  const { getScriptPageList, getProjectDetail } = useContext(MyContext)
-  const { data, actived, onChange } = props
+  const dispatch = useDispatch<Dispatch>()
+  const { messageList } = useSelector((state: RootState) => state.aiScript)
+  const { data, onChange } = props
   const previewRef = useRef<{
     open: (val: string) => void
   }>(null)
   const handlePreview = useCallback(async () => {
-    console.log('预览')
-
     const res = await api.previewScript({
       scriptId: data.scriptId,
     })
@@ -37,21 +33,34 @@ export default (props: IMaterialItem) => {
   }, [])
 
   const handleDel = useCallback(async () => {
-    console.log('删除', data)
     await api.deleteScript({
       scriptId: data.scriptId,
       projectId: data.projectId,
     })
     message.success('删除成功')
-    getScriptPageList()
-    getProjectDetail()
-  }, [])
+    dispatch.aiScript.getScriptPageList({
+      projectId: data.projectId,
+    })
+    dispatch.aiScript.getProjectDetail({
+      projectId: data.projectId,
+    })
+    const updatedList = messageList.map(v => {
+      if (v.scriptId === data.scriptId) {
+        return Object.assign({}, v, {
+          scriptId: 0,
+        })
+      }
+      return v
+    })
+    dispatch.aiScript.updateData({
+      messageList: updatedList,
+    })
+  }, [messageList])
   const items: MenuProps['items'] = [
     {
       key: '1',
       label: (
         <Flex onClick={handlePreview}>
-          {/* {previewIcon()} */}
           <AntdIcon style={{ fontSize: '20px' }} icon='preview'></AntdIcon>
           <span style={{ marginLeft: '8px' }}>预览</span>
         </Flex>
@@ -61,7 +70,6 @@ export default (props: IMaterialItem) => {
       key: '2',
       label: (
         <Flex onClick={handleDel}>
-          {/* {deleteIcon()} */}
           <AntdIcon style={{ fontSize: '20px' }} icon='delete'></AntdIcon>
           <span style={{ marginLeft: '8px' }}>删除</span>
         </Flex>
@@ -79,10 +87,10 @@ export default (props: IMaterialItem) => {
     <>
       <Flex
         className={classNames(Styles['material-item'], {
-          [Styles.actived]: data.actived || actived,
+          [Styles.actived]: data.actived || data.isFinal,
         })}
         onClick={() => onChange(data)}>
-        {/* {data.isFinal ? <AntdIcon icon='checkCircle' classname={Styles['checkCircle']}></AntdIcon> : null} */}
+        {data.isFinal ? <AntdIcon icon='checkCircle' classname={Styles['checkCircle']}></AntdIcon> : null}
         <IconWidget
           className='material-icon'
           name={props.icon}

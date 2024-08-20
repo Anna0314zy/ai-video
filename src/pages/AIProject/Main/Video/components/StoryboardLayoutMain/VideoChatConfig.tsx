@@ -5,7 +5,7 @@ import { WidgetItem } from '@/pages/AIProject/components/WidgetInputItem'
 import { Flex, Form, Space } from 'antd'
 import type { FormProps } from 'antd'
 import { VideoChatParams } from '@/api/types/video'
-import * as api from '@/api/models/video'
+import * as api from '@/api/models/aiVideo'
 const changeOptions = (options: { description: string; value: string }[]) => {
   return options.map(v => ({ label: v.description, value: v.value }))
 }
