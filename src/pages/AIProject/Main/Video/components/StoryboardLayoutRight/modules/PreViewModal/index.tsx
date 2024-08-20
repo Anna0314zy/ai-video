@@ -1,22 +1,21 @@
-import React, { Component } from 'react'
-import { Layout, Modal, Button } from 'antd'
+import React from 'react'
+import { Modal, Button } from 'antd'
 import { connect } from 'react-redux'
 
-class PreViewModal extends Component {
-  handleCancel = () => {
-    Modal.destroyAll() // 关闭当前 Modal
+class PreViewModal {
+  modalInstance: any
+  cdnPath: any
+  constructor() {
+    this.modalInstance = null // 用于存储 Modal 实例
   }
 
-  handleDelete = () => {
-    const { item, onHandleDeleteResourceItem }: any = this.props
-    onHandleDeleteResourceItem(item)
-    this.handleCancel() // 关闭 Modal
-  }
+  show(step: number, item: any, cdnPath: string, onHandleDeleteResourceItem: () => void) {
+    if (this.modalInstance) {
+      this.modalInstance.destroy() // 销毁已有的 Modal 实例
+    }
 
-  render() {
-    const { step, item, cdnPath } = this.props
-
-    return Modal.warning({
+    console.log('%c 🚀 ~ [  ]-17', 'font-size:14px; background:green; color:#fff;', '2222222')
+    this.modalInstance = Modal.warning({
       title: '图片预览',
       closeIcon: true,
       width: 1080,
@@ -38,7 +37,7 @@ class PreViewModal extends Component {
           <Button key='cancel' onClick={this.handleCancel}>
             取消
           </Button>
-          <Button key='del' onClick={this.handleDelete}>
+          <Button key='del' onClick={() => this.handleDelete(item, onHandleDeleteResourceItem)}>
             删除
           </Button>
           <Button type='primary'>下载</Button>
@@ -46,12 +45,33 @@ class PreViewModal extends Component {
       ),
     })
   }
+
+  handleCancel() {
+    if (this.modalInstance) {
+      this.modalInstance.destroy()
+      this.modalInstance = null
+    }
+  }
+
+  handleDelete(item: any, onHandleDeleteResourceItem: () => void) {
+    // @ts-ignore
+    onHandleDeleteResourceItem(item)
+    this.handleCancel()
+  }
 }
 
-// Redux state mapping
+// 创建单例实例
+const preViewModalInstance = new PreViewModal()
+
 const mapStateToProps = (state: any) => ({
   cdnPath: state.common.pathConfig.cdnPath,
 })
 
-// Connect the component to Redux
-export default connect(mapStateToProps)(PreViewModal)
+// 导出显示函数
+export const showPreViewModal = (step: number, item: any, onHandleDeleteResourceItem: () => void) => {
+  preViewModalInstance.show(step, item, preViewModalInstance.cdnPath, onHandleDeleteResourceItem)
+}
+
+// 连接 Redux，并提供 cdnPath 用于构造 Modal
+// @ts-ignore
+export default connect(mapStateToProps)(preViewModalInstance)

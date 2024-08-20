@@ -7,7 +7,6 @@ import IconWidget from '@/components/IconWidget'
 import { EnumUploadType } from '@/api/types/video'
 import { nickIcon } from '@/components/IconWidget/Icons'
 import { downloadFromServer } from '@/utils'
-import PreViewModal from '../PreViewModal'
 import Result from '../Result'
 import ResourceItem from '../ResourceItem'
 import * as api from '@/api/models/video'
@@ -30,19 +29,6 @@ export default (props: IStoryboardVideo) => {
   const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
   const [isShowResult, setIsShowResult] = useState(false)
   const [videoDetail, setVideoDetail] = useState([])
-  const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const showModal = () => {
-    setIsModalOpen(true)
-  }
-
-  const handleOk = () => {
-    setIsModalOpen(false)
-  }
-
-  const handleCancel = () => {
-    setIsModalOpen(false)
-  }
 
   useScrollToBottomHook(scrollVideoRef, 1, () => {
     onChangeGetNewData()
@@ -99,6 +85,65 @@ export default (props: IStoryboardVideo) => {
       onChangeGetNewData()
     })
   }
+
+  const modalBox = (item: any) => {
+    const destroy = () => {
+      modalInstance.destroy()
+      // modalInstance = null
+    }
+
+    const modalInstance = Modal.warning({
+      title: `${step === 1 ? '图片' : '视频'}预览`,
+      closeIcon: true,
+      icon: null,
+      width: 1080,
+      height: 679,
+      content: (
+        <div>
+          {step === 1 ? (
+            <img style={{ width: 1000 }} className='preview-img' src={`${cdnPath}${item.compressUrl}`} alt='' />
+          ) : (
+            <video controls style={{ width: 1000 }}>
+              <source src={cdnPath + item.compressUrl} type='video/mp4' />
+              Your browser does not support the video tag.
+            </video>
+          )}
+        </div>
+      ),
+      footer: (
+        <div style={{ float: 'right' }}>
+          <Button
+            key={'cancel'}
+            onClick={() => {
+              destroy()
+            }}>
+            取消
+          </Button>
+          <Button
+            key={'del'}
+            onClick={() => {
+              onHandleDeleteResourceItem(item)
+              destroy()
+            }}>
+            删除
+          </Button>
+          <Button
+            type={'primary'}
+            onClick={() => {
+              downloadFromServer(
+                cdnPath +
+                  item.compressUrl +
+                  `?id=${item.resourceId}&fileName=${item.name}
+                &ext=${step === 1 ? 'png' : 'mp4'}`,
+                `${item.name}.${step === 1 ? 'png' : 'mp4'}`,
+              )
+            }}>
+            下载
+          </Button>
+        </div>
+      ),
+    })
+  }
   return (
     <Layout className={Styles['storyboard-image']}>
       <Layout.Sider className='storyboard-image-step'>
@@ -146,52 +191,10 @@ export default (props: IStoryboardVideo) => {
                 <ResourceItem
                   key={index}
                   data={item}
+                  cdnPath={cdnPath}
+                  ext={data === 1 ? 'png' : 'mp4'}
                   onHandlePreviewResourceItem={() => {
-                    // PreViewModal({
-                    //   step,
-                    //   item,
-                    //   onHandleDeleteResourceItem,
-                    // })
-                    // Modal.warning({
-                    //   title: '图片预览',
-                    //   closeIcon: true,
-                    //   width: 1080,
-                    //   height: 679,
-                    //   content: (
-                    //     <div>
-                    //       {step === 1 ? (
-                    //         <img
-                    //           style={{ width: 1000 }}
-                    //           className='preview-img'
-                    //           src={`${cdnPath}${item.compressUrl}`}
-                    //           alt=''
-                    //         />
-                    //       ) : (
-                    //         <video controls style={{ width: 1000 }}>
-                    //           <source src={cdnPath + item.compressUrl} type='video/mp4' />
-                    //           Your browser does not support the video tag.
-                    //         </video>
-                    //       )}
-                    //     </div>
-                    //   ),
-                    //   okText: '删除',
-                    //   cancelText: '取消',
-                    //   footer: (
-                    //     <div>
-                    //       <Button key={'cancel'} onClick={() => {}}>
-                    //         取消
-                    //       </Button>
-                    //       <Button key={'del'} onClick={() => onHandleDeleteResourceItem(item)}>
-                    //         删除
-                    //       </Button>
-                    //       <Button type={'primary'}>下载</Button>
-                    //     </div>
-                    //   ),
-                    //   onOk() {},
-                    //   onCancel() {},
-                    // })
-                    // showModal()
-                    // 预览
+                    modalBox(item)
                   }}
                   onHandleDeleteResourceItem={() => {
                     onHandleDeleteResourceItem(item)

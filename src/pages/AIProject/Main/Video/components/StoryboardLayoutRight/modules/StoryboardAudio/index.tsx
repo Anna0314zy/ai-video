@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Input } from 'antd'
+import { Input, Modal, Button } from 'antd'
 import { useParams } from 'react-router-dom'
 import { cloneDeep } from 'lodash-es'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import ResourceItem from '../ResourceItem'
+import { downloadFromServer } from '@/utils'
 import IconWidget from '@/components/IconWidget'
 
 import { EnumUploadType } from '@/api/types/video'
@@ -23,7 +24,7 @@ export default (props: any) => {
   const { shotList, selectedAudio, currentShotId, selectedVoice, currentSelectType, selectedShot } = useSelector(
     (state: any) => state.aiVideo,
   )
-
+  const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
   const [isShowResult, setIsShowResult] = useState(false)
   const [voiceDetail, setVoiceDetail] = useState(false)
   const [narration, setNarration] = useState('')
@@ -68,6 +69,7 @@ export default (props: any) => {
     })
     dispatch.aiVideo.updateData({ shotList: res })
   }
+
   const onFinish = ({ uploadOptions }: { uploadOptions: IUploadOptions }) => {
     // 上传音频
     console.log('onFinish', uploadOptions, uploadOptions.cosFullPath)
@@ -83,6 +85,67 @@ export default (props: any) => {
   const onChangeNarration = (event: any) => {
     setNarration(event.target.value)
     console.log('%c 🚀 ~ [ value ]-60', 'font-size:14px; background:green; color:#fff;', event)
+  }
+  // onHandleDeleteResourceItem 删除某一项
+  const onHandleDeleteResourceItem = (item: any) => {
+    api.delResourceItem({ resourceId: item.resourceId, type: currentSelectType }).then(() => {
+      onChangeGetNewData()
+    })
+  }
+
+  const modalBox = (item: any) => {
+    const destroy = () => {
+      modalInstance.destroy()
+      // modalInstance = null
+    }
+
+    const modalInstance = Modal.warning({
+      title: '音频预览',
+      closeIcon: true,
+      icon: null,
+      width: 500,
+      height: 679,
+      content: (
+        <div style={{ margin: '0 auto' }}>
+          <audio controls style={{ backgroundColor: '#fff', padding: '5px', borderRadius: '4px' }}>
+            <source src={cdnPath + item.compressUrl} type='audio/mpeg' />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      ),
+      footer: (
+        <div style={{ float: 'right' }}>
+          <Button
+            key={'cancel'}
+            onClick={() => {
+              destroy()
+            }}>
+            取消
+          </Button>
+          <Button
+            key={'del'}
+            onClick={() => {
+              onHandleDeleteResourceItem(item)
+              destroy()
+            }}>
+            删除
+          </Button>
+          <Button
+            type={'primary'}
+            onClick={() => {
+              downloadFromServer(
+                cdnPath +
+                  item.compressUrl +
+                  `?id=${item.resourceId}&fileName=${item.name}
+                &ext=${'mp3'}`,
+                `${item.name}.${'mp3'}`,
+              )
+            }}>
+            下载
+          </Button>
+        </div>
+      ),
+    })
   }
   return (
     <div className='storyboard-audio'>
@@ -125,10 +188,15 @@ export default (props: any) => {
               <ResourceItem
                 key={index}
                 data={item}
+                cdnPath={cdnPath}
+                ext={'mp3'}
                 onHandlePreviewResourceItem={() => {
+                  console.log('%c 🚀 ~ [  ]-195', 'font-size:14px; background:green; color:#fff;', '1111')
+                  modalBox(item)
                   // 预览
                 }}
                 onHandleDeleteResourceItem={() => {
+                  onHandleDeleteResourceItem(item)
                   // 删除某个资源
                 }}
                 onClick={() => {

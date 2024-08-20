@@ -2,13 +2,14 @@ import { FC } from 'react'
 import type { MenuProps } from 'antd'
 import { Flex, Dropdown } from 'antd'
 import { useSelector } from 'react-redux'
+import { downloadFromServer } from '@/utils'
 import { fileIcon, videoIcon, voiceIcon, downIcon, moreIcon } from '@/components/IconWidget/Icons'
 
 import AntdIcon from '@/components/IconWidget/AntdIcon'
 import './index.less'
 
 const ResourceItem: FC<any> = props => {
-  const { actived, onClick, data, onHandleDeleteResourceItem, onHandlePreviewResourceItem } = props
+  const { cdnPath, ext, actived, onClick, data, onHandleDeleteResourceItem, onHandlePreviewResourceItem } = props
   const { currentSelectType } = useSelector((state: any) => state.aiVideo)
   const imageIconEnum: any = {
     image: fileIcon,
@@ -58,7 +59,18 @@ const ResourceItem: FC<any> = props => {
         <span>{data?.modified}</span>
       </div>
       <div className='resource-item__operation'>
-        <span>{downIcon()}</span>
+        <span
+          onClick={() => {
+            downloadFromServer(
+              cdnPath +
+                data.compressUrl +
+                `?id=${data.resourceId}&fileName=${data.name}
+                &ext=${ext}`,
+              `${data.name}.${ext}`,
+            )
+          }}>
+          {downIcon()}
+        </span>
         <Dropdown menu={{ items }} placement='bottomRight' arrow={{ pointAtCenter: true }}>
           <span>{moreIcon()}</span>
         </Dropdown>
