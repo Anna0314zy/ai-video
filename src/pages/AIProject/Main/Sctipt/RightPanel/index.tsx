@@ -105,7 +105,7 @@ const RightPanel = () => {
         </ChatUpload>
       </Flex>
       <Flex className='content' vertical={true} wrap={true} gap={10} style={{ overflow: 'hidden' }} flex={1}>
-        <Flex style={{ overflow: 'auto', width: '100%' }} ref={scrollRef} id='scrollableDiv' gap={10}>
+        <Flex style={{ overflow: 'auto', width: '100%' }} ref={scrollRef} id='scrollableDiv' gap={10} vertical={true}>
           {!scriptPageList?.length ? (
             <>
               <Flex vertical={true} align='center' justify='center' style={{ width: '100%' }}>
