@@ -64,7 +64,7 @@ const VideoProcess = () => {
   ])
   const handlePack = () => {
     console.log('打包')
-    // if (!currentShotId) return
+    if (!shotList.length) return
     const shotIds = shotList.map(item => {
       return item.shotId
     })
