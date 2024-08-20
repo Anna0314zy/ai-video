@@ -74,7 +74,7 @@ export default () => {
   return (
     <div className='page-storyboard-left'>
       <div className='page-storyboard-left__header'>
-        <span>共32个镜头</span>
+        <span>共{shotList.length}个镜头</span>
         <span onClick={() => onInsterShot('up', 0)}> 新建镜头</span>
       </div>
 
