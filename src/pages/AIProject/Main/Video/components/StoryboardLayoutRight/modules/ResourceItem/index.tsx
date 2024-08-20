@@ -58,10 +58,12 @@ const ResourceItem: FC<any> = props => {
   )
   return (
     <div className={`resource-item pointer ${actived ? 'actived' : 'unactived'}`} onClick={() => onClick()}>
-      <div className='resource-item__icon f-center'>{imageIconEnum[currentSelectType]()}</div>
-      <div className='resource-item__content '>
-        <span className='one-line-ellipsis'>{data?.name}</span>
-        <span>{data?.modified}</span>
+      <div className='resource-item__content'>
+        <div className='resource-item__content__icon f-center'>{imageIconEnum[currentSelectType]()}</div>
+        <div className='resource-item__content__name '>
+          <span className='one-line-ellipsis'>{data?.name}</span>
+          <span>{data?.modified}</span>
+        </div>
       </div>
       <div className='resource-item__operation'>
         <span

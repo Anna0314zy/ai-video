@@ -1,4 +1,6 @@
  .resource-item {
+  display: flex;
+  justify-content: space-between;
    height: 53px;
    padding: 8px 12px;
    display: flex;
@@ -22,12 +24,17 @@
 
    &__content {
      display: flex;
-     flex-direction: column;
-     justify-content: space-between;
+
+    //  flex-direction: column;
+    //  justify-content: space-between;
      padding: 2px 0;
      margin-right: 15px;
      gap: 6px;
-
+&__name{
+  display: flex;
+     flex-direction: column;
+     justify-content: space-between;
+}
      span {
        line-height: 1;
 
