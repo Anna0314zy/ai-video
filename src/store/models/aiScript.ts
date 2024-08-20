@@ -33,7 +33,6 @@ export default createModel<RootModel>()({
   } as AiScriptState,
   reducers: {
     updateData(state, payload: any) {
-      console.log('%c 🚀 ~ [ payload ]-13', 'font-size:14px; background:green; color:#fff;', payload)
       return { ...state, ...payload }
     },
     // 删除最后一项

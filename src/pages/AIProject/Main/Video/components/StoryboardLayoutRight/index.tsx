@@ -11,7 +11,9 @@ import './index.less'
 export default () => {
   // const [data, setData]: any = useState({ records: [], total: 100, size: 10, current: 1 })
   const dispatch = useDispatch()
-  const { currentSelectType, selectedImage, resourceList, currentShotId } = useSelector((state: any) => state.aiVideo)
+  const { currentSelectType, selectedImage, resourceList, currentShotId, selectedShot } = useSelector(
+    (state: any) => state.aiVideo,
+  )
 
   // 触底加载状态
   useEffect(() => {
@@ -37,8 +39,9 @@ export default () => {
     <Layout.Sider className='page-storyboard-right'>
       <Tabs
         onTabClick={key => {
-          const isSelectImage = key === 'image' && Object.keys(selectedImage).length
+          const isSelectImage = key === 'image' && (Object.keys(selectedImage).length || selectedShot.previewImage)
           dispatch.aiVideo.updateData({ currentSelectType: isSelectImage ? 'video' : key })
+
           console.log('%c 🚀 ~ [ key ]-78', 'font-size:14px; background:green; color:#fff;', key)
         }}
         defaultActiveKey={EnumUploadType['IMAGE']}

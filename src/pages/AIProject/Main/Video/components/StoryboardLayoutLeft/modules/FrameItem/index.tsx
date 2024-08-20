@@ -11,7 +11,6 @@ interface IStoryboardCard {
 }
 export default (props: IStoryboardCard) => {
   const { index, img, active: active, onClick } = props
-  console.log('%c 🚀 ~ [ img ]-13', 'font-size:14px; background:green; color:#fff;', img)
   useEffect(() => {}, [props])
 
   return (

@@ -49,13 +49,6 @@ const ResourceItem: FC<any> = props => {
     },
   ]
 
-  console.log(
-    '%c 🚀 ~ [ process.env.VITE_CDN_SERVER ]-44',
-    'font-size:14px; background:green; color:#fff;',
-    // process.env.VITE_CDN_SERVER,
-    // VITE_CDN_SERVER ='https://ai-tool-static-test.ledupeiyou.com'
-    // process,
-  )
   return (
     <div className={`resource-item pointer ${actived ? 'actived' : 'unactived'}`} onClick={() => onClick()}>
       <div className='resource-item__content'>
