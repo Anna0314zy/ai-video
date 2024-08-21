@@ -132,11 +132,11 @@ const ChatControl = () => {
       <Flex align='center'>
         <div>{chatContentConfig()}</div>
         {currentSelectType === EnumUploadType['IMAGE'] ? (
-          <Button type={'primary'} style={{ marginLeft: '10px' }} onClick={handleCreatePrompt}>
+          <Button type={'primary'} style={{ margin: '0 10px' }} onClick={handleCreatePrompt}>
             应用
           </Button>
         ) : (
-          <Button type={'primary'} style={{ marginLeft: '10px' }} onClick={handleSend}>
+          <Button type={'primary'} style={{ margin: '0 10px' }} onClick={handleSend}>
             发送
           </Button>
         )}

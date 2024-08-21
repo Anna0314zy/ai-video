@@ -12,7 +12,7 @@ const MessageLayout = ({ children, data }: { children: React.ReactNode; data: Ch
       <Flex justify={'flex-start'} style={wrapperStyle}>
         <Image src={chatGpt} preview={false}></Image>
         <Flex vertical={true} flex={1} style={{ paddingLeft: '10px' }}>
-          <div>{dayjs(data.created || Date.now()).format('YYYY-MM-DD HH:mm')}</div>
+          <div>{data.created}</div>
           {children}
         </Flex>
       </Flex>

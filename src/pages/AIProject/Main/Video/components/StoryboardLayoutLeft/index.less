@@ -1,22 +1,24 @@
-.page-storyboard-left{
+.page-storyboard-left {
   width: 208px;
-  height: 100vh;
   background-color: #fff;
-  border-right: 1px solid #F2F3F7;
-  &__header{
+  border-right: 1px solid #f2f3f7;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 10px;
+  &__header {
     width: 100%;
     height: 32px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: sticky;
-    top:0;
+    top: 0;
     background-color: #fff;
     z-index: 1;
     margin-top: -1px;
     padding: 0 16px;
-    span{
-      &:nth-child(1){
+    span {
+      &:nth-child(1) {
         color: #878799;
       }
       &:nth-child(2) {
@@ -25,15 +27,13 @@
       }
     }
   }
-  &__list{
+  &__list {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     padding-right: 16px;
     width: 208px;
-    height: 100vh;
     overflow-y: auto;
-
   }
   & .ant-dropdown-trigger {
     background-color: #fff !important;
@@ -41,12 +41,11 @@
     width: 170px !important;
   }
   & .shot {
-    height: 726px;
+    flex: 1;
     overflow-y: auto;
     align-items: center;
-    div{
-
-      .ant-image{
+    div {
+      .ant-image {
         width: 142px !important;
         height: 80px !important;
       }
