@@ -18,6 +18,9 @@ export default () => {
   // 触底加载状态
   useEffect(() => {
     if (!currentShotId) return
+    // dispatch.aiVideo.updateData({
+    //   currentSelectType: currentSelectType === 'voice' ? 'voice' : selectedShot?.previewImage ? 'video' : 'image',
+    // })
     getResourceList()
   }, [currentShotId, currentSelectType])
 
@@ -35,6 +38,7 @@ export default () => {
     // getResourceList(resourceList?.pageIndex + 1)
     getResourceList()
   }
+
   return (
     <Layout.Sider className='page-storyboard-right'>
       <Tabs

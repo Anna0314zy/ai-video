@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom'
 import './index.less'
 
 export default () => {
-  const { shotList, currentShotId } = useSelector((state: RootState) => state.aiVideo)
+  const { shotList, currentShotId, currentSelectType } = useSelector((state: RootState) => state.aiVideo)
   const dispatch = useDispatch<Dispatch>()
   const { id } = useParams() // 获取路由参数 userId
   function handleOnDragEnd(result: any) {
@@ -117,9 +117,14 @@ export default () => {
                           <FrameItem
                             item={data}
                             onClick={() => {
+                              // dispatch.aiVideo.updateData({
+                              //
+                              // })
                               dispatch.aiVideo.updateData({
                                 currentShotId: data.shotId,
                                 selectedShot: data || {},
+                                currentSelectType:
+                                  currentSelectType === 'voice' ? 'voice' : data?.previewImage ? 'video' : 'image',
                               })
                             }}
                             data={data}

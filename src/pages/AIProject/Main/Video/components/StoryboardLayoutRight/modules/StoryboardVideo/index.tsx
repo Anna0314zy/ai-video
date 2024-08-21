@@ -38,10 +38,13 @@ export default (props: IStoryboardVideo) => {
   })
   useEffect(() => {
     setIsShowResult(false)
-  }, [currentShotId])
-  useEffect(() => {
     setStep(Number(Boolean(selectedShot?.previewImage)) + 1)
-    dispatch.aiVideo.updateData({ currentSelectType: selectedShot?.previewImage ? 'video' : 'image' })
+  }, [currentShotId])
+
+  useEffect(() => {
+    // dispatch.aiVideo.updateData({
+    //   currentSelectType: currentSelectType === 'voice' ? 'voice' : selectedShot?.previewImage ? 'video' : 'image',
+    // })
   }, [selectedShot?.previewImage])
 
   const setpData = [
