@@ -33,7 +33,7 @@ export default createModel<RootModel>()({
   } as AiScriptState,
   reducers: {
     updateData(state, payload: any) {
-      return { ...state, ...payload }
+      return Object.assign(state, payload)
     },
     // 删除最后一项
     deleteLastMessage(state, payload: any) {

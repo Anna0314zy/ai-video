@@ -2,7 +2,6 @@ import { message, Flex, Tag } from 'antd'
 import * as api from '@/api/models/aiVideo'
 import { useContext, useMemo, useState } from 'react'
 import { ChatMessageList, ResourceTypeMap } from '@/api/types/video'
-import { MyContext } from '../../MyContext'
 import ActionBtn from '@/pages/AIProject/components/ActionBtn'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
 import { useDispatch, useSelector } from 'react-redux'
@@ -10,7 +9,6 @@ import { Dispatch, RootState } from '@/store'
 const ContentActionBtn = ({ item }: { item: ChatMessageList }) => {
   const dispatch = useDispatch<Dispatch>()
   const { currentShotId } = useSelector((state: RootState) => state.aiVideo)
-  const { reinstateTask, updateMessage } = useContext(MyContext)
   // 记录按钮的状态
   const [btnLoading, setBtnLoading] = useState<{
     [key: string]: {
@@ -25,20 +23,19 @@ const ContentActionBtn = ({ item }: { item: ChatMessageList }) => {
     })
     try {
       if (key === 'add') {
-        console.log('add')
         if (!item.historyId) return
         const { resourceId, name } = await api.addResource({
           historyId: item.historyId,
           type: item.type,
         })
-        updateMessage(
-          {
+        dispatch.aiVideo.updateMessage({
+          data: {
             ...item,
             resourceId,
             resourceName: name,
           },
-          false,
-        )
+          auto: false,
+        })
         dispatch.aiVideo.getResourceList({
           shotId: currentShotId,
           type: item.type,
@@ -47,7 +44,7 @@ const ContentActionBtn = ({ item }: { item: ChatMessageList }) => {
         message.success(`${ResourceTypeMap[item.type]}标记成功`)
       } else if (key === 'refresh') {
         console.log('refresh')
-        await reinstateTask(item.taskId)
+        await dispatch.aiVideo.reinstateTask(item.taskId)
       }
     } finally {
       setBtnLoading({

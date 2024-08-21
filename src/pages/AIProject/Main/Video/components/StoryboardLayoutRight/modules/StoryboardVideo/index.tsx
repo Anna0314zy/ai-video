@@ -11,7 +11,8 @@ import Result from '../Result'
 import ResourceItem from '../ResourceItem'
 import * as api from '@/api/models/aiVideo'
 import Styles from './index.module.less'
-import { MyContext } from '../../../../MyContext'
+import { Dispatch } from '@/store'
+import { useParams } from 'react-router-dom'
 interface IStoryboardVideo {
   data?: any
   step?: number | string // 显示第几步骤
@@ -21,8 +22,8 @@ interface IStoryboardVideo {
 
 export default (props: IStoryboardVideo) => {
   const { data, onChangeGetNewData }: any = props
-  const { deleteMessageByResourceId } = useContext(MyContext)
-  const dispatch = useDispatch()
+  const projectId = Number(useParams().id)
+  const dispatch = useDispatch<Dispatch>()
   const scrollVideoRef = useRef(null)
 
   const [step, setStep]: any = useState(props.step || 1)
@@ -39,11 +40,9 @@ export default (props: IStoryboardVideo) => {
     setIsShowResult(false)
   }, [currentShotId])
   useEffect(() => {
-    setStep(Number(Boolean(selectedShot.previewImage)) + 1)
-    dispatch.aiVideo.updateData({ currentSelectType: selectedShot.previewImage ? 'video' : 'image' })
-
-    console.log('%c 🚀 ~ [  ]-45', 'font-size:14px; background:green; color:#fff;', selectedShot.previewImage)
-  }, [selectedShot.previewImage])
+    setStep(Number(Boolean(selectedShot?.previewImage)) + 1)
+    dispatch.aiVideo.updateData({ currentSelectType: selectedShot?.previewImage ? 'video' : 'image' })
+  }, [selectedShot?.previewImage])
 
   const setpData = [
     {
@@ -75,6 +74,7 @@ export default (props: IStoryboardVideo) => {
     } else {
       setIsShowResult(false)
     }
+    dispatch.aiVideo.getShotListByProjectId(projectId)
   }
   const onHandleAddResource = () => {
     // 导入资源
@@ -95,8 +95,10 @@ export default (props: IStoryboardVideo) => {
     api.delResourceItem({ resourceId: item.resourceId, type: currentSelectType }).then(() => {
       onChangeGetNewData()
     })
-    deleteMessageByResourceId({
+    dispatch.aiVideo.deleteMessageByResourceId({
       resourceId: item.resourceId,
+      type: item.type,
+      shotId: currentShotId,
     })
   }
 
@@ -137,8 +139,10 @@ export default (props: IStoryboardVideo) => {
             key={'del'}
             onClick={() => {
               onHandleDeleteResourceItem(item)
-              deleteMessageByResourceId({
-                resourceId: data.resourceId,
+              dispatch.aiVideo.deleteMessageByResourceId({
+                resourceId: item.resourceId,
+                type: item.type,
+                shotId: currentShotId,
               })
               destroy()
             }}>

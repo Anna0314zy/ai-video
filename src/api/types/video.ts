@@ -72,7 +72,7 @@ export interface Text2imageMessageOptions {
   type: number
 }
 export interface CommonMessage {
-  historyId?: number
+  historyId: number
   taskId: string //列表唯一值
   taskState: keyof typeof TaskState
   type: ResourceType
@@ -108,4 +108,4 @@ export interface AudioTaskParams extends AudioChatParams {
 export interface VideoTaskParams extends VideoChatParams {
   shotId: number
 }
-export const PAGE_SIZE = 200
+export const PAGE_SIZE = 5

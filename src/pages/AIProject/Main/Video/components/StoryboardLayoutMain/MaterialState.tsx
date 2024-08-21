@@ -2,18 +2,19 @@ import { Flex } from 'antd'
 import { ChatMessageList, TaskState } from '@/api/types/video'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
 import ActionBtn from '@/pages/AIProject/components/ActionBtn'
-import { useState, useContext } from 'react'
-import { MyContext } from '../../MyContext'
+import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { Dispatch } from '@/store'
 // 配置颜色
 const MaterialState = ({ data }: { data: ChatMessageList }) => {
+  const dispatch = useDispatch<Dispatch>()
   const [loading, setLoading] = useState(false)
-  const { reinstateTask, updateMessage } = useContext(MyContext)
   // 对state 进行解释
   if (['Completed'].includes(data.taskState)) return null
   const onClick = async () => {
     setLoading(true)
     try {
-      await reinstateTask(data.taskId)
+      await dispatch.aiVideo.reinstateTask(data.taskId)
     } finally {
       setLoading(false)
     }

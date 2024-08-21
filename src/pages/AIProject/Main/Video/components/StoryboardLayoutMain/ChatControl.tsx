@@ -1,6 +1,5 @@
 import { Button, Flex, message, Image } from 'antd'
-import { useContext, useState, useRef, useMemo } from 'react'
-import { MyContext } from '../../MyContext'
+import { useState, useRef, useMemo } from 'react'
 import AudioChatConfig from './AudioChatConfig'
 import VideoChatConfig from './VideoChatConfig'
 import ImageChatConfig from './ImageChatConfig'
@@ -9,18 +8,20 @@ import * as api from '@/api/models/aiVideo'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import { RcFile } from 'antd/lib/upload'
 import { EnumUploadType } from '@/api/types/video'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/store'
+import { useParams } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { RootState, Dispatch } from '@/store'
 const style: React.CSSProperties = {
   backgroundColor: '#fff',
   padding: '10px',
 }
 const ChatControl = () => {
+  const dispatch = useDispatch<Dispatch>()
   const { currentSelectType, currentShotId, shotList } = useSelector((state: RootState) => state.aiVideo)
   const currentShot = useMemo(() => {
     return shotList.find(v => v.shotId === currentShotId)
   }, [currentShotId, shotList])
-  const { projectId, addChatTask } = useContext(MyContext)
+  const projectId = Number(useParams().id)
   const formRef = useRef<any>()
   const [prompt, setPrompt] = useState<{
     text?: string
@@ -49,14 +50,14 @@ const ChatControl = () => {
   }
   const handleInputSend = async () => {
     if (!prompt?.text) return
-    await addChatTask(
-      {
+    await dispatch.aiVideo.addChatTask({
+      data: {
         text: prompt.text,
         shotId: currentShotId,
         projectId: projectId!,
       },
-      EnumUploadType['IMAGE'],
-    )
+      type: EnumUploadType['IMAGE'],
+    })
   }
   const handleInputChange = (val: string) => {
     console.log('handleInputChange', val)
@@ -121,7 +122,10 @@ const ChatControl = () => {
       base.motionBucketId = base.motionBucketId || 0
       await formRef.current?.form.validateFields()
     }
-    await addChatTask(base, currentSelectType)
+    await dispatch.aiVideo.addChatTask({
+      data: base,
+      type: currentSelectType,
+    })
   }
   return (
     <Flex vertical={true} style={style}>

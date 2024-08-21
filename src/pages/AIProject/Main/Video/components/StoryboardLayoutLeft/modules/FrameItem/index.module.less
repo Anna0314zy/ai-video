@@ -1,46 +1,44 @@
 .storyboard-card {
-    padding: 8px;
-    display: flex;
-    align-items: flex-end;
-    // width: 170px;
-    height: 96px;
-    border-radius: 6px;
-    cursor: pointer;
-    // float: right;
+  padding: 8px;
+  display: flex;
+  align-items: flex-end;
+  // width: 170px;
+  height: 96px;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  // float: right;
+  :global {
+    .storyboard-card-index {
+      // flex:1;
+      // padding-right:5px;
+      font-size: 12px;
+      font-weight: 500;
+      // line-height: 14px;
+      // text-align: right;
+      color: #4b5162;
+    }
+    .storyboard-card-img {
+      // flex-shrink: 0;
+      width: 142px;
+      height: 80px;
+      background: #fff;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+  }
+  &[data-active='true'] {
+    // transition: all 0.5s ease-in-out;
+    background: #3163f6;
     :global {
-        .storyboard-card-index{
-            // flex:1;
-            // padding-right:5px;
-            font-size: 12px;
-            font-weight: 500;
-            // line-height: 14px;
-            // text-align: right;
-            color:#4B5162;
-        }
-        .storyboard-card-img{
-            // flex-shrink: 0;
-            width:142px;
-            height:80px;
-            background: #fff;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
+      .storyboard-card-index {
+        color: #fff !important;
+      }
     }
-    &[data-active="true"]{
-        // transition: all 0.5s ease-in-out;
-        background: #3163F6;
-        :global{
-            .storyboard-card-index{
-                color:#fff !important;
-            }
-        }
-
-    }
-    .success{
-        width: 142px;
-        height: 16px;
-        background: #39C63999;
-    }
-
+  }
+  .success {
+    width: 142px;
+    height: 16px;
+    background: #39c63999;
+  }
 }

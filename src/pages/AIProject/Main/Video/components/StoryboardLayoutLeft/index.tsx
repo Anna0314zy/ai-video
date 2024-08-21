@@ -1,5 +1,4 @@
-import { FC, useState, useContext } from 'react'
-import { Layout, Flex, Modal } from 'antd'
+import { Flex, Modal } from 'antd'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import RightClick from './modules/RightClick'
 import FrameItem from './modules/FrameItem'
@@ -116,9 +115,10 @@ export default () => {
                             onClick={() => {
                               dispatch.aiVideo.updateData({
                                 currentShotId: data.shotId,
-                                selectedShot: data,
+                                selectedShot: data || {},
                               })
                             }}
+                            data={data}
                             key={index}
                             index={index + 1}
                             img={`https://ai-tool-static-test.ledupeiyou.com${data.previewImage}`}

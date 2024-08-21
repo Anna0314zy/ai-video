@@ -4,14 +4,14 @@ import { Flex, Dropdown } from 'antd'
 import { useSelector } from 'react-redux'
 import { downloadFromServer } from '@/utils'
 import { fileIcon, videoIcon, voiceIcon, downIcon, moreIcon } from '@/components/IconWidget/Icons'
-
+import { useDispatch } from 'react-redux'
+import { Dispatch } from '@/store'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
 import './index.less'
-import { MyContext } from '../../../../MyContext'
 const ResourceItem: FC<any> = props => {
-  const { deleteMessageByResourceId } = useContext(MyContext)
+  const dispatch = useDispatch<Dispatch>()
   const { cdnPath, ext, actived, onClick, data, onHandleDeleteResourceItem, onHandlePreviewResourceItem } = props
-  const { currentSelectType } = useSelector((state: any) => state.aiVideo)
+  const { currentSelectType, currentShotId } = useSelector((state: any) => state.aiVideo)
 
   const imageIconEnum: any = {
     image: fileIcon,
@@ -37,9 +37,12 @@ const ResourceItem: FC<any> = props => {
         <Flex
           onClick={() => {
             onHandleDeleteResourceItem()
-            deleteMessageByResourceId({
+            dispatch.aiVideo.deleteMessageByResourceId({
               resourceId: data.resourceId,
+              type: data.type,
+              shotId: currentShotId,
             })
+
             console.log('%c 🚀 ~ [  ]-23', 'font-size:14px; background:green; color:#fff;', '删除资源')
           }}>
           <AntdIcon style={{ fontSize: '20px' }} icon={'delete'}></AntdIcon>
