@@ -10,10 +10,9 @@ interface IStoryboardCard {
   active: boolean
   item: any
   onClick: () => void
-  data: any
 }
 export default (props: IStoryboardCard) => {
-  const { item, index, img, active: active, onClick, data } = props
+  const { item, index, img, active: active, onClick } = props
   useEffect(() => {}, [props])
   const done = () => {
     return <div className='circle f-center done'>{nickIcon()}</div>
@@ -29,7 +28,7 @@ export default (props: IStoryboardCard) => {
   }
   return (
     <div className={Styles['storyboard-card']} data-active={active} onClick={onClick}>
-      <span style={{ position: 'absolute', top: 20, left: -10 }}>{data?.shotId}</span>
+      <span style={{ position: 'absolute', top: 20, left: -10 }}>{item?.shotId}</span>
       <span className='storyboard-card-index'>{index}.&nbsp;</span>
       <div className='storyboard-card-img'>
         <Image src={img} width={149} height={86} preview={false} fallback={fallback} />

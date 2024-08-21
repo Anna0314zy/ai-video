@@ -119,7 +119,6 @@ export default () => {
                                 selectedShot: data || {},
                               })
                             }}
-                            data={data}
                             key={index}
                             index={index + 1}
                             img={`https://ai-tool-static-test.ledupeiyou.com${data.previewImage}`}

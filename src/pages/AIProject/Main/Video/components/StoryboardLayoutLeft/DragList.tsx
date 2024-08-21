@@ -36,6 +36,7 @@ const DragList = () => {
                   {provided => (
                     <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                       <FrameItem
+                        item={data}
                         onClick={() => handleItemClick(data)}
                         key={index}
                         index={index + 1}
