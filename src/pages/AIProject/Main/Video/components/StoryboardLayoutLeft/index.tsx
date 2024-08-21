@@ -112,6 +112,7 @@ export default () => {
                         }}>
                         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                           <FrameItem
+                            item={data}
                             onClick={() => {
                               dispatch.aiVideo.updateData({
                                 currentShotId: data.shotId,

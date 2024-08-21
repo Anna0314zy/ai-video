@@ -32,13 +32,128 @@
     background: #3163f6;
     :global {
       .storyboard-card-index {
-        color: #fff !important;
+        // flex:1;
+        // padding-right:5px;
+        font-size: 12px;
+        font-weight: 500;
+        // line-height: 14px;
+        // text-align: right;
+        color: #4b5162;
+      }
+      .storyboard-card-img {
+        position: relative;
+        // flex-shrink: 0;
+        width: 142px;
+        height: 80px;
+        background: #fff;
+        border-radius: 6px;
+        overflow: hidden;
+        .success {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: absolute;
+          bottom: 0;
+          width: 142px;
+          height: 16px;
+          background: #39c63999;
+          // background-color: red;
+          color: #fff;
+          font-size: 10px;
+          font-weight: 500;
+          .circle {
+            width: 10px;
+            height: 10px;
+            border-radius: 10px;
+            background-color: #fff;
+            margin-right: 4px;
+            svg {
+              fill: #58b24a;
+              stroke: #58b24a;
+              width: 6px;
+              height: 8px;
+            }
+            &.undone {
+              // width: 10px;
+              // height: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: space-evenly;
+              i {
+                width: 1.5px;
+                height: 1.5px;
+                background-color: #58b24a;
+                border-radius: 1.5px;
+              }
+            }
+          }
+        }
+        .progress {
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          position: absolute;
+          bottom: 0;
+          width: 142px;
+          height: 16px;
+          background: #14141a66;
+          color: rgba(255, 255, 255, 1);
+          font-size: 10px;
+          font-weight: 500;
+          &__item {
+            display: flex;
+            align-items: center;
+            &.done {
+            }
+            &.undone {
+              color: rgba(255, 255, 255, 0.4);
+              .circle {
+                opacity: 0.4;
+              }
+            }
+            .circle {
+              width: 10px;
+              height: 10px;
+              border-radius: 10px;
+              background-color: #fff;
+              margin-right: 4px;
+
+              svg {
+                fill: #58b24a;
+                stroke: #58b24a;
+                width: 6px;
+                height: 8px;
+              }
+
+              &.undone {
+                // width: 10px;
+                // height: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: space-evenly;
+
+                i {
+                  width: 1.5px;
+                  height: 1.5px;
+                  background-color: #58b24a;
+                  border-radius: 1.5px;
+                }
+              }
+            }
+          }
+
+          // opacity: .4;
+        }
       }
     }
-  }
-  .success {
-    width: 142px;
-    height: 16px;
-    background: #39c63999;
+    &[data-active='true'] {
+      // transition: all 0.5s ease-in-out;
+      background: #3163f6;
+      :global {
+        .storyboard-card-index {
+          color: #fff !important;
+        }
+      }
+    }
   }
 }

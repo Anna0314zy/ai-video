@@ -25,7 +25,7 @@ export default (props: IStoryboardVideo) => {
   const projectId = Number(useParams().id)
   const dispatch = useDispatch<Dispatch>()
   const scrollVideoRef = useRef(null)
-
+  const { id } = useParams() // 获取路由参数 userId
   const [step, setStep]: any = useState(props.step || 1)
   const { selectedImage, selectedVideo, currentSelectType, currentShotId, selectedShot } = useSelector(
     (state: any) => state.aiVideo,
@@ -57,7 +57,11 @@ export default (props: IStoryboardVideo) => {
   const onHandleJumpNextStep = () => {
     if (step === 1 && Object.keys(selectedImage).length) {
       dispatch.aiVideo.updateData({ currentSelectType: 'video' })
-      api.confirmResource({ shotId: currentShotId, resourceId: selectedImage.resourceId, type: currentSelectType })
+      api
+        .confirmResource({ shotId: currentShotId, resourceId: selectedImage.resourceId, type: currentSelectType })
+        .then(() => {
+          dispatch.aiVideo.getShotListByProjectId(Number(id))
+        })
       setStep((preData: any) => {
         return preData + 1
       })
