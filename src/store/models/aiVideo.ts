@@ -154,7 +154,7 @@ export default createModel<RootModel>()({
       const res = await api.getResourceList({
         ...params,
         pageIndex: params.pageIndex || 1,
-        pageSize: params.pageSize || 50,
+        pageSize: params.pageSize || 10,
       })
       dispatch.aiVideo.updateData({
         resourceList: res,
