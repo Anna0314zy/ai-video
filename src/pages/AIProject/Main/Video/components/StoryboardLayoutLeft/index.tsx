@@ -50,11 +50,14 @@ export default () => {
     })
 
     console.log('%c 🚀 ~ [  ]-49', 'font-size:14px; background:green; color:#fff;', _shotList)
-    api.saveShotList({
-      projectId: Number(id),
-      shotInfoDtoList: _shotList,
-    })
-    dispatch.aiVideo.getShotListByProjectId(Number(id))
+    api
+      .saveShotList({
+        projectId: Number(id),
+        shotInfoDtoList: _shotList,
+      })
+      .then(() => {
+        dispatch.aiVideo.getShotListByProjectId(Number(id))
+      })
   }
   const onDelete = (index: number) => {
     const items = Array.from(shotList)
