@@ -52,10 +52,7 @@ export default (props: any) => {
 
   const saveShotList = () => {
     // 更新分镜头信息
-    api.saveShotList({
-      projectId: Number(id),
-      shotInfoDtoList: [{ shotId: currentShotId, narration: narration, sort: selectedShot.sort }],
-    })
+
     const cloneShotList = cloneDeep(shotList)
     const res = cloneShotList.map((item: any) => {
       if (item.shotId === currentShotId) {
@@ -67,6 +64,10 @@ export default (props: any) => {
       return item
     })
     dispatch.aiVideo.updateData({ shotList: res })
+    api.saveShotList({
+      projectId: Number(id),
+      shotInfoDtoList: res,
+    })
   }
 
   const onFinish = ({ uploadOptions }: { uploadOptions: IUploadOptions }) => {
