@@ -14,13 +14,11 @@ export default () => {
   const { currentSelectType, selectedImage, resourceList, currentShotId, selectedShot } = useSelector(
     (state: any) => state.aiVideo,
   )
-
+  useEffect(() => {}, [resourceList.length])
   // 触底加载状态
   useEffect(() => {
     if (!currentShotId) return
-    // dispatch.aiVideo.updateData({
-    //   currentSelectType: currentSelectType === 'voice' ? 'voice' : selectedShot?.previewImage ? 'video' : 'image',
-    // })
+
     getResourceList()
   }, [currentShotId, currentSelectType])
 
