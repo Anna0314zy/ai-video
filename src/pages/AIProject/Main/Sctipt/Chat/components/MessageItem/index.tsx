@@ -9,6 +9,7 @@ interface IProps {
   md: any
 }
 export default ({ messageInfo, md }: IProps) => {
+  if (!messageInfo.messageContent) return
   return (
     <HeadLayout messageInfo={messageInfo}>
       <Flex vertical={true} className={`content messageInfo-item-cont ${messageInfo.role}`}>

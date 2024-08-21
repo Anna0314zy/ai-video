@@ -1,24 +1,24 @@
-import { Flex, Button, Dropdown, message, Space } from 'antd'
-import { useMemo, useContext, useCallback, useState, useRef } from 'react'
+import { Flex, Button, Dropdown, message } from 'antd'
+import { useMemo, useCallback, useState, useRef } from 'react'
 import ScriptText from './ScriptText'
 import * as api from '@/api/models/aiScript'
-import { MyContext } from '@/pages/AIProject/Main/Sctipt/MyContext'
 import { downloadFromServer, Ext } from '@/utils'
 import { ScriptPageList } from '@/api/types/script'
 import { downloadTemplateUrl } from '@/api/models/aiScript'
 import type { MenuProps } from 'antd'
 import ChatUpload from '@/pages/AIProject/Main/Sctipt/Chat/components/ChatUpload'
-import Styles from './index.module.less'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 import IconWidget from '@/components/IconWidget'
 import { useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 const RightPanel = () => {
   const navigate = useNavigate()
+  const { id } = useParams() // 获取路由参数 userId
+  const projectId = Number(id)
   const dispatch = useDispatch<Dispatch>()
   const scrollRef = useRef<HTMLDivElement>(null)
   const { scriptPageList } = useSelector((state: RootState) => state.aiScript)
-  const { projectId } = useContext(MyContext)
   const [loading, setLoading] = useState(false)
   //当前被选中的剧本
   const targetScript = useMemo(() => {
@@ -59,23 +59,7 @@ const RightPanel = () => {
         scriptId: targetScript?.scriptId!,
       })
       message.success('确认成功')
-
       navigate(`/project/${targetScript?.projectId!}/video`)
-      // dispatch.aiScript.updateData({
-      //   scriptPageList: scriptPageList.map(item => {
-      //     if (item.scriptId === targetScript?.scriptId) {
-      //       return Object.assign({}, item, {
-      //         isFinal: 1,
-      //       })
-      //     }
-      //     return Object.assign({}, item, {
-      //       isFinal: 0,
-      //     })
-      //   }),
-      // })
-      // dispatch.aiScript.getProjectDetail({
-      //   projectId,
-      // })
     } finally {
       setLoading(false)
     }

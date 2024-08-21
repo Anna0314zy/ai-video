@@ -11,8 +11,8 @@ import ScriptPreview from './ScriptPreview'
 import DownloadScript from './DownloadScript'
 import Styles from './index.module.less'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
-import { useDispatch, useSelector } from 'react-redux'
-import { Dispatch, RootState } from '@/store'
+import { useDispatch } from 'react-redux'
+import { Dispatch } from '@/store'
 interface IMaterialItem {
   data: ScriptPageList // 素材数据
   icon?: string // 素材icon
@@ -20,7 +20,6 @@ interface IMaterialItem {
 }
 export default (props: IMaterialItem) => {
   const dispatch = useDispatch<Dispatch>()
-  const { messageList } = useSelector((state: RootState) => state.aiScript)
   const { data, onChange } = props
   const previewRef = useRef<{
     open: (val: string) => void
@@ -44,18 +43,10 @@ export default (props: IMaterialItem) => {
     dispatch.aiScript.getProjectDetail({
       projectId: data.projectId,
     })
-    const updatedList = messageList.map(v => {
-      if (v.scriptId === data.scriptId) {
-        return Object.assign({}, v, {
-          scriptId: 0,
-        })
-      }
-      return v
+    dispatch.aiScript.deleteMessageByResourceId({
+      scriptId: data.scriptId,
     })
-    dispatch.aiScript.updateData({
-      messageList: updatedList,
-    })
-  }, [messageList])
+  }, [])
   const items: MenuProps['items'] = [
     {
       key: '1',

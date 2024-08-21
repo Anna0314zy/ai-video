@@ -1,10 +1,9 @@
-import { useContext, useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useRef, useMemo } from 'react'
 import Style from '../index.module.less'
 import ChatConfig from './components/ChatConfig'
-import { Flex, Button, Space } from 'antd'
+import { Flex, Button, Space, message } from 'antd'
 import IconWidget from '@/components/IconWidget'
 import { v4 as uuidv4 } from 'uuid'
-import { MyContext } from '../MyContext'
 import ChatInput from '../../../components/ChatInput'
 import ChatUpload from './components/ChatUpload'
 import * as api from '@/api/models/aiScript'
@@ -14,22 +13,26 @@ import { convertToMarkdown } from '@/utils'
 import { SCRIPT_SEND_THOROUGH } from '@/const/socket'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
-const ChatControl = (props: any) => {
+import { useParams } from 'react-router-dom'
+import { getQueryParam } from '@/utils'
+const ChatControl = ({ stompSocket }: any) => {
+  const { id } = useParams() // 获取路由参数 userId
+  const projectId = Number(id)
+  const subjectName = getQueryParam('subjectName') as string
   const dispatch = useDispatch<Dispatch>()
   const { accountId } = useSelector((state: RootState) => state.auth.userInfo)
-  const sessionId = useSelector((state: RootState) => state.aiScript.currentSessionId)
-  const { chatIng, setChatIng, projectId, subjectName, stompSocket } = useContext(MyContext)
+  const { currentSessionId: sessionId, chatIng } = useSelector((state: RootState) => state.aiScript)
   const handleCreateChat = async () => {
     const data = await api.createChat({
-      projectId: projectId,
+      projectId: Number(id),
     })
     dispatch.aiScript.getProjectDetail({
-      projectId: projectId,
+      projectId: Number(id),
     })
   }
   const init = async () => {
     const latestSessionId = await dispatch.aiScript.getProjectDetail({
-      projectId: projectId,
+      projectId: Number(id),
     })
     if (!latestSessionId) handleCreateChat()
   }
@@ -72,7 +75,13 @@ const ChatControl = (props: any) => {
     })
   }
   const handleSendMessage = async () => {
-    setChatIng(true)
+    if (!stompSocket) {
+      message.error('服务端连接失败')
+      return
+    }
+    dispatch.aiScript.updateData({
+      chatIng: true,
+    })
     let params: any = {
       sessionId,
       text: prompt.text,
@@ -81,7 +90,15 @@ const ChatControl = (props: any) => {
     }
     if (prompt.fileId) params.attachmentFileId = prompt.fileId
     // 如果有requesting 删除requesting
-    dispatch.aiScript.updateMessageList([
+    dispatch.aiScript.addMessage([
+      {
+        requesting: true,
+        created: Date.now(),
+        role: Role.Gpt,
+        id: uuidv4(),
+        sessionId: sessionId!,
+        userSend: true,
+      },
       {
         messageContent: convertToMarkdown(prompt.text || ''),
         role: Role.user,
@@ -93,9 +110,9 @@ const ChatControl = (props: any) => {
         created: Date.now(),
         sessionId: sessionId!,
       },
-      { requesting: true, created: Date.now(), role: Role.Gpt, id: uuidv4(), sessionId: sessionId! },
     ])
-    stompSocket.send(SCRIPT_SEND_THOROUGH, JSON.stringify(params))
+
+    if (stompSocket) stompSocket.send(SCRIPT_SEND_THOROUGH, JSON.stringify(params))
     setPrompt(prev => {
       return {
         ...prev,
