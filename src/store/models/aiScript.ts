@@ -1,78 +1,148 @@
-import { Layout, Button } from 'antd'
-import { useEffect, useRef, useState, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
-import { getQueryParam } from '@/utils'
-import { getProjectDetail as getDetail, ProjectList } from '@/api/models/project'
-import { convertToMarkdown } from '@/utils'
+import { getProjectDetail as getDetail, ProjectList, PageList } from '@/api/models/project'
 import { MessageList, ScriptPageList, PAGE_SIZE } from '@/api/types/script'
-import useStompSocket from '@/hooks/useStompSocket'
-import { SCRIPT_SUBSCRIBE_THOROUGH, SCRIPT_SEND_THOROUGH, SCRIPT_END_SUBSCRIBE_THOROUGH } from '@/const/socket'
-import { throttle } from 'lodash-es'
 import { createModel } from '@rematch/core'
 import { RootModel } from '.'
-import { ResourceType, ShotList } from '@/api/types/video'
 import * as api from '@/api/models/aiScript'
 import { RootState } from '..'
-
+import { get, set, uniqBy } from 'lodash-es'
+import { elementScrollIntoView, convertToMarkdown } from '@/utils'
+import { v4 as uuidv4 } from 'uuid'
+let oldText = ''
 interface AiScriptState {
-  messageList: MessageList[]
   messageListTotalLength: number
   scriptPageListTotalLength: number
   scriptPageList: ScriptPageList[]
   currentSessionId?: number
   currentProjectDetail: ProjectList
+  messageListMap: {
+    data: MessageList[]
+    total: number | null
+    current: number
+    size: number
+  }
+  chatIng: boolean
+  chatIngText: string
+  stompSocket: any
 }
 export default createModel<RootModel>()({
   state: {
-    messageList: [],
+    messageListMap: {
+      data: [],
+      total: null,
+      size: 0,
+      current: 1,
+    },
     messageListTotalLength: 0,
     scriptPageListTotalLength: 0,
     scriptPageList: [],
     currentSessionId: 0,
     currentProjectDetail: {} as ProjectList,
+    chatIng: false,
+    chatIngText: '',
+    stompSocket: null,
+    // const [chatIng, setChatIng] = useState(false)
+    // const [chatIngText, setChatIngText] = useState<string>('')
   } as AiScriptState,
   reducers: {
-    updateData(state, payload: any) {
+    updateData(state, payload: Partial<AiScriptState>) {
       return Object.assign(state, payload)
+    },
+    updateChatIngText(state, payload: string) {
+      // const newText = convertToMarkdown(state.chatIngText + payload)
+
+      // // 检查新的文oldText本是否与旧的不同，如果相同则不更新
+      // if (state.chatIngText !== newText) {
+      // }
+      oldText += payload
+      state.chatIngText = oldText + payload
     },
     // 删除最后一项
     deleteLastMessage(state, payload: any) {
-      const { messageList } = state
-      return {
-        ...state,
-        messageList: messageList.filter(v => !v.requesting),
-      }
+      const old = get(state, `messageListMap.data`) || []
+      // 找到 requestring
+      set(
+        state,
+        `messageListMap.data`,
+        old.filter(v => !v.requesting),
+      )
     },
-    updateMessageList(state, payload: Partial<MessageList> | Partial<MessageList>[]) {
-      const dataArray = Array.isArray(payload) ? payload : [payload]
-      // 更新消息列表
-      const updatedList = state.messageList.map(v => {
-        const updatedMessage = dataArray.find(d => d.id === v.id)
-        return updatedMessage ? Object.assign({}, v, updatedMessage) : v
+    updateChatingMessage(state, payload: MessageList) {
+      // 添加最新的数据
+      console.log('zy updateChatingMessage', payload)
+      const fromId = payload.fromId
+      // const
+      const oldData = (get(state, `messageListMap.data`) || []).filter(v => !v.requesting)
+      const transformedData = oldData.map(item => {
+        if (item.userSend) {
+          item.id = fromId || uuidv4()
+        }
+        return item
       })
-
-      // 添加新的消息
-      const newMessages = dataArray.filter(d => !state.messageList.some(v => v.id === d.id))
-      const finalList = [...updatedList, ...newMessages]
-      // 更新状态
-      return {
-        ...state,
-        messageList: finalList as MessageList[],
-      }
+      set(state, `messageListMap.data`, [payload, ...transformedData])
+      console.log('zy updateChatingMessage', [payload, ...transformedData])
     },
-    updateMessageListByScriptId(state, scriptId: number) {
-      const updatedList = state.messageList.map(v => {
-        if (v.scriptId === scriptId) {
-          return Object.assign({}, v, {
+    deleteMessageByResourceId(state, params: { scriptId: number }) {
+      const { scriptId } = params
+      const data: MessageList[] = get(state, `messageListMap.data`) || []
+      const newData = data.map(item => {
+        if (item.scriptId === scriptId) {
+          return Object.assign({}, item, {
             scriptId: 0,
+            scriptName: '',
           })
         }
-        return v
+        return item
       })
-      return {
-        ...state,
-        messageList: updatedList,
-      }
+      set(state, `messageListMap.data`, newData)
+    },
+    updateMessage(
+      state,
+      params: {
+        data: MessageList
+      },
+    ) {
+      const { data } = params
+      const old: MessageList[] = get(state, `messageListMap.data`) || []
+      const newData = old.map(item => {
+        if (item.id === data.id) {
+          return Object.assign({}, item, data)
+        }
+        return item
+      })
+
+      set(state, `messageListMap.data`, newData)
+    },
+    addMessage(state, data: MessageList | MessageList[]) {
+      const params = Array.isArray(data) ? data : [data]
+      const oldData: MessageList[] = get(state, `messageListMap.data`, [])
+      const total = get(state, `messageListMap.total`) || 0
+      set(state, `messageListMap.data`, [...params, ...oldData])
+      set(state, `messageListMap.total`, total + params.length)
+      console.log('addMessage params', params, params[params.length - 1])
+      console.log('elementScrollIntoView', params[params.length - 1].id)
+      elementScrollIntoView(params[params.length - 1].id)
+    },
+    initMessage(
+      state,
+      params: {
+        data: PageList<MessageList>
+        scroll: boolean
+      },
+    ) {
+      const { data, scroll = true } = params
+      const records = (data?.records || []).reverse() || []
+      // 获取旧数据
+      const old = get(state, `messageListMap.data`, [])
+
+      // 根据 scroll 参数决定是否合并新数据
+
+      const newData = scroll ? uniqBy([...old, ...records], 'id') : records
+      // 使用 set 方法更新数据，Redux Toolkit 会处理不可变性
+      set(state, `messageListMap`, {
+        data: newData,
+        total: data.total,
+        size: data.size,
+      })
     },
   },
   effects: dispatch => ({
@@ -87,6 +157,7 @@ export default createModel<RootModel>()({
     ) {
       console.log('zy getScriptPageList', projectId, current, size, scroll)
       const res = await api.getPageScript({ projectId, current: current || 1, size })
+
       const records = res.records || []
       dispatch.aiScript.updateData({
         scriptPageList: scroll ? [...state.aiScript.scriptPageList, ...records] : records,
@@ -95,23 +166,25 @@ export default createModel<RootModel>()({
       return records
     },
     async getChatHistories(
-      { current = 1, size = PAGE_SIZE, scroll = false }: { current: number; size?: number; scroll?: boolean },
+      { current = 1, size = 10, scroll = false }: { current: number; size?: number; scroll?: boolean },
       state: RootState,
     ) {
-      if (!state.aiScript.currentSessionId) return []
+      if (!state.aiScript.currentSessionId) return
       const res = await api.getChatHistories({ sessionId: state.aiScript.currentSessionId!, current, size })
+
       const records = res.records || []
-      console.log('zy loadMore getChatHistories', records)
       const data = records.map(v => {
         return {
           ...v,
           messageContent: convertToMarkdown(v.messageContent || ''),
         }
       })
-
-      dispatch.aiScript.updateData({
-        messageList: scroll ? [...data, ...state.aiScript.messageList] : data,
-        messageListTotalLength: res.total,
+      dispatch.aiScript.initMessage({
+        data: {
+          ...res,
+          records: data,
+        },
+        scroll,
       })
       return data
     },

@@ -10,8 +10,9 @@ import {
   VideoTaskParams,
 } from '@/api/types/video'
 import * as api from '@/api/models/aiVideo'
-import { get, set, unionBy } from 'lodash-es'
+import { get, set, uniqBy } from 'lodash-es'
 import { PageList } from '@/api/models/project'
+import { elementScrollIntoView } from '@/utils'
 interface IMessageData {
   data: ChatMessageList[]
   total: number | null
@@ -28,11 +29,6 @@ interface MessageListMap {
   voice: {
     [key: string]: IMessageData
   }
-}
-function scrollToBottom(id: number) {
-  console.log('scrollToBottom', id, document.getElementById(String(id)))
-  const ele = document.getElementById(String(id))
-  ele?.scrollIntoView({ behavior: 'smooth' })
 }
 
 interface AiVideoState {
@@ -99,12 +95,10 @@ export default createModel<RootModel>()({
     addMessage(state, data: ChatMessageList) {
       const { type, shotId } = data
       const oldData: ChatMessageList[] = get(state, `messageListMap.${type}.${shotId}.data`, [])
-      const total = get(state, `messageListMap.${type}.${shotId}.total`)
+      const total = get(state, `messageListMap.${type}.${shotId}.total`) || 0
       set(state, `messageListMap.${type}.${shotId}.data`, [data, ...oldData])
       set(state, `messageListMap.${type}.${shotId}.total`, total + 1)
-      setTimeout(() => {
-        scrollToBottom(data.historyId)
-      }, 100)
+      elementScrollIntoView(data.historyId)
     },
     initMessage(
       state,
@@ -121,7 +115,7 @@ export default createModel<RootModel>()({
       const old = get(state, `messageListMap.${type}.${shotId}.data`, [])
 
       // 根据 scroll 参数决定是否合并新数据
-      const newData = scroll ? unionBy([...old, ...records], 'historyId') : records
+      const newData = scroll ? uniqBy([...old, ...records], 'historyId') : records
       console.log(
         '%c 🚀 ~ [  ]-121',
         'font-size:14px; background:green; color:#fff;',

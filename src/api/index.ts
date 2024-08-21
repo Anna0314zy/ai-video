@@ -4,7 +4,7 @@ import { LoginUrl } from '@/config/login'
 import { getToken } from '@/utils/auth'
 
 const request = axios.create({
-  timeout: 60000,
+  timeout: 60000 * 2,
   headers: {
     'Content-Type': 'application/json',
   },
