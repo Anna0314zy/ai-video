@@ -166,7 +166,7 @@ export default createModel<RootModel>()({
       return records
     },
     async getChatHistories(
-      { current = 1, size = 10, scroll = false }: { current: number; size?: number; scroll?: boolean },
+      { current = 1, size = 30, scroll = false }: { current: number; size?: number; scroll?: boolean },
       state: RootState,
     ) {
       if (!state.aiScript.currentSessionId) return
