@@ -40,11 +40,11 @@ export default (props: IStoryboardVideo) => {
     setIsShowResult(false)
   }, [currentShotId])
   useEffect(() => {
-    setStep(Number(Boolean(selectedShot.previewImage)) + 1)
-    dispatch.aiVideo.updateData({ currentSelectType: selectedShot.previewImage ? 'video' : 'image' })
+    setStep(Number(Boolean(selectedShot?.previewImage)) + 1)
+    dispatch.aiVideo.updateData({ currentSelectType: selectedShot?.previewImage ? 'video' : 'image' })
 
     console.log('%c 🚀 ~ [  ]-45', 'font-size:14px; background:green; color:#fff;', selectedShot.previewImage)
-  }, [selectedShot.previewImage])
+  }, [selectedShot?.previewImage])
 
   const setpData = [
     {
