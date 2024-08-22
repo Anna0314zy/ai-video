@@ -18,7 +18,6 @@ export default () => {
   // 触底加载状态
   useEffect(() => {
     if (!currentShotId) return
-
     getResourceList()
   }, [currentShotId, currentSelectType])
 
