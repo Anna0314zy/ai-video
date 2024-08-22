@@ -26,7 +26,6 @@ export interface MessageList {
   createUser?: string // 创建会话的员工名称
   created: number // 创建时间
   requesting?: boolean // 请求中
-  sending?: boolean // 发送中
   id: string | number
   attachmentFileInfo?: {
     fileId?: number
@@ -35,6 +34,8 @@ export interface MessageList {
   scriptId?: number | string // 对应剧本id
   scriptName?: string
   loading?: boolean // 标记为剧本中
+  fromId?: number // ws 通知我的时候需要告诉用户发送记录的id 用于去重
+  userSend?: boolean // 标识用户发出的那一条
 }
 export interface ScriptPageList {
   // 都写成可选

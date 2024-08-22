@@ -12,7 +12,6 @@ export enum Ext {
  */
 export function getQueryParam(key: string) {
   const urlParams = new URLSearchParams(window.location.search)
-  console.log('urlParams', urlParams, urlParams.get(key))
   return urlParams.get(key)
 }
 
@@ -66,4 +65,12 @@ export function convertToMarkdown(text: string) {
   // console.log(replacedText.replace(/(\\S)\\n/g, '$1  \n'))
 
   return replacedText.replace(/(\S)\\n/g, '$1  \n').replace(/\\n/g, '  \n')
+}
+
+export function elementScrollIntoView(id: number | string) {
+  setTimeout(() => {
+    console.log('elementScrollIntoView', id, document.getElementById(String(id)))
+    const ele = document.getElementById(String(id))
+    ele?.scrollIntoView({ behavior: 'smooth' })
+  }, 10)
 }

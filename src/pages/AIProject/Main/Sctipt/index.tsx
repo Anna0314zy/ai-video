@@ -2,12 +2,10 @@ import Header from './Header'
 import ChatContent from './Chat/ChatContent'
 import ChatControl from './Chat/ChatControl'
 import { Layout } from 'antd'
-import { useEffect, useState, useRef } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getQueryParam } from '@/utils'
 import { convertToMarkdown } from '@/utils'
 import RightPanel from './RightPanel'
-import { MyContext } from './MyContext'
 import useStompSocket from '@/hooks/useStompSocket'
 import { SCRIPT_SUBSCRIBE_THOROUGH, SCRIPT_END_SUBSCRIBE_THOROUGH } from '@/const/socket'
 import { useDispatch, useSelector } from 'react-redux'
@@ -34,45 +32,34 @@ const layoutStyle: React.CSSProperties = {
 
 export default () => {
   const { id } = useParams() // 获取路由参数 userId
-  const projectName = getQueryParam('projectName') as string
-  const subjectName = getQueryParam('subjectName') as string
   const dispatch = useDispatch<Dispatch>()
-  const { currentSessionId: sessionId, messageList } = useSelector((state: RootState) => state.aiScript)
-  const [chatIng, setChatIng] = useState(false)
-  const [chatIngText, setChatIngText] = useState<string>('')
-
-  useEffect(() => {
-    console.log('%c zy messageList', 'color:blue', messageList)
-  }, [messageList])
+  const [chatIngText, setChatIngText] = useState('')
 
   useEffect(() => {
     dispatch.aiScript.getScriptPageList({
       projectId: Number(id),
     })
   }, [])
-  const socketCallback = (message: any) => {
+  const socketCallback = useCallback((message: any) => {
     setChatIngText(prev => {
-      const newText = convertToMarkdown(prev + message.payload)
-      return newText
+      return convertToMarkdown(prev + message.payload)
     })
-  }
+  }, [])
 
-  const chatEndSocketCallback = (message: any) => {
+  const chatEndSocketCallback = useCallback((message: any) => {
     // TODO
-    console.log('%c SCRIPT_END_SUBSCRIBE_THOROUGH socketCallback', 'color:red', message)
-    setChatIng(false)
     setChatIngText('')
+    dispatch.aiScript.updateData({
+      chatIng: false,
+    })
     //  如果信息失败
     if (message.payload.isSuccess === true) {
-      const data = messageList.filter(v => !v.requesting)
-      dispatch.aiScript.deleteLastMessage({})
-      console.log(data, messageList, 'data----')
-      dispatch.aiScript.updateMessageList({
+      dispatch.aiScript.updateChatingMessage({
         ...message.payload,
         messageContent: convertToMarkdown(message.payload.messageContent || ''),
       })
     }
-  }
+  }, [])
   const { stompSocket } = useStompSocket([
     {
       path: SCRIPT_SUBSCRIBE_THOROUGH,
@@ -83,35 +70,19 @@ export default () => {
       callback: chatEndSocketCallback,
     },
   ])
-  const contentMessagesRef = useRef<HTMLDivElement>(null)
-  const handleScrollBottom = () => {
-    if (contentMessagesRef.current) contentMessagesRef.current.scrollTop = contentMessagesRef.current.scrollHeight
-  }
-  const contextValue = {
-    projectName,
-    projectId: Number(id),
-    subjectName,
-    chatIng,
-    setChatIng,
-    stompSocket,
-    contentMessagesRef,
-    handleScrollBottom,
-  }
 
   return (
-    <MyContext.Provider value={contextValue}>
-      <Layout style={layoutStyle}>
-        <Header />
-        <Layout style={{ height: '100%' }}>
-          <Content style={contentStyle}>
-            <ChatContent messageList={messageList} chatIngText={chatIngText} chatIng={chatIng} sessionId={sessionId} />
-            <ChatControl />
-          </Content>
-          <Sider width={'24.4vw'} style={sliderStyle}>
-            <RightPanel></RightPanel>
-          </Sider>
-        </Layout>
+    <Layout style={layoutStyle}>
+      <Header />
+      <Layout style={{ height: '100%' }}>
+        <Content style={contentStyle}>
+          <ChatContent chatIngText={chatIngText} />
+          <ChatControl stompSocket={stompSocket} chatIngText={chatIngText} />
+        </Content>
+        <Sider width={'24.4vw'} style={sliderStyle}>
+          <RightPanel></RightPanel>
+        </Sider>
       </Layout>
-    </MyContext.Provider>
+    </Layout>
   )
 }
