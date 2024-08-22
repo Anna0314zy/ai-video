@@ -107,7 +107,7 @@ const ChatContent = () => {
               <MessageLayout key={item.taskId} data={item}>
                 <Flex vertical={true}>
                   <div>
-                    shotId:{item.shotId}-historyId:{item.historyId}
+                    {/* shotId:{item.shotId}-historyId:{item.historyId} */}
                     {item.content || item.text}
                   </div>
                   <MaterialContent data={item} />
