@@ -17,7 +17,7 @@ interface IStoryboardVideo {
   data?: any
   step?: number | string // 显示第几步骤
   disabled?: boolean
-  onChangeGetNewData: () => void
+  onChangeGetNewData: (pageIndex: number) => void
 }
 
 export default (props: IStoryboardVideo) => {
@@ -27,14 +27,14 @@ export default (props: IStoryboardVideo) => {
   const scrollVideoRef = useRef(null)
   const { id } = useParams() // 获取路由参数 userId
   const [step, setStep]: any = useState(props.step || 1)
-  const { selectedImage, selectedVideo, currentSelectType, currentShotId, selectedShot } = useSelector(
+  const { selectedImage, selectedVideo, currentSelectType, currentShotId, selectedShot, resourceList } = useSelector(
     (state: any) => state.aiVideo,
   )
   const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
   const [isShowResult, setIsShowResult] = useState(false)
   const [videoDetail, setVideoDetail] = useState([])
   useScrollToBottomHook(scrollVideoRef, 1, () => {
-    onChangeGetNewData()
+    onChangeGetNewData(resourceList?.current + 1)
   })
   useEffect(() => {
     setIsShowResult(false)

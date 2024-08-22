@@ -30,10 +30,11 @@ export default () => {
     })
   }
 
-  const onChangeGetNewData = () => {
-    if (resourceList?.total / 10 === resourceList?.pageIndex) return
-    // getResourceList(resourceList?.pageIndex + 1)
-    getResourceList()
+  const onChangeGetNewData = (pageIndex?: number) => {
+    console.log('%c 🚀 ~ [ pageIndex ]-34', 'font-size:14px; background:green; color:#fff;', pageIndex)
+    if (resourceList?.total / 10 <= resourceList?.current) return
+    getResourceList(pageIndex)
+    // getResourceList()
   }
 
   return (
@@ -52,14 +53,20 @@ export default () => {
             label: <div className='tab-icon'>{videoTabIcon()}画面</div>,
             key: EnumUploadType['IMAGE'],
             children: (
-              <StoryboardVideo data={resourceList?.records || []} onChangeGetNewData={() => onChangeGetNewData()} />
+              <StoryboardVideo
+                data={resourceList?.records || []}
+                onChangeGetNewData={(pageIndex: number) => onChangeGetNewData(pageIndex)}
+              />
             ),
           },
           {
             label: <div className='tab-icon'>{settingIcon()}旁白</div>,
             key: EnumUploadType['AUDIO'],
             children: (
-              <StoryboardAudio data={resourceList?.records || []} onChangeGetNewData={() => onChangeGetNewData()} />
+              <StoryboardAudio
+                data={resourceList?.records || []}
+                onChangeGetNewData={(pageIndex: number) => onChangeGetNewData(pageIndex)}
+              />
             ),
           },
         ]}
