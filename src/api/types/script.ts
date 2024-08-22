@@ -65,4 +65,3 @@ export const getHeaderTips = (state?: string) => {
   }
   return '镜头设计'
 }
-export const PAGE_SIZE = 200

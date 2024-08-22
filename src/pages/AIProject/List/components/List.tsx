@@ -10,6 +10,7 @@ import { v3 as uuidv3 } from 'uuid'
 import { ScriptStatus } from '@/api/types/script'
 import { EditOutlined, CheckCircleOutlined, CheckCircleTwoTone } from '@ant-design/icons'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
+import { useSize } from 'ahooks'
 interface DataType {
   key: string
   name: string
@@ -129,38 +130,44 @@ export default ({
     },
   ]
 
+  const wrapper = useRef<HTMLDivElement>(null)
+  const wrapperSize = useSize(wrapper)
+  const tableHeaderSize = useSize(document.querySelector('#home-ai-project .ant-table-header'))
+  console.log('wrapperSize', wrapperSize, tableHeaderSize)
   return (
     <>
-      <div className={Styles['home-layout']}>
+      <div className={Styles['home-layout']} id='home-ai-project'>
         <Flex className='home-header' justify='space-between' align='center'>
           <div className='home-title'>我的项目</div>
           <CreateProjectBtn />
         </Flex>
-        <Table
-          size='small'
-          columns={columns}
-          rowKey='id'
-          dataSource={data.records || []}
-          scroll={{ y: `calc(100vh - 260px)` }}
-          pagination={{
-            total: data.total,
-            current: data.current,
-            pageSize: data.size,
-            position: ['bottomCenter'],
-            hideOnSinglePage: true,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal(total) {
-              return `共 ${total} 条记录`
-            },
-            onChange: (page, pageSize) => {
-              getList({
-                current: page,
-                size: pageSize,
-              })
-            },
-          }}
-        />
+        <div className={Styles['table-content']} ref={wrapper}>
+          <Table
+            size='small'
+            columns={columns}
+            rowKey='id'
+            dataSource={data.records || []}
+            scroll={{ y: (wrapperSize?.height || 300) - (tableHeaderSize?.height || 50) - 24 - 32 }}
+            pagination={{
+              total: data.total,
+              current: data.current,
+              pageSize: data.size,
+              position: ['bottomCenter'],
+              hideOnSinglePage: true,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal(total) {
+                return `共 ${total} 条记录`
+              },
+              onChange: (page, pageSize) => {
+                getList({
+                  current: page,
+                  size: pageSize,
+                })
+              },
+            }}
+          />
+        </div>
       </div>
     </>
   )

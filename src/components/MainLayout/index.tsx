@@ -10,10 +10,12 @@ import Auth from '@/hooks/useAuth'
 import Styles from './index.module.less'
 import { logout } from '@/utils/auth'
 import IconWidget from '@/components/IconWidget/index'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/store'
+import { useSelector, useDispatch } from 'react-redux'
+import { RootState, Dispatch } from '@/store'
+import { useEffect } from 'react'
 export default function MainLayout() {
   const { userInfo } = useSelector((state: RootState) => state.auth)
+  const dispatch = useDispatch<Dispatch>()
   const items: MenuProps['items'] = [
     {
       key: '1',
@@ -24,7 +26,9 @@ export default function MainLayout() {
       ),
     },
   ]
-
+  useEffect(() => {
+    dispatch.auth.getUserInfo()
+  }, [])
   return (
     <Auth>
       <Layout className={Styles['main-layout']}>
@@ -42,7 +46,7 @@ export default function MainLayout() {
               <Dropdown menu={{ items }} placement='bottomLeft'>
                 <div className='header-useInfo'>
                   <div className='header-avatar'>{userInfo.username?.substring(0, 1)}</div>
-                  <span className='header-username'>{userInfo.username}</span>
+                  {/* <span className='header-username'>{userInfo.username}</span> */}
                   <IconWidget className='icon-arrow-bottom' name='arrowBottom' />
                 </div>
               </Dropdown>

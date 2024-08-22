@@ -18,7 +18,7 @@ const CheckLogin = (Component: React.ComponentType) => {
 
     if (!isLoaded) {
       return (
-        <Flex align={'center'} justify={'center'} style={{ width: '100vh', height: '100vh' }}>
+        <Flex align={'center'} justify={'center'} style={{ height: '100vh' }}>
           <Spin>Loading...</Spin>
         </Flex>
       ) // 或者你可以用一个自定义的加载组件
