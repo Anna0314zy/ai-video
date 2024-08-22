@@ -7,6 +7,7 @@ import { Dispatch, RootState } from '@/store'
 import { ShotList } from '@/api/types/video'
 import * as api from '@/api/models/aiVideo'
 import { useParams } from 'react-router-dom'
+import { useDeepCompareEffect } from '@/hooks/useDeepCompareEffect'
 import './index.less'
 import { useEffect } from 'react'
 
@@ -22,7 +23,7 @@ export default () => {
     items.splice(result.destination.index, 0, reorderedItem)
     sortUpdateShotList(items)
   }
-  useEffect(() => {}, [currentShotId])
+  useDeepCompareEffect(() => {}, [currentShotId, shotList])
   // 插入更新
   const onInsterShot = async (type: string, index: number) => {
     const items = Array.from(shotList) as Partial<ShotList>[]
