@@ -141,12 +141,15 @@ export default createModel<RootModel>()({
   },
   effects: dispatch => ({
     async getShotListByProjectId(id: number, state: any) {
-      const { shotBaseInfoList } = await api.getShotListByProjectId(id)
+      const { shotBaseInfoList }: any = await api.getShotListByProjectId(id)
       const { selectedShot } = state.aiVideo
+      const len = Object.keys(selectedShot).length
+      // const _selectedShot = len ? selectedShot : shotBaseInfoList[0]
       dispatch.aiVideo.updateData({
         shotList: shotBaseInfoList || [],
-        currentShotId: Object.keys(selectedShot).length ? selectedShot.shotId : shotBaseInfoList[0]?.shotId,
-        selectedShot: Object.keys(selectedShot).length ? selectedShot : shotBaseInfoList[0],
+        currentShotId: len ? selectedShot.shotId : shotBaseInfoList[0]?.shotId,
+        selectedShot: len ? selectedShot : shotBaseInfoList[0],
+        currentSelectType: selectedShot?.previewImage || shotBaseInfoList[0]?.previewImage ? 'video' : 'image',
       })
     },
     async getResourceList(params: { shotId: number; pageSize?: number; pageIndex?: number; type: string }) {
