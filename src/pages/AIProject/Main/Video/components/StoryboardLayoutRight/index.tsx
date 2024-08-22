@@ -5,13 +5,13 @@ import * as api from '@/api/models/aiVideo'
 import StoryboardVideo from './modules/StoryboardVideo'
 import StoryboardAudio from './modules/StoryboardAudio'
 import { videoTabIcon, settingIcon } from '@/components/IconWidget/Icons'
-import { EnumUploadType } from '@/api/types/video'
+import { EnumUploadType, ResourceType } from '@/api/types/video'
 import './index.less'
-import { RootState } from '@/store'
+import { RootState, Dispatch } from '@/store'
 
 export default () => {
   // const [data, setData]: any = useState({ records: [], total: 100, size: 10, current: 1 })
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<Dispatch>()
   const { currentSelectType, selectedImage, resourceList, currentShotId, selectedShot, shotList } = useSelector(
     (state: RootState) => state.aiVideo,
   )
@@ -43,7 +43,7 @@ export default () => {
     <Layout.Sider className='page-storyboard-right'>
       <Tabs
         onTabClick={key => {
-          dispatch.aiVideo.updateData({ currentSelectType: key })
+          dispatch.aiVideo.updateData({ currentSelectType: key as ResourceType })
         }}
         activeKey={currentSelectType !== 'voice' ? 'image' : 'voice'}
         centered

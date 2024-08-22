@@ -157,7 +157,8 @@ export default createModel<RootModel>()({
         pageSize: params.pageSize || 10,
       })
       dispatch.aiVideo.updateData({
-        resourceList: { ...res, records: [...(resourceList?.records || []), ...res.records] },
+        resourceList:
+          params.pageIndex === 1 ? res : { ...res, records: [...(resourceList?.records || []), ...res.records] },
       })
     },
     async getMessageList({
