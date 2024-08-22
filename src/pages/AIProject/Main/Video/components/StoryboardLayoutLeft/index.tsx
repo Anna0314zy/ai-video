@@ -102,6 +102,7 @@ export default () => {
                               dispatch.aiVideo.updateData({
                                 currentShotId: data.shotId,
                                 selectedShot: data || {},
+                                resourceList: {},
                                 currentSelectType:
                                   currentSelectType === 'voice' ? 'voice' : data?.previewImage ? 'video' : 'image',
                               })

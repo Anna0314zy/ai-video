@@ -34,6 +34,7 @@ export default (props: IStoryboardVideo) => {
   const [isShowResult, setIsShowResult] = useState(false)
   const [videoDetail, setVideoDetail] = useState([])
   useScrollToBottomHook(scrollVideoRef, 1, () => {
+    if (resourceList?.total / 10 <= resourceList?.current) return
     onChangeGetNewData(resourceList?.current + 1)
   })
   useEffect(() => {

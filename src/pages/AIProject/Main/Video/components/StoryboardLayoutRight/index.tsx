@@ -32,7 +32,7 @@ export default () => {
 
   const onChangeGetNewData = (pageIndex?: number) => {
     console.log('%c 🚀 ~ [ pageIndex ]-34', 'font-size:14px; background:green; color:#fff;', pageIndex)
-    if (resourceList?.total / 10 <= resourceList?.current) return
+
     getResourceList(pageIndex)
     // getResourceList()
   }
