@@ -132,7 +132,7 @@ const ChatControl = () => {
       {currentSelectType === EnumUploadType['IMAGE'] && (
         <ChatInput prompt={prompt} onChange={handleInputChange} onSend={handleInputSend}>
           <CommonUpload
-            accept='.jpg,.jpeg,.png'
+            accept='image/*'
             style={prompt.fileUrl ? { color: '#1975ff' } : {}}
             beforeUpload={beforeUpload}
             onFinish={onFinish}
