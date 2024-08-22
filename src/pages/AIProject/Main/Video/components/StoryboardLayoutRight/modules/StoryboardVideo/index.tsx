@@ -17,7 +17,7 @@ interface IStoryboardVideo {
   data?: any
   step?: number | string // 显示第几步骤
   disabled?: boolean
-  onChangeGetNewData: () => void
+  onChangeGetNewData: (pageIndex: number) => void
 }
 
 export default (props: IStoryboardVideo) => {
@@ -27,14 +27,14 @@ export default (props: IStoryboardVideo) => {
   const scrollVideoRef = useRef(null)
   const { id } = useParams() // 获取路由参数 userId
   const [step, setStep]: any = useState(props.step || 1)
-  const { selectedImage, shotList, selectedVideo, currentSelectType, currentShotId, selectedShot } = useSelector(
-    (state: RootState) => state.aiVideo,
-  )
+  const { selectedImage, shotList, selectedVideo, currentSelectType, currentShotId, selectedShot, resourceList } =
+    useSelector((state: RootState) => state.aiVideo)
   const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
   const [isShowResult, setIsShowResult] = useState(false)
   const [videoDetail, setVideoDetail] = useState([])
   useScrollToBottomHook(scrollVideoRef, 1, () => {
-    onChangeGetNewData()
+    if (resourceList?.total / 10 <= resourceList?.current) return
+    onChangeGetNewData(resourceList?.current + 1)
   })
   useEffect(() => {
     setIsShowResult(false)
@@ -184,11 +184,15 @@ export default (props: IStoryboardVideo) => {
       ),
     })
   }
+  const onChangeActive = (item: any) => {
+    return item.resourceId === (step === 1 ? selectedImage : selectedVideo)['resourceId'] || item.isFinal === 'final'
+  }
   return (
     <Layout className={Styles['storyboard-image']}>
       <Layout.Sider className='storyboard-image-step'>
         {setpData.map((item, index) => (
           <Fragment key={index}>
+            {/* <div> */}
             <button
               className='btn-step'
               data-actived={currentSelectType === item.val}
@@ -245,7 +249,7 @@ export default (props: IStoryboardVideo) => {
                     console.log('%c 🚀 ~ [  ]-86', 'font-size:14px; background:green; color:#fff;', item)
                     dispatch.aiVideo.updateData({ [step === 1 ? 'selectedImage' : 'selectedVideo']: item })
                   }}
-                  actived={item.resourceId === (step === 1 ? selectedImage : selectedVideo)['resourceId']}
+                  actived={onChangeActive(item)}
                 />
               ))
             )}
