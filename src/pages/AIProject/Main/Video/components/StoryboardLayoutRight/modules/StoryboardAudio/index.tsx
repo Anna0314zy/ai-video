@@ -13,15 +13,16 @@ import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import Result from '../Result'
 import * as api from '@/api/models/aiVideo'
 import './index.less'
+import { Dispatch, RootState } from '@/store'
 const { TextArea } = Input
 
 export default (props: any) => {
   const { data, onChangeGetNewData } = props
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<Dispatch>()
   const scrollAudioRef = useRef(null)
   const { id } = useParams() // 获取路由参数 userId
   const { shotList, selectedAudio, currentShotId, selectedVoice, currentSelectType, selectedShot } = useSelector(
-    (state: any) => state.aiVideo,
+    (state: RootState) => state.aiVideo,
   )
   const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
   const [isShowResult, setIsShowResult] = useState(false)
@@ -44,6 +45,7 @@ export default (props: any) => {
           })
       }
       setIsShowResult(!isShowResult)
+      dispatch.aiVideo.getShotListByProjectId(Number(id))
     }
   }
   useScrollToBottomHook(scrollAudioRef, 1, () => {
