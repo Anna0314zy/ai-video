@@ -8,6 +8,7 @@ import { ShotList } from '@/api/types/video'
 import * as api from '@/api/models/aiVideo'
 import { useParams } from 'react-router-dom'
 import './index.less'
+import { useEffect } from 'react'
 
 export default () => {
   const { shotList, currentShotId, currentSelectType, selectedShot } = useSelector((state: RootState) => state.aiVideo)
@@ -21,7 +22,7 @@ export default () => {
     items.splice(result.destination.index, 0, reorderedItem)
     sortUpdateShotList(items)
   }
-
+  useEffect(() => {}, [currentShotId])
   // 插入更新
   const onInsterShot = async (type: string, index: number) => {
     const items = Array.from(shotList) as Partial<ShotList>[]
