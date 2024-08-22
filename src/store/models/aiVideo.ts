@@ -34,7 +34,7 @@ interface MessageListMap {
 interface AiVideoState {
   currentSelectType: ResourceType
   currentShotId: number
-  shotList: Array<any>
+  shotList: Array<ShotList>
   messageListMap: MessageListMap
 
   [key: string]: any

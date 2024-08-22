@@ -1,17 +1,17 @@
-import { Fragment, useState, useRef, useContext, useEffect } from 'react'
+import { Fragment, useState, useRef, useMemo, useEffect } from 'react'
 import { Layout, Modal, Button } from 'antd'
 import { useSelector, useDispatch } from 'react-redux'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import IconWidget from '@/components/IconWidget'
-import { EnumUploadType } from '@/api/types/video'
+import { EnumUploadType, ResourceTypeMap, ResourceType } from '@/api/types/video'
 // import { nickIcon } from '@/components/IconWidget/Icons'
 import { downloadFromServer } from '@/utils'
 import Result from '../Result'
 import ResourceItem from '../ResourceItem'
 import * as api from '@/api/models/aiVideo'
 import Styles from './index.module.less'
-import { Dispatch } from '@/store'
+import { Dispatch, RootState } from '@/store'
 import { useParams } from 'react-router-dom'
 interface IStoryboardVideo {
   data?: any
@@ -27,8 +27,8 @@ export default (props: IStoryboardVideo) => {
   const scrollVideoRef = useRef(null)
   const { id } = useParams() // 获取路由参数 userId
   const [step, setStep]: any = useState(props.step || 1)
-  const { selectedImage, selectedVideo, currentSelectType, currentShotId, selectedShot } = useSelector(
-    (state: any) => state.aiVideo,
+  const { selectedImage, shotList, selectedVideo, currentSelectType, currentShotId, selectedShot } = useSelector(
+    (state: RootState) => state.aiVideo,
   )
   const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
   const [isShowResult, setIsShowResult] = useState(false)
@@ -40,21 +40,33 @@ export default (props: IStoryboardVideo) => {
     setIsShowResult(false)
     setStep(Number(Boolean(selectedShot?.previewImage)) + 1)
   }, [currentShotId])
+  const currentShot = useMemo(() => {
+    return shotList.find(item => item.shotId === currentShotId)
+  }, [currentShotId])
 
   useEffect(() => {
-    // dispatch.aiVideo.updateData({
-    //   currentSelectType: currentSelectType === 'voice' ? 'voice' : selectedShot?.previewImage ? 'video' : 'image',
-    // })
-  }, [selectedShot?.previewImage])
+    // 如果在画面这里 则默认显示 video
+    if (currentSelectType !== 'voice') {
+      dispatch.aiVideo.updateData({
+        currentSelectType: currentShot?.imageStatus === 'completed' ? 'video' : 'image',
+      })
+    }
+  }, [currentShot])
 
-  const setpData = [
+  const setpData: {
+    id: number
+    name: string
+    val: ResourceType
+  }[] = [
     {
       id: 1,
-      name: '图片',
+      name: ResourceTypeMap['image'],
+      val: 'image',
     },
     {
       id: 2,
-      name: '视频',
+      name: ResourceTypeMap['video'],
+      val: 'video',
     },
   ]
   const onHandleJumpNextStep = () => {
@@ -179,10 +191,10 @@ export default (props: IStoryboardVideo) => {
           <Fragment key={index}>
             <button
               className='btn-step'
-              data-actived={step === index + 1}
+              data-actived={currentSelectType === item.val}
               onClick={async () => {
-                setStep(item.id)
-                dispatch.aiVideo.updateData({ currentSelectType: item.id === 1 ? 'image' : 'video' })
+                if (currentShot?.imageStatus !== 'completed' && item.val === 'video') return
+                dispatch.aiVideo.updateData({ currentSelectType: item.val })
               }}>
               <div className='btn-step-index f-center'>{item.id}</div>
               {/* Object.keys(selectedImage).length ? nickIcon() :  */}

@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect, useMemo } from 'react'
 import { Layout, Tabs } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
 import * as api from '@/api/models/aiVideo'
@@ -7,13 +7,15 @@ import StoryboardAudio from './modules/StoryboardAudio'
 import { videoTabIcon, settingIcon } from '@/components/IconWidget/Icons'
 import { EnumUploadType } from '@/api/types/video'
 import './index.less'
+import { RootState } from '@/store'
 
 export default () => {
   // const [data, setData]: any = useState({ records: [], total: 100, size: 10, current: 1 })
   const dispatch = useDispatch()
-  const { currentSelectType, selectedImage, resourceList, currentShotId, selectedShot } = useSelector(
-    (state: any) => state.aiVideo,
+  const { currentSelectType, selectedImage, resourceList, currentShotId, selectedShot, shotList } = useSelector(
+    (state: RootState) => state.aiVideo,
   )
+
   useEffect(() => {}, [resourceList.length])
   // 触底加载状态
   useEffect(() => {
@@ -40,12 +42,9 @@ export default () => {
     <Layout.Sider className='page-storyboard-right'>
       <Tabs
         onTabClick={key => {
-          const isSelectImage = key === 'image' && (Object.keys(selectedImage).length || selectedShot.previewImage)
-          dispatch.aiVideo.updateData({ currentSelectType: isSelectImage ? 'video' : key })
-
-          console.log('%c 🚀 ~ [ key ]-78', 'font-size:14px; background:green; color:#fff;', key)
+          dispatch.aiVideo.updateData({ currentSelectType: key })
         }}
-        defaultActiveKey={EnumUploadType['IMAGE']}
+        activeKey={currentSelectType !== 'voice' ? 'image' : 'voice'}
         centered
         items={[
           {
