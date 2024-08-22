@@ -241,7 +241,7 @@ export default (props: IStoryboardVideo) => {
                   key={index}
                   data={item}
                   cdnPath={cdnPath}
-                  ext={data === 1 ? 'png' : 'mp4'}
+                  ext={currentSelectType === 'image' ? 'png' : 'mp4'}
                   onHandlePreviewResourceItem={() => {
                     modalBox(item)
                   }}

@@ -38,16 +38,6 @@ const ChatControl = () => {
       return <AudioChatConfig ref={formRef} />
     }
   }
-  const handleUploadSuccess = (val: { fileId: number; fileName: string }) => {
-    // handleApply(val)
-    setPrompt(prev => {
-      return {
-        ...prev,
-        fileId: val.fileId,
-        fileName: val.fileName,
-      }
-    })
-  }
   const handleInputSend = async () => {
     if (!prompt?.text) return
     await dispatch.aiVideo.addChatTask({
@@ -58,6 +48,7 @@ const ChatControl = () => {
       },
       type: EnumUploadType['IMAGE'],
     })
+    setPrompt({})
   }
   const handleInputChange = (val: string) => {
     console.log('handleInputChange', val)
@@ -87,7 +78,6 @@ const ChatControl = () => {
     }))
   }
   const onFinish = ({ uploadOptions }: { uploadOptions: IUploadOptions }) => {
-    console.log('onFinish', uploadOptions, uploadOptions.cosFullPath)
     setPrompt(prev => ({
       ...prev,
       fileUrl: uploadOptions.cosFullPath,
@@ -103,9 +93,7 @@ const ChatControl = () => {
     return Promise.resolve(true)
   }
   const handleSend = async () => {
-    console.log('formRef', formRef.current?.form.getFieldsValue(), currentShot?.narration)
     const params = formRef.current?.form.getFieldsValue()
-    console.log('%c params', 'color: #ff0000;', params)
     let base = {
       ...params,
       shotId: currentShotId,
@@ -144,6 +132,7 @@ const ChatControl = () => {
       {currentSelectType === EnumUploadType['IMAGE'] && (
         <ChatInput prompt={prompt} onChange={handleInputChange} onSend={handleInputSend}>
           <CommonUpload
+            accept='.jpg,.jpeg,.png'
             style={prompt.fileUrl ? { color: '#1975ff' } : {}}
             beforeUpload={beforeUpload}
             onFinish={onFinish}

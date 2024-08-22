@@ -28,6 +28,7 @@ export interface CommonUploadProps {
   children?: React.ReactNode
   beforeUpload?: (file: RcFile) => Promise<boolean>
   style?: React.CSSProperties
+  accept?: string
 }
 const CommonUpload = ({
   beforeUpload,
@@ -37,11 +38,13 @@ const CommonUpload = ({
   onFinish,
   onError,
   style = {},
+  accept,
 }: CommonUploadProps) => {
   const uploadProps: UploadProps = {
     multiple: false,
     maxCount: 1,
     showUploadList: false,
+    accept: accept,
     // accept: uploadAccept[type],
     customRequest: async (options: any) => {
       try {
