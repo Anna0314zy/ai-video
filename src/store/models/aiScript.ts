@@ -163,7 +163,7 @@ export default createModel<RootModel>()({
     async getScriptPageList({
       projectId,
       current,
-      size = 10,
+      size = 50,
       scroll = false,
     }: {
       projectId: number
