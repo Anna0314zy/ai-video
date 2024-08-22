@@ -1,5 +1,5 @@
 import { Flex, Button, Dropdown, message } from 'antd'
-import { useMemo, useCallback, useState, useRef } from 'react'
+import { useMemo, useCallback, useState, useRef, useEffect } from 'react'
 import ScriptText from './ScriptText'
 import * as api from '@/api/models/aiScript'
 import { downloadFromServer, Ext } from '@/utils'
@@ -9,7 +9,7 @@ import type { MenuProps } from 'antd'
 import ChatUpload from '@/pages/AIProject/Main/Sctipt/Chat/components/ChatUpload'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
-import IconWidget from '@/components/IconWidget'
+
 import { useNavigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 const RightPanel = () => {
@@ -18,23 +18,27 @@ const RightPanel = () => {
   const projectId = Number(id)
   const dispatch = useDispatch<Dispatch>()
   const scrollRef = useRef<HTMLDivElement>(null)
-  const { scriptPageList } = useSelector((state: RootState) => state.aiScript)
+  const { scriptPageListMap } = useSelector((state: RootState) => state.aiScript)
   const [loading, setLoading] = useState(false)
+  const [activeObj, setActive] = useState<{ [k: string]: boolean }>({})
+  useEffect(() => {
+    console.log('activeObj', activeObj)
+  }, [activeObj])
+  const handleChoose = useCallback((val: ScriptPageList) => {
+    setActive(prev => ({
+      // 重置所有键为 false
+      ...Object.keys(prev).reduce((acc, k) => ({ ...acc, [k]: false }), {}),
+      // 将最新的键设置为 true
+      [val.scriptId]: true,
+    }))
+  }, [])
   //当前被选中的剧本
   const targetScript = useMemo(() => {
-    return scriptPageList?.find(v => v.actived)
-  }, [scriptPageList])
-  const handleChoose = useCallback(
-    (val: ScriptPageList) => {
-      dispatch.aiScript.updateData({
-        scriptPageList: scriptPageList.map(item => ({
-          ...item, // 保持其他属性不变
-          actived: item.scriptId === val.scriptId, // 设置 actived 状态
-        })),
-      })
-    },
-    [scriptPageList],
-  )
+    // 找到键值为 true 的键
+    const activeKey = Object.keys(activeObj).find(key => activeObj[key])
+    return scriptPageListMap?.data?.find(v => v.scriptId === Number(activeKey))
+  }, [scriptPageListMap, activeObj])
+
   const handleDownloadTemplate = useCallback((event: any, ext: keyof typeof Ext) => {
     event.preventDefault() // 阻止默认行为，例如点击链接不会导航到 href
     event.stopPropagation()
@@ -76,7 +80,7 @@ const RightPanel = () => {
     <Flex
       className='script-right-panel'
       vertical={true}
-      style={{ padding: '0 24px 24px 24px', overflow: 'hidden', maxHeight: '100%', userSelect: 'none' }}>
+      style={{ padding: '0 24px 24px 24px', overflow: 'hidden', height: '100%', userSelect: 'none' }}>
       <Flex className='header' justify='space-between'>
         <Button type='link' style={{ color: '#000', fontSize: '16px', fontWeight: 500 }}>
           剧本资源
@@ -89,32 +93,19 @@ const RightPanel = () => {
         </ChatUpload>
       </Flex>
       <Flex className='content' vertical={true} wrap={true} gap={10} style={{ overflow: 'hidden' }} flex={1}>
-        <Flex style={{ overflow: 'auto', width: '100%' }} ref={scrollRef} id='scrollableDiv' gap={10} vertical={true}>
-          {!scriptPageList?.length ? (
-            <>
-              <Flex vertical={true} align='center' justify='center' style={{ width: '100%' }}>
-                <IconWidget name='empty' style={{ maxWidth: '100%', objectFit: 'contain' }} />
-                <p>空空如也，快去创造剧本吧~</p>
-              </Flex>
-            </>
-          ) : (
-            scriptPageList?.map(v => {
-              return <ScriptText key={v.scriptId} data={v} handleChoose={handleChoose}></ScriptText>
-            })
-          )}
-        </Flex>
+        <ScriptText handleChoose={handleChoose} activeObj={activeObj}></ScriptText>
       </Flex>
 
-      {scriptPageList?.length > 0 && (
+      {scriptPageListMap?.total ? (
         <Button
           loading={loading}
           onClick={handleConfirm}
           disabled={targetScript?.scriptId ? false : true}
           type='primary'
-          style={{ width: '100%', marginTop: '10px' }}>
+          style={{ width: '100%', margin: '10px 0 88px 0' }}>
           确认剧本
         </Button>
-      )}
+      ) : null}
     </Flex>
   )
 }

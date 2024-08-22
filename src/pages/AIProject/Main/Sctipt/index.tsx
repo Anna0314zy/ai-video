@@ -34,13 +34,10 @@ export default () => {
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
   const [chatIngText, setChatIngText] = useState('')
-
-  useEffect(() => {
-    dispatch.aiScript.getScriptPageList({
-      projectId: Number(id),
-    })
-  }, [])
   const socketCallback = useCallback((message: any) => {
+    dispatch.aiScript.updateData({
+      chatIng: true,
+    })
     setChatIngText(prev => {
       return convertToMarkdown(prev + message.payload)
     })
@@ -70,6 +67,10 @@ export default () => {
       callback: chatEndSocketCallback,
     },
   ])
+
+  useEffect(() => {
+    if (stompSocket) dispatch.aiScript.updateData({ stompSocket })
+  }, [stompSocket])
 
   return (
     <Layout style={layoutStyle}>

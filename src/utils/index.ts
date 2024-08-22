@@ -72,5 +72,5 @@ export function elementScrollIntoView(id: number | string) {
     console.log('elementScrollIntoView', id, document.getElementById(String(id)))
     const ele = document.getElementById(String(id))
     ele?.scrollIntoView({ behavior: 'smooth' })
-  }, 10)
+  }, 100)
 }

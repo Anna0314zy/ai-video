@@ -71,6 +71,10 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
   }
 
   const handleRefresh = async () => {
+    if (!stompSocket) {
+      message.error('服务端连接失败')
+      return
+    }
     dispatch.aiScript.updateData({
       chatIng: true,
     })

@@ -110,7 +110,7 @@ export default createModel<RootModel>()({
       },
     ) {
       const { data, scroll = true, type, shotId } = params
-      const records = (data?.records || []).reverse() || []
+      const records = data?.records || []
       // 获取旧数据
       const old = get(state, `messageListMap.${type}.${shotId}.data`, [])
 

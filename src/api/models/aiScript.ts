@@ -1,5 +1,5 @@
 import { ScriptPageList } from '@/api/types/script'
-import { ProjectList } from '@/api/models/project'
+import { PageList, ProjectList } from '@/api/models/project'
 import api from '../index'
 import { ScriptPrompt, MessageList } from '../types/script'
 
@@ -68,10 +68,7 @@ export const saveScript = (params: SaveScriptParams) => {
 
 //剧本分页查询
 export const getPageScript = (params: { projectId: number; current: number; size: number }) => {
-  return api.post<{
-    records: any[]
-    total: number
-  }>(`${http}/api/text/v1/pageScript`, params)
+  return api.post<PageList<ScriptPageList>>(`${http}/api/text/v1/pageScript`, params)
 }
 //剧本预览
 export const previewScript = (params: { scriptId: number }) => {

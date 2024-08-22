@@ -17,6 +17,7 @@ interface IMaterialItem {
   data: ScriptPageList // 素材数据
   icon?: string // 素材icon
   onChange: (val: ScriptPageList) => void
+  actived?: boolean
 }
 export default (props: IMaterialItem) => {
   const dispatch = useDispatch<Dispatch>()
@@ -78,7 +79,7 @@ export default (props: IMaterialItem) => {
     <>
       <Flex
         className={classNames(Styles['material-item'], {
-          [Styles.actived]: data.actived,
+          [Styles.actived]: props.actived,
         })}
         onClick={() => onChange(data)}>
         {data.isFinal ? <AntdIcon icon='checkCircle' classname={Styles['checkCircle']}></AntdIcon> : null}

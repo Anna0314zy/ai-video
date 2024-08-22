@@ -49,7 +49,6 @@ export interface ScriptPageList {
   scriptType?: string
   scriptStyle?: string
   scriptContent?: string
-  actived?: boolean
   modified: string
   isFinal?: number // 是否确认剧本
   name: string

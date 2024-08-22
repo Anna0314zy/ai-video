@@ -2,7 +2,7 @@ import { MessageList } from '@/api/types/script'
 import MarkdownIt from 'markdown-it'
 import MessageItem from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageItem'
 import GptMessage from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageItem/GptMessage'
-import { useMemo, useEffect, useRef } from 'react'
+import { useMemo, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 import InfiniteScroll from 'react-infinite-scroll-component'
@@ -20,20 +20,29 @@ const ChatContent = ({ chatIngText }: any) => {
   if (!md) md = new MarkdownIt()
   const { messageListMap, currentSessionId } = useSelector((state: RootState) => state.aiScript)
   const dispatch = useDispatch<Dispatch>()
+  const [loading, setLoading] = useState(false)
   const lastMessage = useMemo(() => {
     return messageListMap.data?.find(v => v.requesting) || {}
   }, [messageListMap])
   const loadMoreData = async (scroll: boolean, current?: number) => {
+    if (loading) return
+    // setLoading(true)
     // 如果是滚动 需要计算从哪一页开始请求
-    const data = get(messageListMap, `data`, [])
-    const size = get(messageListMap, `size`)
-    await dispatch.aiScript.getChatHistories({
-      scroll,
-      current: current ? current : data?.length > 0 ? Math.round(data.length / size) + 1 : 1,
-    })
+    try {
+      const data = get(messageListMap, `data`, [])
+      const size = get(messageListMap, `size`)
+      console.log('loadMoreData getChatHistories ', current, data.length, size, Math.floor(data.length / size) + 1)
+      await dispatch.aiScript.getChatHistories({
+        scroll,
+        current: scroll ? Math.floor(data.length / size) + 1 : 1,
+      })
+    } finally {
+      setLoading(false)
+    }
   }
   useEffect(() => {
-    loadMoreData(false, 1)
+    console.log('currentSessionId loadMoreData', currentSessionId)
+    if (currentSessionId) loadMoreData(false, 1)
   }, [currentSessionId])
   const wrapper = useRef<HTMLDivElement>(null)
   const size = useSize(wrapper)
