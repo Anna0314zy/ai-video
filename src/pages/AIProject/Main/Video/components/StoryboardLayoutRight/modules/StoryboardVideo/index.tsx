@@ -180,8 +180,9 @@ export default (props: IStoryboardVideo) => {
             <button
               className='btn-step'
               data-actived={step === index + 1}
-              onClick={() => {
-                // setStep(item.id)
+              onClick={async () => {
+                setStep(item.id)
+                dispatch.aiVideo.updateData({ currentSelectType: item.id === 1 ? 'image' : 'video' })
               }}>
               <div className='btn-step-index f-center'>{item.id}</div>
               {/* Object.keys(selectedImage).length ? nickIcon() :  */}
