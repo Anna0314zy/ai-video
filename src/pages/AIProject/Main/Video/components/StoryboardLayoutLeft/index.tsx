@@ -7,6 +7,7 @@ import { Dispatch, RootState } from '@/store'
 import { ShotList } from '@/api/types/video'
 import * as api from '@/api/models/aiVideo'
 import { useParams } from 'react-router-dom'
+import { message } from 'antd'
 import './index.less'
 
 export default () => {
@@ -91,8 +92,9 @@ export default () => {
                             onCancel() {},
                           })
                         }}
-                        onDownload={() => {
-                          api.packageBatch([currentShotId])
+                        onDownload={async () => {
+                          await api.packageBatch([currentShotId])
+                          message.success('打包中...,请稍后~')
                           // 下载资源
                         }}>
                         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>

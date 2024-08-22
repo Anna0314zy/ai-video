@@ -1,4 +1,4 @@
-import { Layout, Button } from 'antd'
+import { Layout, Button, message } from 'antd'
 import Header from './components/Header'
 import StoryboardLayoutLeft from './components/StoryboardLayoutLeft'
 import StoryboardLayoutRight from './components/StoryboardLayoutRight'
@@ -34,7 +34,7 @@ const VideoProcess = () => {
   }
   const packSocketCallback = (message: any) => {
     console.log('packSocketCallback', message.payload)
-    downloadFromServer(message.payload, '打包资源')
+    downloadFromServer(message.payload)
   }
   useStompSocket([
     {
@@ -54,13 +54,14 @@ const VideoProcess = () => {
       callback: packSocketCallback,
     },
   ])
-  const handlePack = () => {
+  const handlePack = async () => {
     console.log('打包')
     if (!shotList.length) return
     const shotIds = shotList.map(item => {
       return item.shotId
     })
-    packageBatch(shotIds)
+    await packageBatch(shotIds)
+    message.success('打包中...,请稍后~')
   }
   return (
     <Layout className={Styles['page-storyboard']}>

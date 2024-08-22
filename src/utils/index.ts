@@ -21,7 +21,7 @@ export function decodeUnicode(str: string): string {
   })
 }
 
-export const downloadFromServer = async (url: string, filename: string) => {
+export const downloadFromServer = async (url: string, filename?: string) => {
   try {
     // 发起 GET 请求，设置 responseType 为 'blob'
     const response = await axios.get(`${url}`, {
@@ -39,7 +39,7 @@ export const downloadFromServer = async (url: string, filename: string) => {
     const blobUrl = URL.createObjectURL(blob)
     console.log('blobUrl', blobUrl)
     a.href = blobUrl
-    a.download = filename // 设置文件名
+    if (filename) a.download = filename // 设置文件名
     // 触发点击事件来启动下载
     document.body.appendChild(a) // 必须将元素添加到 DOM 中
     a.click()
