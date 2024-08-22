@@ -20,13 +20,21 @@ export default () => {
     const items = Array.from(shotList)
     const [reorderedItem] = items.splice(result.source.index, 1)
     items.splice(result.destination.index, 0, reorderedItem)
+    const _shotList = items.map((v: any, index) => ({
+      ...v,
+      sort: index + 1,
+    }))
     dispatch.aiVideo.updateData({
-      shotList: items.map((v: any, index) => ({
-        ...v,
-        sort: index + 1,
-      })),
+      shotList: _shotList,
     })
-
+    api
+      .saveShotList({
+        projectId: Number(id),
+        shotInfoDtoList: _shotList,
+      })
+      .then(() => {
+        dispatch.aiVideo.getShotListByProjectId(Number(id))
+      })
     console.log('%c 🚀 ~ [ shotList ]-27', 'font-size:14px; background:green; color:#fff;', shotList)
   }
   const handleItemClick = (item: ShotList) => {

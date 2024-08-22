@@ -138,11 +138,12 @@ export default createModel<RootModel>()({
       const { shotBaseInfoList }: any = await api.getShotListByProjectId(id)
       const { selectedShot } = state.aiVideo
       const len = Object.keys(selectedShot).length
-      // const _selectedShot = len ? selectedShot : shotBaseInfoList[0]
+      //
+      const firstUnDone = shotBaseInfoList.find((item: any) => item.status === 'uncompleted')
       dispatch.aiVideo.updateData({
         shotList: shotBaseInfoList || [],
-        currentShotId: len ? selectedShot.shotId : shotBaseInfoList[0]?.shotId,
-        selectedShot: len ? selectedShot : shotBaseInfoList[0],
+        currentShotId: len ? selectedShot.shotId : firstUnDone?.shotId,
+        selectedShot: len ? selectedShot : firstUnDone,
         currentSelectType: selectedShot?.previewImage || shotBaseInfoList[0]?.previewImage ? 'video' : 'image',
       })
     },
