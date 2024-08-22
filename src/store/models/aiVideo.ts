@@ -150,7 +150,7 @@ export default createModel<RootModel>()({
           ? shotBaseInfoList[0]?.shotId
           : firstUnDone?.shotId,
         selectedShot: len ? selectedShot : shotBaseInfoList.length === 1 ? shotBaseInfoList[0] : firstUnDone,
-        currentSelectType: selectedShot?.previewImage || shotBaseInfoList[0]?.previewImage ? 'video' : 'image',
+        // currentSelectType: selectedShot?.previewImage || shotBaseInfoList[0]?.previewImage ? 'video' : 'image',
       })
       console.log('%c 🚀 ~ [  ]-145', 'font-size:14px; background:green; color:#fff;', state)
     },
