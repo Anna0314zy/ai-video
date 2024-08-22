@@ -8,10 +8,12 @@ import { ShotList } from '@/api/types/video'
 import * as api from '@/api/models/aiVideo'
 import { useParams } from 'react-router-dom'
 import { message } from 'antd'
+import { useDeepCompareEffect } from '@/hooks/useDeepCompareEffect'
 import './index.less'
+import { useEffect } from 'react'
 
 export default () => {
-  const { shotList, currentShotId, currentSelectType } = useSelector((state: RootState) => state.aiVideo)
+  const { shotList, currentShotId, currentSelectType, selectedShot } = useSelector((state: RootState) => state.aiVideo)
   const dispatch = useDispatch<Dispatch>()
   const { id } = useParams() // 获取路由参数 userId
   // 拖拽更新
@@ -22,7 +24,7 @@ export default () => {
     items.splice(result.destination.index, 0, reorderedItem)
     sortUpdateShotList(items)
   }
-
+  useDeepCompareEffect(() => {}, [currentShotId, shotList])
   // 插入更新
   const onInsterShot = async (type: string, index: number) => {
     const items = Array.from(shotList) as Partial<ShotList>[]
@@ -37,6 +39,11 @@ export default () => {
     const items = Array.from(shotList)
     items.splice(index, 1)
     sortUpdateShotList(items)
+    if (index + 1 === selectedShot.sort) {
+      dispatch.aiVideo.updateData({
+        selectedShot: items[index],
+      })
+    }
   }
 
   const sortUpdateShotList = (preList: any) => {

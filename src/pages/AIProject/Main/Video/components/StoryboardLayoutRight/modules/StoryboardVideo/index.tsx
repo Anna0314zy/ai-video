@@ -25,20 +25,9 @@ export default (props: IStoryboardVideo) => {
   const projectId = Number(useParams().id)
   const dispatch = useDispatch<Dispatch>()
   const scrollVideoRef = useRef(null)
-  const { id } = useParams() // 获取路由参数 userId
-  // const [step, setStep]: any = useState(props.step || 1)
-  const {
-    selectedImage,
-    shotList,
-    isShowResult,
-    selectedVideo,
-    currentSelectType,
-    currentShotId,
-    selectedShot,
-    resourceList,
-  } = useSelector((state: RootState) => state.aiVideo)
+  const { selectedImage, shotList, isShowResult, selectedVideo, currentSelectType, currentShotId, resourceList } =
+    useSelector((state: RootState) => state.aiVideo)
   const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
-  // const [isShowResult, setIsShowResult] = useState(false)
   const [videoDetail, setVideoDetail] = useState([])
   useScrollToBottomHook(scrollVideoRef, 1, () => {
     if (resourceList?.total / 10 <= resourceList?.current) return
@@ -48,7 +37,6 @@ export default (props: IStoryboardVideo) => {
     dispatch.aiVideo.updateData({
       isShowResult: false,
     })
-    // setStep(Number(Boolean(selectedShot?.previewImage)) + 1)
   }, [currentShotId])
   const currentShot = useMemo(() => {
     return shotList.find(item => item.shotId === currentShotId)
@@ -80,6 +68,8 @@ export default (props: IStoryboardVideo) => {
     },
   ]
   const onHandleJumpNextStep = async () => {
+    // if (!Object.keys(currentSelect).length) return
+    // setCurrentSelect(null)
     const target = resourceList.records?.find((v: any) => v.isFinal === 'final')
     await api.confirmResource({
       shotId: currentShotId,
@@ -102,9 +92,6 @@ export default (props: IStoryboardVideo) => {
     dispatch.aiVideo.getShotListByProjectId(projectId)
   }
 
-  const onHandleAddResource = () => {
-    // 导入资源
-  }
   const onFinish = ({ uploadOptions }: { uploadOptions: IUploadOptions }) => {
     console.log('onFinish', uploadOptions, uploadOptions.cosFullPath)
     api
@@ -192,7 +179,10 @@ export default (props: IStoryboardVideo) => {
     })
   }
   const onChangeActive = (item: any) => {
-    return item.resourceId === (currentSelectType === 'image' ? selectedImage : selectedVideo)['resourceId']
+    return (
+      item.resourceId === (currentSelectType === 'image' ? selectedImage : selectedVideo)['resourceId'] ||
+      item.isFinal === 'final'
+    )
   }
   return (
     <Layout className={Styles['storyboard-image']}>
@@ -220,7 +210,11 @@ export default (props: IStoryboardVideo) => {
         {!isShowResult && (
           <div className='storyboard-image-content__header'>
             <span>{ResourceTypeMap[currentSelectType]}资源</span>
-            <CommonUpload beforeUpload={beforeUpload} onFinish={onFinish} type={currentSelectType}>
+            <CommonUpload
+              beforeUpload={beforeUpload}
+              onFinish={onFinish}
+              type={currentSelectType}
+              accept={currentSelectType === 'image' ? 'image/*' : '.mp4'}>
               <span>导入{ResourceTypeMap[currentSelectType]}</span>
             </CommonUpload>
           </div>
@@ -251,6 +245,7 @@ export default (props: IStoryboardVideo) => {
                   }}
                   onClick={() => {
                     console.log('%c 🚀 ~ [  ]-86', 'font-size:14px; background:green; color:#fff;', item)
+                    // setCurrentSelect(item)
                     dispatch.aiVideo.updateData({
                       [currentSelectType === 'image' ? 'selectedImage' : 'selectedVideo']: item,
                     })

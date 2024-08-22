@@ -38,6 +38,7 @@ export default (props: any) => {
         api
           .confirmResource({ shotId: currentShotId, resourceId: selectedAudio.resourceId, type: currentSelectType })
           .then(async () => {
+            dispatch.aiVideo.getShotListByProjectId(Number(id))
             const res = await api.getVoiceDetail({ shotId: currentShotId })
 
             console.log('%c 🚀 ~ [  ]-28', 'font-size:14px; background:green; color:#fff;', res)
@@ -168,6 +169,7 @@ export default (props: any) => {
             beforeUpload={beforeUpload}
             onFinish={onFinish}
             // onError={onError}
+            accept={'.mp3'}
             type={EnumUploadType['AUDIO']}>
             <span>导入音频</span>
           </CommonUpload>
