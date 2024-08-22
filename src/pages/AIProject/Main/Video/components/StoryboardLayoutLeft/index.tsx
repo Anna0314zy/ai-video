@@ -13,50 +13,39 @@ export default () => {
   const { shotList, currentShotId, currentSelectType } = useSelector((state: RootState) => state.aiVideo)
   const dispatch = useDispatch<Dispatch>()
   const { id } = useParams() // 获取路由参数 userId
+  // 拖拽更新
   function handleOnDragEnd(result: any) {
-    console.log('%c 🚀 ~ [ result ]-15', 'font-size:14px; background:green; color:#fff;', result)
     if (!result.destination) return
-
     const items = Array.from(shotList)
     const [reorderedItem] = items.splice(result.source.index, 1)
     items.splice(result.destination.index, 0, reorderedItem)
-    const _shotList = items.map((v: any, index) => ({
-      ...v,
-      sort: index + 1,
-    }))
-    dispatch.aiVideo.updateData({
-      shotList: _shotList,
-    })
-    api
-      .saveShotList({
-        projectId: Number(id),
-        shotInfoDtoList: _shotList,
-      })
-      .then(() => {
-        dispatch.aiVideo.getShotListByProjectId(Number(id))
-      })
-    console.log('%c 🚀 ~ [ shotList ]-27', 'font-size:14px; background:green; color:#fff;', shotList)
+    sortUpdateShotList(items)
   }
-  const handleItemClick = (item: ShotList) => {
-    dispatch.aiVideo.updateData({
-      currentShotId: item.shotId,
-    })
-  }
+
+  // 插入更新
   const onInsterShot = async (type: string, index: number) => {
     const items = Array.from(shotList)
     items.splice(type === 'up' ? (index === 0 ? 0 : index - 1) : index + 1, 0, {
       narration: '',
       sort: type === 'up' ? (index === 0 ? 0 : index - 1) : index + 1,
     })
-    const _shotList = items.map((v: any, index) => ({
+    sortUpdateShotList(items)
+  }
+  // 删除更新
+  const onDelete = (index: number) => {
+    const items = Array.from(shotList)
+    items.splice(index, 1)
+    sortUpdateShotList(items)
+  }
+
+  const sortUpdateShotList = (preList: any) => {
+    const _shotList = preList.map((v: any, index: number) => ({
       ...v,
       sort: index + 1,
     }))
     dispatch.aiVideo.updateData({
       shotList: _shotList,
     })
-
-    console.log('%c 🚀 ~ [  ]-49', 'font-size:14px; background:green; color:#fff;', _shotList)
     api
       .saveShotList({
         projectId: Number(id),
@@ -65,21 +54,6 @@ export default () => {
       .then(() => {
         dispatch.aiVideo.getShotListByProjectId(Number(id))
       })
-  }
-  const onDelete = (index: number) => {
-    const items = Array.from(shotList)
-    items.splice(index, 1)
-    const _shotList = items.map((v: any, index) => ({
-      ...v,
-      sort: index + 1,
-    }))
-    dispatch.aiVideo.updateData({
-      shotList: _shotList,
-    })
-    api.saveShotList({
-      projectId: Number(id),
-      shotInfoDtoList: _shotList,
-    })
   }
   return (
     <div className='page-storyboard-left'>
@@ -125,9 +99,6 @@ export default () => {
                           <FrameItem
                             item={data}
                             onClick={() => {
-                              // dispatch.aiVideo.updateData({
-                              //
-                              // })
                               dispatch.aiVideo.updateData({
                                 currentShotId: data.shotId,
                                 selectedShot: data || {},
