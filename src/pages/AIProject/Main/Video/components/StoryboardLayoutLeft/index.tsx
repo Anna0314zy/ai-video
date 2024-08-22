@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom'
 import './index.less'
 
 export default () => {
-  const { shotList, currentShotId, currentSelectType } = useSelector((state: RootState) => state.aiVideo)
+  const { shotList, currentShotId, currentSelectType, selectedShot } = useSelector((state: RootState) => state.aiVideo)
   const dispatch = useDispatch<Dispatch>()
   const { id } = useParams() // 获取路由参数 userId
   // 拖拽更新
@@ -36,6 +36,11 @@ export default () => {
     const items = Array.from(shotList)
     items.splice(index, 1)
     sortUpdateShotList(items)
+    if (index + 1 === selectedShot.sort) {
+      dispatch.aiVideo.updateData({
+        selectedShot: items[index],
+      })
+    }
   }
 
   const sortUpdateShotList = (preList: any) => {
