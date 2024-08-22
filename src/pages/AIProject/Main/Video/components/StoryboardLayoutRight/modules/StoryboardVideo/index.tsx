@@ -172,17 +172,26 @@ export default (props: IStoryboardVideo) => {
       ),
     })
   }
+  const onChangeActive = (item: any) => {
+    return item.resourceId === (step === 1 ? selectedImage : selectedVideo)['resourceId'] || item.isFinal === 'final'
+  }
   return (
     <Layout className={Styles['storyboard-image']}>
       <Layout.Sider className='storyboard-image-step'>
         {setpData.map((item, index) => (
           <Fragment key={index}>
+            {/* <div> */}
             <button
               className='btn-step'
               data-actived={step === index + 1}
               onClick={async () => {
-                setStep(item.id)
-                dispatch.aiVideo.updateData({ currentSelectType: item.id === 1 ? 'image' : 'video' })
+                // if (
+                //   (item.id === 2 && !Object.keys(selectedImage).length) ||
+                //   (item.id === 2 && data.some((el: any) => el.isFinal === 'final'))
+                // )
+                //   return
+                // setStep(item.id)
+                // dispatch.aiVideo.updateData({ currentSelectType: item.id === 1 ? 'image' : 'video' })
               }}>
               <div className='btn-step-index f-center'>{item.id}</div>
               {/* Object.keys(selectedImage).length ? nickIcon() :  */}
@@ -233,7 +242,7 @@ export default (props: IStoryboardVideo) => {
                     console.log('%c 🚀 ~ [  ]-86', 'font-size:14px; background:green; color:#fff;', item)
                     dispatch.aiVideo.updateData({ [step === 1 ? 'selectedImage' : 'selectedVideo']: item })
                   }}
-                  actived={item.resourceId === (step === 1 ? selectedImage : selectedVideo)['resourceId']}
+                  actived={onChangeActive(item)}
                 />
               ))
             )}
