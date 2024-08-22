@@ -24,7 +24,7 @@ export default () => {
 
   // 插入更新
   const onInsterShot = async (type: string, index: number) => {
-    const items = Array.from(shotList)
+    const items = Array.from(shotList) as Partial<ShotList>[]
     items.splice(type === 'up' ? (index === 0 ? 0 : index - 1) : index + 1, 0, {
       narration: '',
       sort: type === 'up' ? (index === 0 ? 0 : index - 1) : index + 1,

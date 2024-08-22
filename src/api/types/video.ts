@@ -34,6 +34,7 @@ export interface ShotList {
   videoStatus?: keyof typeof ShotStatus
   voiceStatus?: keyof typeof ShotStatus
   imageUrl?: string
+  previewImage?: string
 }
 
 // 音频chat Form
