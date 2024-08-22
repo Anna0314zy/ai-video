@@ -1,5 +1,5 @@
 import { getProjectDetail as getDetail, ProjectList, PageList } from '@/api/models/project'
-import { MessageList, ScriptPageList, PAGE_SIZE } from '@/api/types/script'
+import { MessageList, ScriptPageList } from '@/api/types/script'
 import { createModel } from '@rematch/core'
 import { RootModel } from '.'
 import * as api from '@/api/models/aiScript'
@@ -62,7 +62,6 @@ export default createModel<RootModel>()({
     },
     updateChatingMessage(state, payload: MessageList & { fromChatId: number }) {
       // 添加最新的数据
-      console.log('zy updateChatingMessage', payload)
       const fromChatId = payload.fromChatId
 
       // const
@@ -73,8 +72,7 @@ export default createModel<RootModel>()({
         }
         return item
       })
-      set(state, `messageListMap.data`, [payload, ...transformedData])
-      console.log('zy updateChatingMessage', [payload, ...transformedData])
+      set(state, `messageListMap.data`, uniqBy([payload, ...transformedData], 'id'))
     },
     deleteMessageByResourceId(state, params: { scriptId: number }) {
       const { scriptId } = params

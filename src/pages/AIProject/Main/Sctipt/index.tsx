@@ -10,6 +10,8 @@ import useStompSocket from '@/hooks/useStompSocket'
 import { SCRIPT_SUBSCRIBE_THOROUGH, SCRIPT_END_SUBSCRIBE_THOROUGH } from '@/const/socket'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
+import { v4 as uuidv4 } from 'uuid'
+import { Role } from '@/api/types/script'
 const { Sider, Content } = Layout
 const contentStyle: React.CSSProperties = {
   textAlign: 'center',
@@ -33,7 +35,25 @@ const layoutStyle: React.CSSProperties = {
 export default () => {
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
+  const { chatIng, messageListMap, currentSessionId } = useSelector((state: RootState) => state.aiScript)
   const [chatIngText, setChatIngText] = useState('')
+
+  useEffect(() => {
+    if (chatIng && currentSessionId) {
+      const data = messageListMap.data?.find(item => item.requesting)
+      // 增加一条
+      console.log('chatIng', chatIng, data)
+      if (!data) {
+        dispatch.aiScript.addMessage({
+          requesting: true,
+          created: Date.now(),
+          role: Role.Gpt,
+          id: uuidv4(),
+          sessionId: currentSessionId!,
+        })
+      }
+    }
+  }, [chatIng])
   const socketCallback = useCallback((message: any) => {
     dispatch.aiScript.updateData({
       chatIng: true,
