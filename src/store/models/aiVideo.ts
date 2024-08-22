@@ -147,15 +147,17 @@ export default createModel<RootModel>()({
         currentSelectType: selectedShot?.previewImage || shotBaseInfoList[0]?.previewImage ? 'video' : 'image',
       })
     },
-    async getResourceList(params: { shotId: number; pageSize?: number; pageIndex?: number; type: string }) {
+    async getResourceList(params: { shotId: number; pageSize?: number; pageIndex?: number; type: string }, state: any) {
       // console.log('%c 🚀 ~ [  ]-37', 'font-size:14px; background:green; color:#fff;', state.currentSelectType)
+      const { resourceList } = state.aiVideo
+      console.log('%c 🚀 ~ [ resourceList ]-153', 'font-size:14px; background:green; color:#fff;', resourceList)
       const res = await api.getResourceList({
         ...params,
         pageIndex: params.pageIndex || 1,
         pageSize: params.pageSize || 10,
       })
       dispatch.aiVideo.updateData({
-        resourceList: res,
+        resourceList: { ...res, records: [...(resourceList?.records || []), ...res.records] },
       })
     },
     async getMessageList({
