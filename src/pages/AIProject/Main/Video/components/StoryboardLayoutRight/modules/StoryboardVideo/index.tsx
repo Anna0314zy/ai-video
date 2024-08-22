@@ -210,7 +210,11 @@ export default (props: IStoryboardVideo) => {
         {!isShowResult && (
           <div className='storyboard-image-content__header'>
             <span>{ResourceTypeMap[currentSelectType]}资源</span>
-            <CommonUpload beforeUpload={beforeUpload} onFinish={onFinish} type={currentSelectType}>
+            <CommonUpload
+              beforeUpload={beforeUpload}
+              onFinish={onFinish}
+              type={currentSelectType}
+              accept={currentSelectType === 'image' ? 'image/*' : '.mp4'}>
               <span>导入{ResourceTypeMap[currentSelectType]}</span>
             </CommonUpload>
           </div>

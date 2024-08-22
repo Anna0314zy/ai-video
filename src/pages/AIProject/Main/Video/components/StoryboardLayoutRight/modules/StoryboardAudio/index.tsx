@@ -169,6 +169,7 @@ export default (props: any) => {
             beforeUpload={beforeUpload}
             onFinish={onFinish}
             // onError={onError}
+            accept={'.mp3'}
             type={EnumUploadType['AUDIO']}>
             <span>导入音频</span>
           </CommonUpload>
