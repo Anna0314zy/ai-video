@@ -16,6 +16,10 @@ export default () => {
     (state: RootState) => state.aiVideo,
   )
 
+  const currentShot = useMemo(() => {
+    return shotList.find(item => item.shotId === currentShotId)
+  }, [currentShotId])
+
   useEffect(() => {}, [resourceList.length])
   // 触底加载状态
   useEffect(() => {
@@ -42,7 +46,14 @@ export default () => {
     <Layout.Sider className='page-storyboard-right'>
       <Tabs
         onTabClick={key => {
-          dispatch.aiVideo.updateData({ currentSelectType: key as ResourceType })
+          if (key === 'voice') {
+            dispatch.aiVideo.updateData({ currentSelectType: key as ResourceType, isShowResult: false })
+          } else {
+            dispatch.aiVideo.updateData({
+              currentSelectType: currentShot?.imageStatus === 'completed' ? 'video' : 'image',
+              isShowResult: false,
+            })
+          }
         }}
         activeKey={currentSelectType !== 'voice' ? 'image' : 'voice'}
         centered

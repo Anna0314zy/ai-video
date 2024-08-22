@@ -36,7 +36,7 @@ interface AiVideoState {
   currentShotId: number
   shotList: Array<ShotList>
   messageListMap: MessageListMap
-
+  isShowResult: boolean
   [key: string]: any
 }
 export default createModel<RootModel>()({
@@ -54,6 +54,7 @@ export default createModel<RootModel>()({
       video: {},
       voice: {},
     },
+    isShowResult: false,
   } as AiVideoState,
   reducers: {
     updateData(state, payload: Partial<AiVideoState>) {

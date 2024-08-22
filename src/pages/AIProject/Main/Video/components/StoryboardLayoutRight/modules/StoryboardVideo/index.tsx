@@ -27,17 +27,27 @@ export default (props: IStoryboardVideo) => {
   const scrollVideoRef = useRef(null)
   const { id } = useParams() // 获取路由参数 userId
   // const [step, setStep]: any = useState(props.step || 1)
-  const { selectedImage, shotList, selectedVideo, currentSelectType, currentShotId, selectedShot, resourceList } =
-    useSelector((state: RootState) => state.aiVideo)
+  const {
+    selectedImage,
+    shotList,
+    isShowResult,
+    selectedVideo,
+    currentSelectType,
+    currentShotId,
+    selectedShot,
+    resourceList,
+  } = useSelector((state: RootState) => state.aiVideo)
   const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
-  const [isShowResult, setIsShowResult] = useState(false)
+  // const [isShowResult, setIsShowResult] = useState(false)
   const [videoDetail, setVideoDetail] = useState([])
   useScrollToBottomHook(scrollVideoRef, 1, () => {
     if (resourceList?.total / 10 <= resourceList?.current) return
     onChangeGetNewData(resourceList?.current + 1)
   })
   useEffect(() => {
-    setIsShowResult(false)
+    dispatch.aiVideo.updateData({
+      isShowResult: false,
+    })
     // setStep(Number(Boolean(selectedShot?.previewImage)) + 1)
   }, [currentShotId])
   const currentShot = useMemo(() => {
@@ -84,7 +94,9 @@ export default (props: IStoryboardVideo) => {
     } else {
       const res = await api.getVideoDetail({ shotId: currentShotId })
       setVideoDetail(res)
-      setIsShowResult(prev => !prev)
+      dispatch.aiVideo.updateData({
+        isShowResult: !isShowResult,
+      })
     }
 
     dispatch.aiVideo.getShotListByProjectId(projectId)
