@@ -42,7 +42,7 @@ export default () => {
       <Tabs
         onTabClick={key => {
           const isSelectImage = key === 'image' && (Object.keys(selectedImage).length || selectedShot.previewImage)
-          dispatch.aiVideo.updateData({ currentSelectType: isSelectImage ? 'video' : key })
+          dispatch.aiVideo.updateData({ currentSelectType: isSelectImage ? 'video' : key, resourceList: {} })
 
           console.log('%c 🚀 ~ [ key ]-78', 'font-size:14px; background:green; color:#fff;', key)
         }}
