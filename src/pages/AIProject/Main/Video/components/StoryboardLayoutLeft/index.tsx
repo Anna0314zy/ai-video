@@ -94,7 +94,7 @@ export default () => {
                         }}
                         onDownload={async () => {
                           await api.packageBatch([currentShotId])
-                          message.success('打包中...,请稍后~')
+                          message.success('打包中...请稍后~')
                           // 下载资源
                         }}>
                         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>

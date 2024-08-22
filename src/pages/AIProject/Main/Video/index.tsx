@@ -33,8 +33,9 @@ const VideoProcess = () => {
     })
   }
   const packSocketCallback = (message: any) => {
-    console.log('packSocketCallback', message.payload)
-    downloadFromServer(message.payload)
+    const fileName = message.payload.split('/').pop()
+    console.log('packSocketCallback', fileName)
+    downloadFromServer(message.payload, fileName)
   }
   useStompSocket([
     {
@@ -61,7 +62,7 @@ const VideoProcess = () => {
       return item.shotId
     })
     await packageBatch(shotIds)
-    message.success('打包中...,请稍后~')
+    message.success('打包中...请稍后~')
   }
   return (
     <Layout className={Styles['page-storyboard']}>
