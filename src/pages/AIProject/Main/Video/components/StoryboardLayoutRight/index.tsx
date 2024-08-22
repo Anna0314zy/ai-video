@@ -26,7 +26,6 @@ export default () => {
   const getResourceList = (pageIndex?: number) => {
     dispatch.aiVideo.getResourceList({
       shotId: currentShotId,
-      pageSize: 10,
       pageIndex: pageIndex || 1,
       type: currentSelectType,
     })
