@@ -156,7 +156,7 @@ export default (props: any) => {
         <TextArea
           style={{ height: 120, resize: 'none' }}
           onBlur={() => saveShotList()}
-          value={narration || selectedShot.narration}
+          value={narration || selectedShot?.narration}
           onChange={(event: any) => {
             onChangeNarration(event)
           }}
