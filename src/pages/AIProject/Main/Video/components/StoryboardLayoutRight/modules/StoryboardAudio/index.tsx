@@ -163,14 +163,11 @@ export default (props: any) => {
         <div className='storyboard-audio__header'>
           <span>旁白资源</span>
           <CommonUpload
-            // style={prompt.fileUrl ? { color: '#1975ff' } : {}}
             beforeUpload={beforeUpload}
             onFinish={onFinish}
             // onError={onError}
             type={EnumUploadType['AUDIO']}>
-            <span>
-              <span>导入音频</span>
-            </span>
+            <span>导入音频</span>
           </CommonUpload>
         </div>
       )}
