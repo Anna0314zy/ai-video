@@ -147,7 +147,10 @@ export default ({
             columns={columns}
             rowKey='id'
             dataSource={data.records || []}
-            scroll={{ y: (wrapperSize?.height || 300) - (tableHeaderSize?.height || 50) - 24 - 32 }}
+            scroll={{
+              y: (wrapperSize?.height || 300) - (tableHeaderSize?.height || 50) - 24 - 32,
+              x: 1000,
+            }}
             pagination={{
               total: data.total,
               current: data.current,
