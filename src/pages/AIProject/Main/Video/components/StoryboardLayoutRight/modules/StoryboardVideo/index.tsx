@@ -26,7 +26,7 @@ export default (props: IStoryboardVideo) => {
   const dispatch = useDispatch<Dispatch>()
   const scrollVideoRef = useRef(null)
   const { id } = useParams() // 获取路由参数 userId
-  const [step, setStep]: any = useState(props.step || 1)
+  // const [step, setStep]: any = useState(props.step || 1)
   const { selectedImage, shotList, selectedVideo, currentSelectType, currentShotId, selectedShot, resourceList } =
     useSelector((state: RootState) => state.aiVideo)
   const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
@@ -38,7 +38,7 @@ export default (props: IStoryboardVideo) => {
   })
   useEffect(() => {
     setIsShowResult(false)
-    setStep(Number(Boolean(selectedShot?.previewImage)) + 1)
+    // setStep(Number(Boolean(selectedShot?.previewImage)) + 1)
   }, [currentShotId])
   const currentShot = useMemo(() => {
     return shotList.find(item => item.shotId === currentShotId)
@@ -69,32 +69,27 @@ export default (props: IStoryboardVideo) => {
       val: 'video',
     },
   ]
-  const onHandleJumpNextStep = () => {
-    if (step === 1 && Object.keys(selectedImage).length) {
-      dispatch.aiVideo.updateData({ currentSelectType: 'video' })
-      api
-        .confirmResource({ shotId: currentShotId, resourceId: selectedImage.resourceId, type: currentSelectType })
-        .then(() => {
-          dispatch.aiVideo.getShotListByProjectId(Number(id))
-        })
-      setStep((preData: any) => {
-        return preData + 1
+  const onHandleJumpNextStep = async () => {
+    const target = resourceList.records?.find((v: any) => v.isFinal === 'final')
+    await api.confirmResource({
+      shotId: currentShotId,
+      resourceId:
+        (currentSelectType === 'image' ? selectedImage.resourceId : selectedVideo.resourceId) || target?.resourceId,
+      type: currentSelectType,
+    })
+    if (currentSelectType === 'image') {
+      dispatch.aiVideo.updateData({
+        currentSelectType: 'video',
       })
-    }
-    if (step === 2 && !isShowResult && Object.keys(selectedVideo).length) {
-      api
-        .confirmResource({ shotId: currentShotId, resourceId: selectedVideo.resourceId, type: currentSelectType })
-        .then(async () => {
-          const res = await api.getVideoDetail({ shotId: currentShotId })
-          setVideoDetail(res)
-        })
-
-      setIsShowResult(true)
     } else {
-      setIsShowResult(false)
+      const res = await api.getVideoDetail({ shotId: currentShotId })
+      setVideoDetail(res)
+      setIsShowResult(prev => !prev)
     }
+
     dispatch.aiVideo.getShotListByProjectId(projectId)
   }
+
   const onHandleAddResource = () => {
     // 导入资源
   }
@@ -128,14 +123,14 @@ export default (props: IStoryboardVideo) => {
     }
 
     const modalInstance = Modal.warning({
-      title: `${step === 1 ? '图片' : '视频'}预览`,
+      title: `${ResourceTypeMap[currentSelectType]}预览`,
       closeIcon: true,
       icon: null,
       width: 1080,
       height: 679,
       content: (
         <div>
-          {step === 1 ? (
+          {currentSelectType === 'image' ? (
             <img style={{ width: 1000 }} className='preview-img' src={`${cdnPath}${item.compressUrl}`} alt='' />
           ) : (
             <video controls style={{ width: 1000 }}>
@@ -174,8 +169,8 @@ export default (props: IStoryboardVideo) => {
                 cdnPath +
                   item.compressUrl +
                   `?id=${item.resourceId}&fileName=${item.name}
-                &ext=${step === 1 ? 'png' : 'mp4'}`,
-                `${item.name}.${step === 1 ? 'png' : 'mp4'}`,
+                &ext=${currentSelectType === 'image' ? 'png' : 'mp4'}`,
+                `${item.name}.${currentSelectType === 'image' ? 'png' : 'mp4'}`,
               )
             }}>
             下载
@@ -185,7 +180,7 @@ export default (props: IStoryboardVideo) => {
     })
   }
   const onChangeActive = (item: any) => {
-    return item.resourceId === (step === 1 ? selectedImage : selectedVideo)['resourceId'] || item.isFinal === 'final'
+    return item.resourceId === (currentSelectType === 'image' ? selectedImage : selectedVideo)['resourceId']
   }
   return (
     <Layout className={Styles['storyboard-image']}>
@@ -212,24 +207,21 @@ export default (props: IStoryboardVideo) => {
       <Layout.Content className='storyboard-image-content'>
         {!isShowResult && (
           <div className='storyboard-image-content__header'>
-            <span>{step === 1 ? '图片' : '视频'}资源</span>
-            <CommonUpload
-              beforeUpload={beforeUpload}
-              onFinish={onFinish}
-              type={EnumUploadType[step === 1 ? 'IMAGE' : 'VIDEO']}>
-              <span>导入{step === 1 ? '图片' : '视频'}</span>
+            <span>{ResourceTypeMap[currentSelectType]}资源</span>
+            <CommonUpload beforeUpload={beforeUpload} onFinish={onFinish} type={currentSelectType}>
+              <span>导入{ResourceTypeMap[currentSelectType]}</span>
             </CommonUpload>
           </div>
         )}
 
         {isShowResult ? (
-          Object.keys(videoDetail).length && <Result data={videoDetail} type={'video'} />
+          Object.keys(videoDetail || {}).length > 0 && <Result data={videoDetail} type={'video'} />
         ) : (
           <div ref={scrollVideoRef} className='storyboard-image-content__list'>
             {!data.length ? (
               <div className='empty-box'>
                 <IconWidget name='empty' />
-                <p>空空如也，快去创作{step === 1 ? '图片' : '视频'}吧～</p>
+                <p>空空如也，快去创作{ResourceTypeMap[currentSelectType]}吧～</p>
               </div>
             ) : (
               data.map((item: any, index: number) => (
@@ -247,7 +239,9 @@ export default (props: IStoryboardVideo) => {
                   }}
                   onClick={() => {
                     console.log('%c 🚀 ~ [  ]-86', 'font-size:14px; background:green; color:#fff;', item)
-                    dispatch.aiVideo.updateData({ [step === 1 ? 'selectedImage' : 'selectedVideo']: item })
+                    dispatch.aiVideo.updateData({
+                      [currentSelectType === 'image' ? 'selectedImage' : 'selectedVideo']: item,
+                    })
                   }}
                   actived={onChangeActive(item)}
                 />
@@ -258,7 +252,7 @@ export default (props: IStoryboardVideo) => {
         <div
           className={`storyboard-image-content__btn ${isShowResult ? 'edit-btn' : 'un'}`}
           onClick={() => onHandleJumpNextStep()}>
-          <span>{isShowResult ? '重新编辑' : step === 1 ? '确认并开始视频设计' : '确认视频'}</span>
+          <span>{isShowResult ? '重新编辑' : currentSelectType === 'image' ? '确认并开始视频设计' : '确认视频'}</span>
         </div>
       </Layout.Content>
     </Layout>
