@@ -107,6 +107,7 @@ export default (props: IStoryboardVideo) => {
   const onHandleDeleteResourceItem = (item: any) => {
     api.delResourceItem({ resourceId: item.resourceId, type: currentSelectType }).then(() => {
       onChangeGetNewData()
+      dispatch.aiVideo.getShotListByProjectId(projectId)
     })
     dispatch.aiVideo.deleteMessageByResourceId({
       resourceId: item.resourceId,

@@ -46,7 +46,7 @@ export default (props: any) => {
           })
       }
       setIsShowResult(!isShowResult)
-      dispatch.aiVideo.getShotListByProjectId(Number(id))
+      // dispatch.aiVideo.getShotListByProjectId(Number(id))
     }
   }
   useScrollToBottomHook(scrollAudioRef, 1, () => {
@@ -93,6 +93,7 @@ export default (props: any) => {
   const onHandleDeleteResourceItem = (item: any) => {
     api.delResourceItem({ resourceId: item.resourceId, type: currentSelectType }).then(() => {
       onChangeGetNewData()
+      dispatch.aiVideo.getShotListByProjectId(Number(id))
     })
   }
 
@@ -209,6 +210,7 @@ export default (props: any) => {
           )}
         </div>
       )}
+
       <div className={`storyboard-audio__btn ${isShowResult ? 'edit-btn' : 'un'}`} onClick={() => onHandleJumpNext()}>
         <span>{isShowResult ? '重新编辑' : '确认旁白'}</span>
       </div>
