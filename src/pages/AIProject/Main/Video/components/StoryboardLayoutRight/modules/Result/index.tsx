@@ -8,10 +8,15 @@ const Result: FC<any> = (props: any) => {
   const [detail, setDetail] = useState([])
   const [picUrl, setPicUrl] = useState('')
   useEffect(() => {
-    const Image = data.find((item: any) => item.name === '图片地址')
-    if (Object.keys(Image).length) {
-      setPicUrl(Image.description)
+    if (!data.length) return
+    console.log('%c 🚀 ~ [ data ]-12', 'font-size:14px; background:green; color:#fff;', data)
+    if (type !== 'voice') {
+      const Image = data?.find((item: any) => item.name === '图片地址')
+      if (Object.keys(Image).length) {
+        setPicUrl(Image.description)
+      }
     }
+
     const items: any = data.map((item: any, index: number) => {
       if (item.name === '图片地址') {
         return item
