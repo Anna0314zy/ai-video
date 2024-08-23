@@ -23,11 +23,9 @@ const ChatControl = () => {
   }, [currentShotId, shotList])
 
   useEffect(() => {
-    if (!formRef.current?.form.getFieldValue('btnValue')) {
-      formRef.current?.form.setFieldsValue({
-        btnValue: currentShot?.midjourneyPrompt,
-      })
-    }
+    formRef.current?.form.setFieldsValue({
+      btnValue: currentShot?.midjourneyPrompt,
+    })
   }, [currentShot, currentSelectType])
   const projectId = Number(useParams().id)
   const formRef = useRef<any>()
