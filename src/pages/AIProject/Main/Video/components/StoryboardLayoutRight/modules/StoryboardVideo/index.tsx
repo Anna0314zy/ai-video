@@ -28,7 +28,7 @@ export default (props: IStoryboardVideo) => {
   const { selectedImage, shotList, isShowResult, selectedVideo, currentSelectType, currentShotId, resourceList } =
     useSelector((state: RootState) => state.aiVideo)
   const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
-  const [videoDetail, setVideoDetail] = useState([])
+  const [videoDetail, setVideoDetail]: any = useState([])
   useScrollToBottomHook(scrollVideoRef, 1, () => {
     if (resourceList?.total / 10 <= resourceList?.current) return
     onChangeGetNewData(resourceList?.current + 1)
@@ -82,8 +82,51 @@ export default (props: IStoryboardVideo) => {
         currentSelectType: 'video',
       })
     } else {
-      const res = await api.getVideoDetail({ shotId: currentShotId })
-      setVideoDetail(res)
+      const res: any = await api.getVideoDetail({ shotId: currentShotId })
+      setVideoDetail(res.dataList)
+      // const res: any = [
+      //   {
+      //     name: '音频id',
+      //     description: '138',
+      //     value: '138',
+      //   },
+      //   {
+      //     name: '创建时间',
+      //     description: '2024-08-23T11:38:24',
+      //     value: '2024-08-23T11:38:24',
+      //   },
+      //   {
+      //     name: '语言',
+      //     description: '中文(简体普通话)',
+      //     value: 'Chinese (Mandarin, Simplified)',
+      //   },
+      //   {
+      //     name: '声音',
+      //     description: '云杰',
+      //     value: 'zh-CN-YunjieNeural',
+      //   },
+      //   {
+      //     name: '情感',
+      //     description: '默认',
+      //     value: '',
+      //   },
+      //   {
+      //     name: '语速',
+      //     description: '0.8倍',
+      //     value: '0.8',
+      //   },
+      //   {
+      //     name: '语调',
+      //     description: '非常高',
+      //     value: 'x-high',
+      //   },
+      //   {
+      //     name: '图片地址',
+      //     description: 'https://ai-tool-static-test.ledupeiyou.com/text2img/d7b4d26b-800e-4b1c-944d-b63ae1b94156.png',
+      //     value: 'https://ai-tool-static-test.ledupeiyou.com/text2img/d7b4d26b-800e-4b1c-944d-b63ae1b94156.png',
+      //   },
+      // ]
+      // setVideoDetail(res)
       dispatch.aiVideo.updateData({
         isShowResult: !isShowResult,
       })
@@ -219,7 +262,7 @@ export default (props: IStoryboardVideo) => {
         )}
 
         {isShowResult ? (
-          Object.keys(videoDetail || {}).length > 0 && <Result data={videoDetail} type={'video'} />
+          videoDetail.length > 0 && <Result data={videoDetail} type={'video'} />
         ) : (
           <div ref={scrollVideoRef} className='storyboard-image-content__list'>
             {!data.length ? (

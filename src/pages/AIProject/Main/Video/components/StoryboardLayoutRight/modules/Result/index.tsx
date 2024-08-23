@@ -3,40 +3,29 @@ import { Descriptions } from 'antd'
 import './index.less'
 
 const Result: FC<any> = (props: any) => {
+  // dataList
   const { data, type } = props
   const [detail, setDetail] = useState([])
+  const [picUrl, setPicUrl] = useState('')
   useEffect(() => {
-    const videoEnum: any = {
-      videoId: '视频id',
-      created: '创建时间',
-      seed: '随机因子',
-      motionBucketId: '主体运动',
-      fps: '帧率',
-      conditionFactor: '背景运动',
+    if (!data.length) return
+    console.log('%c 🚀 ~ [ data ]-12', 'font-size:14px; background:green; color:#fff;', data)
+    if (type !== 'voice') {
+      const Image = data?.find((item: any) => item.name === '图片地址')
+      if (Object.keys(Image).length) {
+        setPicUrl(Image.description)
+      }
     }
-    const voiceEnum: any = {
-      voiceId: '音频id',
-      created: '创建时间',
-      language: '语言',
-      shortName: '声音',
-      style: '情感',
-      rate: '语速',
-      pitch: '词调',
-    }
-    const items: any = Object.keys(data).map((item: any, index: number) => {
-      const keys = type === 'video' ? videoEnum : voiceEnum
-      if (!keys[item] || !keys[item]) return {}
-      if (item === 'fps') {
-        return {
-          key: index,
-          label: keys[item],
-          children: `${data[item]}帧/S`,
-        }
+
+    const items: any = data.map((item: any, index: number) => {
+      if (item.name === '图片地址') {
+        return item
       }
       return {
+        ...item,
         key: index,
-        label: keys[item],
-        children: data[item],
+        label: item.name,
+        children: item.description,
       }
     })
     setDetail(items)
@@ -45,7 +34,7 @@ const Result: FC<any> = (props: any) => {
   console.log('%c 🚀 ~ [ data ]-7', 'font-size:14px; background:green; color:#fff;', data)
   return (
     <div className='result'>
-      <div className='result__video'>{data.picUrl && <img src={data.picUrl || ''} alt='' />}</div>
+      <div className='result__video'>{picUrl && <img src={picUrl || ''} alt='' />}</div>
       <div className='result__content'>
         <Descriptions items={detail} column={1} colon={false} />
       </div>
