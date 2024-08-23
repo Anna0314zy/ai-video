@@ -179,10 +179,7 @@ export default (props: IStoryboardVideo) => {
     })
   }
   const onChangeActive = (item: any) => {
-    return (
-      item.resourceId === (currentSelectType === 'image' ? selectedImage : selectedVideo)['resourceId'] ||
-      item.isFinal === 'final'
-    )
+    return item.resourceId === (currentSelectType === 'image' ? selectedImage : selectedVideo)['resourceId']
   }
   return (
     <Layout className={Styles['storyboard-image']}>

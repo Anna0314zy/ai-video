@@ -38,7 +38,7 @@ const DragList = () => {
                       <FrameItem
                         item={data}
                         onClick={() => handleItemClick(data)}
-                        key={index}
+                        key={data.shotId}
                         index={index + 1}
                         img={data.imageUrl}
                         active={data.shotId === currentShotId}

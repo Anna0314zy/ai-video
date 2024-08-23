@@ -36,6 +36,9 @@ const ContentActionBtn = ({ item }: { item: ChatMessageList }) => {
           },
           auto: false,
         })
+        dispatch.aiVideo.updateData({
+          isShowResult: false,
+        })
         dispatch.aiVideo.getResourceList({
           shotId: currentShotId,
           type: item.type,
