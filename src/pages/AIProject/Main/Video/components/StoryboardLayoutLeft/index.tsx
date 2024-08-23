@@ -74,7 +74,7 @@ export default () => {
         <Droppable droppableId='shot'>
           {provided => (
             <Flex className='shot' {...provided.droppableProps} ref={provided.innerRef} vertical={true}>
-              {shotList?.map((data, index) => {
+              {shotList?.map((data: any, index) => {
                 return (
                   <Draggable key={data.shotId} draggableId={String(data.shotId)} index={index}>
                     {provided => (
