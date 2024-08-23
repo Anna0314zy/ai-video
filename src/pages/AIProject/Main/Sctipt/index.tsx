@@ -78,18 +78,23 @@ export default () => {
   }, [])
   const addScriptSuccess = (messageData: any) => {
     //刷新剧本列表
-    dispatch.aiScript.getScriptPageList({
-      projectId: Number(id),
-    })
     const messageInfo = messageData.payload
-    dispatch.aiScript.updateMessage({
-      data: {
-        ...messageInfo,
-        id: messageInfo.sessionChatId,
-        scriptName: messageInfo.name,
-      },
-    })
-    message.success('剧本标记成功')
+    if (messageInfo.isSuccess) {
+      dispatch.aiScript.getScriptPageList({
+        projectId: Number(id),
+      })
+
+      dispatch.aiScript.updateMessage({
+        data: {
+          ...messageInfo,
+          id: messageInfo.sessionChatId,
+          scriptName: messageInfo.name,
+        },
+      })
+      message.success('剧本标记成功')
+    } else {
+      message.error(messageInfo.errorMsg)
+    }
   }
   const { stompSocket } = useStompSocket([
     {
