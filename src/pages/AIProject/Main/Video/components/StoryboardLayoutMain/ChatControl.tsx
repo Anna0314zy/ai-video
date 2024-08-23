@@ -28,7 +28,7 @@ const ChatControl = () => {
         btnValue: currentShot?.midjourneyPrompt,
       })
     }
-  }, [currentShot])
+  }, [currentShot, currentSelectType])
   const projectId = Number(useParams().id)
   const formRef = useRef<any>()
   const [prompt, setPrompt] = useState<{
@@ -59,7 +59,6 @@ const ChatControl = () => {
     setPrompt({})
   }
   const handleInputChange = (val: string) => {
-    console.log('handleInputChange', val)
     setPrompt(prev => {
       return {
         ...prev,
@@ -68,7 +67,6 @@ const ChatControl = () => {
     })
   }
   const handleCreatePrompt = async () => {
-    console.log('formRef', formRef.current?.form.getFieldsValue())
     const params = formRef.current?.form.getFieldsValue()
     const btnList = formRef.current.btnList
     const res = await api.generateImagePrompt({
@@ -97,7 +95,6 @@ const ChatControl = () => {
     }
   }
   const beforeUpload = (file: RcFile) => {
-    console.log(file)
     return Promise.resolve(true)
   }
   const handleSend = async () => {
@@ -125,7 +122,6 @@ const ChatControl = () => {
   }
   const [loading, setLoading] = useState(false)
   const handleTranslate = useCallback(async () => {
-    console.log('handleTranslate')
     setLoading(true)
     try {
       const data = await api.translateToEnglish(formRef.current?.form.getFieldValue('btnValue'))

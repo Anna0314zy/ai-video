@@ -56,7 +56,6 @@ const ModelCreate = (_: any, ref: any) => {
     )
   }
   useEffect(() => {
-    console.log('新建')
     getOptionsList()
   }, [])
   return (

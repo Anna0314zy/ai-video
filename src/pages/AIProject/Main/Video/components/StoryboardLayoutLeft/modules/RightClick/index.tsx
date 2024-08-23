@@ -21,7 +21,6 @@ const RightClick = ({
 
   const MenuLabel = ({ icon, text }: { icon: string; text: string }) => {
     const onHandleEvent = (key: string) => {
-      console.log(key, 'key')
       switch (key) {
         case 'up':
         case 'down':

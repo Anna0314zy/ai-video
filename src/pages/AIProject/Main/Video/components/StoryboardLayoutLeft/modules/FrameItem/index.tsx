@@ -3,7 +3,6 @@ import { Image } from 'antd'
 import Styles from './index.module.less'
 import fallback from '@/components/IconWidget/images/fallback.png'
 import { nickIcon } from '@/components/IconWidget/Icons'
-console.log('Styles', Styles)
 interface IStoryboardCard {
   index: number
   img?: string

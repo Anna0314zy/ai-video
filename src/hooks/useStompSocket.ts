@@ -21,15 +21,12 @@ const useStompSocket = (
       sendThorough: SEND_THOROUGH,
       subscribeThorough: subscribeThorough.map(v => `${v.path}/${accountId}`),
     })
-    console.log('>> ws subscribeThorough', subscribeThorough)
 
     subscribeThorough.forEach(item => {
       stomp.on(`${item.path}/${accountId}`, (message: any) => {
-        console.log(`>> ws onSubscribe ${item.path}`, message)
         item.callback(message)
       })
     })
-    console.log('stompSocket-------', stomp)
     setStom(stomp)
 
     return () => {

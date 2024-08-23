@@ -17,13 +17,10 @@ const ImageChatConfig = (_: any, ref: any) => {
     }[]
   >([])
 
-  const [typeList, setTypeList] = useState<{ value: string; label: string }[]>([])
   const getImagePromptBtnList = async () => {
     if (!currentShotId) return
     const res = await api.getImagePromptBtnList(currentShotId)
-    console.log('res-----', res)
     setBtnList(res)
-    setTypeList(res.map(v => ({ value: v.btnName, label: v.btnName })))
   }
   useEffect(() => {
     getImagePromptBtnList()
@@ -57,7 +54,6 @@ const ImageChatConfig = (_: any, ref: any) => {
       return v
     })
   }, [btnList])
-  console.log(config, 'config')
   return (
     <Form form={form} name='basic' labelAlign='left' layout='vertical' initialValues={{}} autoComplete='off'>
       <Flex wrap={true}>

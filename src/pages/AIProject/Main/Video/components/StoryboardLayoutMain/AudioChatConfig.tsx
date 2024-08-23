@@ -16,14 +16,6 @@ const AudioChatConfig = (_: any, ref: any) => {
   const [rateOptions, setRateOptions] = useState<{ label: string; value: string }[]>([])
 
   const [form] = Form.useForm()
-
-  const onFinish: FormProps<AudioChatParams>['onFinish'] = values => {
-    console.log('form Success:', form.getFieldsValue())
-  }
-
-  const onFinishFailed: FormProps<AudioChatParams>['onFinishFailed'] = errorInfo => {
-    console.log('Failed:', errorInfo)
-  }
   // // 绑定ref对外引用
   useImperativeHandle(ref, () => ({
     form,
@@ -52,7 +44,6 @@ const AudioChatConfig = (_: any, ref: any) => {
     getVoices()
   }
   const getVoices = async () => {
-    console.log('languagesName', form.getFieldValue('languagesName'))
     const res = await api.getVoices(form.getFieldValue('languagesName'))
     setVoicesOptions(changeOptions(res.voiceElementRespList))
   }
@@ -71,7 +62,6 @@ const AudioChatConfig = (_: any, ref: any) => {
     getOtherAudioConfig()
   }, [])
   const onValuesChange = (val: Record<keyof AudioChatParams, any>) => {
-    console.log('onValuesChange', val, form, Object.keys(val), Object.values(val))
     if (Object.keys(val).includes('languagesName')) {
       //请求
       if (Object.values(val).filter(Boolean).length > 0) {
@@ -98,8 +88,6 @@ const AudioChatConfig = (_: any, ref: any) => {
       labelAlign='left'
       layout='vertical'
       initialValues={{}}
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
       onValuesChange={onValuesChange}
       autoComplete='off'>
       <Flex wrap={true}>

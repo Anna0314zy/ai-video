@@ -29,7 +29,6 @@ request.interceptors.response.use(
   (res: AxiosResponse<ResponseData>) => {
     try {
       if (res.status === 200) {
-        console.log('res', res)
         const { data, message: msg, code } = res.data
         const NumCode = Number(code)
         switch (NumCode) {
@@ -60,7 +59,6 @@ request.interceptors.response.use(
     if (Number(code) === 30001) {
       message.error('登录过期，请重新登录')
       localStorage.removeItem('token')
-      console.log('LoginUrl', LoginUrl)
       window.location.href = LoginUrl
       return
     }
@@ -77,8 +75,6 @@ const http = {
     })
   },
   post: <T>(url: string, data: Record<string, any> = {}, configs?: AxiosRequestConfig): Promise<T> => {
-    console.log('url', url, data, configs)
-
     return request.post(url, data, configs)
   },
   put: <T>(url: string, data: Record<string, any> = {}, configs?: AxiosRequestConfig): Promise<T> => {

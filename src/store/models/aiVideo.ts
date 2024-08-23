@@ -58,7 +58,6 @@ export default createModel<RootModel>()({
   } as AiVideoState,
   reducers: {
     updateData(state, payload: Partial<AiVideoState>) {
-      console.log('%c 🚀 ~ [ payload ]-24', 'font-size:14px; background:green; color:#fff;', state.currentSelectType)
       return Object.assign(state, payload)
     },
     deleteMessageByResourceId(state, params: { resourceId: number; shotId: number; type: number }) {

@@ -26,7 +26,6 @@ const VideoProcess = () => {
     dispatch.aiVideo.getShotListByProjectId(Number(id))
   }, [])
   const socketCallback = (message: any) => {
-    console.log('%c socketCallback', 'color:red', message)
     dispatch.aiVideo.updateMessage({
       data: message.payload,
       auto: false,
@@ -34,7 +33,6 @@ const VideoProcess = () => {
   }
   const packSocketCallback = (message: any) => {
     const fileName = message.payload.split('/').pop()
-    console.log('packSocketCallback', fileName)
     downloadFromServer(message.payload, fileName)
   }
   useStompSocket([
@@ -56,7 +54,6 @@ const VideoProcess = () => {
     },
   ])
   const handlePack = async () => {
-    console.log('打包')
     if (!shotList.length) return
     const shotIds = shotList.map(item => {
       return item.shotId

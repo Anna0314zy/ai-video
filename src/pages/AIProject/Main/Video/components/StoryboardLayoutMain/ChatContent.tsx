@@ -25,13 +25,7 @@ const ChatContent = () => {
       [key: string]: boolean
     }
   }>({})
-  const [current, setCurrent] = useState(1)
-  useEffect(() => {
-    setCurrent(1)
-  }, [currentSelectType])
-  const [total, setTotal] = useState<number | null>(null)
   const imageBtnClick = async (item: ChatMessageList, option: Text2imageMessageOptions) => {
-    console.log('imageBtnClick', item)
     setLoading(prev => ({
       ...prev,
       [item.taskId]: {
@@ -86,9 +80,6 @@ const ChatContent = () => {
     const messageListLength = (cur.data || []).length
     return total !== null ? messageListLength < total : true
   }, [currentSelectType, messageListMap, currentShotId])
-  useEffect(() => {
-    console.log('%c hasMore', 'color:red;', hasMore, size?.height)
-  }, [hasMore, size])
   return (
     <Layout.Content id='script-to-video-wrapper' ref={wrapper}>
       {size?.height && currentShotId && currentSelectType ? (

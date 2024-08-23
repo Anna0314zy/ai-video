@@ -21,7 +21,6 @@ if (Object.keys(iconModules).length === 0) {
     icons[iconName] = iconModules[path].ReactComponent
   }
 }
-console.log('icons', icons)
 interface IconProps {
   icon: string
   classname?: string

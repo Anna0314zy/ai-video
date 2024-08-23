@@ -86,7 +86,6 @@ export default createModel<RootModel>()({
         }
         return item
       })
-      console.log(newData, scriptId, 'deleteMessageByResourceIdnewData')
       set(state, `messageListMap.data`, newData)
     },
     updateMessage(
@@ -112,8 +111,6 @@ export default createModel<RootModel>()({
       const total = get(state, `messageListMap.total`) || 0
       set(state, `messageListMap.data`, [...params, ...oldData])
       set(state, `messageListMap.total`, total + params.length)
-      console.log('addMessage params', params, params[params.length - 1])
-      console.log('elementScrollIntoView', params[params.length - 1].id)
       elementScrollIntoView(params[0].id)
     },
     initMessage(
@@ -179,7 +176,6 @@ export default createModel<RootModel>()({
       { current = 1, size = 30, scroll = false }: { current: number; size?: number; scroll?: boolean },
       state: RootState,
     ) {
-      console.log('loadMoreData getChatHistories', current, size, scroll)
       const res = await api.getChatHistories({ sessionId: state.aiScript.currentSessionId!, current, size })
 
       const records = res.records || []

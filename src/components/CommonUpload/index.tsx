@@ -48,7 +48,6 @@ const CommonUpload = ({
     // accept: uploadAccept[type],
     customRequest: async (options: any) => {
       try {
-        console.log('options', options)
         const { file } = options
         if (beforeUpload) {
           await beforeUpload(file)
@@ -77,11 +76,6 @@ const CommonUpload = ({
         const suffix = (file.name || '').split('.').pop().toLocaleLowerCase()
         const Md5 = uuidv4()
         const cosFullPath = cosInfo.Folder + '/' + Md5 + '.' + suffix
-        console.log('uploadOptions', {
-          fileMd5: Md5,
-          fileName: file.name,
-          cosFullPath,
-        })
         cos.upload({
           file: file,
           onProgress,

@@ -46,7 +46,6 @@ const ContentActionBtn = ({ item }: { item: ChatMessageList }) => {
         })
         message.success(`${ResourceTypeMap[item.type]}标记成功`)
       } else if (key === 'refresh') {
-        console.log('refresh')
         await dispatch.aiVideo.reinstateTask(item.taskId)
       }
     } finally {

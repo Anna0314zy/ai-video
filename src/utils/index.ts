@@ -37,7 +37,6 @@ export const downloadFromServer = async (url: string, filename?: string) => {
 
     // 使用 URL.createObjectURL 创建一个指向 Blob 的 URL
     const blobUrl = URL.createObjectURL(blob)
-    console.log('blobUrl', blobUrl)
     a.href = blobUrl
     if (filename) a.download = filename // 设置文件名
     // 触发点击事件来启动下载
