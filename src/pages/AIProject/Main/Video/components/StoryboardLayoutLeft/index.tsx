@@ -82,7 +82,7 @@ export default () => {
                         }}
                         onDelete={() => {
                           // 删除资源
-                          Modal.warning({
+                          Modal.confirm({
                             title: '是否删除当前镜头？',
                             content: (
                               <div>
