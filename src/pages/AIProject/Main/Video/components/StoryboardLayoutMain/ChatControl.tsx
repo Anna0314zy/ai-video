@@ -137,7 +137,7 @@ const ChatControl = () => {
       <Flex align='center'>
         <div>{chatContentConfig()}</div>
         {currentSelectType === EnumUploadType['IMAGE'] ? (
-          <Space>
+          <Space style={{ marginLeft: '10px' }}>
             <Button type={'primary'} loading={loading} disabled={loading} onClick={handleTranslate}>
               翻译
             </Button>
