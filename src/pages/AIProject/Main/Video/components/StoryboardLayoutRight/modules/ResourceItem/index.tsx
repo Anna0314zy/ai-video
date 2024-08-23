@@ -58,7 +58,7 @@ const ResourceItem: FC<any> = props => {
         <div className='resource-item__content__icon f-center'>{imageIconEnum[currentSelectType]()}</div>
         <div className='resource-item__content__name '>
           <span className='one-line-ellipsis'>{data?.name}</span>
-          <span>{data?.modified}</span>
+          <span>{data?.modified.replace(/T/g, ' ')}</span>
         </div>
       </div>
       <div className='resource-item__operation'>

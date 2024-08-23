@@ -36,14 +36,12 @@ export default () => {
   }
   // 删除更新
   const onDelete = (index: number) => {
+    dispatch.aiVideo.updateData({
+      selectedShot: {},
+    })
     const items = Array.from(shotList)
     items.splice(index, 1)
     sortUpdateShotList(items)
-    if (index + 1 === selectedShot.sort) {
-      dispatch.aiVideo.updateData({
-        selectedShot: items[index],
-      })
-    }
   }
 
   const sortUpdateShotList = (preList: any) => {
