@@ -17,10 +17,10 @@ const style: React.CSSProperties = {
 }
 const ChatControl = () => {
   const dispatch = useDispatch<Dispatch>()
-  const { currentSelectType, currentShotId, shotList } = useSelector((state: RootState) => state.aiVideo)
-  const currentShot = useMemo(() => {
-    return shotList.find(v => v.shotId === currentShotId)
-  }, [currentShotId, shotList])
+  const { currentSelectType, currentShotId, selectedShot } = useSelector((state: RootState) => state.aiVideo)
+  // const currentShot = useMemo(() => {
+  //   return shotList.find(v => v.shotId === currentShotId)
+  // }, [currentShotId, shotList])
   const projectId = Number(useParams().id)
   const formRef = useRef<any>()
   const [prompt, setPrompt] = useState<{
@@ -99,8 +99,8 @@ const ChatControl = () => {
       shotId: currentShotId,
     }
     if (currentSelectType === 'voice') {
-      base.text = currentShot?.narration
-      if (!currentShot?.narration) {
+      base.text = selectedShot?.narration
+      if (!selectedShot?.narration) {
         return message.error('旁白不能为空')
       }
       await formRef.current?.form.validateFields()

@@ -15,7 +15,7 @@ const Result: FC<any> = (props: any) => {
       conditionFactor: '背景运动',
     }
     const voiceEnum: any = {
-      voiceId: '旁白音频id',
+      voiceId: '音频id',
       created: '创建时间',
       language: '语言',
       shortName: '声音',
