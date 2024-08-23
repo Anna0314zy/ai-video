@@ -39,6 +39,7 @@ const ScriptPreview = ({ handleDownload, handleDel, data }: any, ref: any) => {
   return (
     <CommonModal
       ref={modelRef}
+      wrapClassName='script-preview'
       width={'80%'}
       height={'80%'}
       title='预览'

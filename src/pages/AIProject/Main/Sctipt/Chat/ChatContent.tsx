@@ -57,7 +57,7 @@ const ChatContent = ({ chatIngText }: any) => {
   return (
     <div
       style={{ flex: 1, overflow: 'hidden', backgroundColor: '#F2F3F7', color: '#000000' }}
-      className='chat-content'
+      className='script-chat-content'
       ref={wrapper}>
       {size?.height ? (
         <InfiniteScroll
