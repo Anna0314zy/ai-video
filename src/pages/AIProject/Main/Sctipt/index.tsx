@@ -77,16 +77,17 @@ export default () => {
       })
     }
   }, [])
-  const addScriptSuccess = (message: any) => {
+  const addScriptSuccess = (messageData: any) => {
     //刷新剧本列表
     dispatch.aiScript.getScriptPageList({
       projectId: Number(id),
     })
-    const messageInfo = message.payload
+    const messageInfo = messageData.payload
     dispatch.aiScript.updateMessage({
       data: {
         ...messageInfo,
         id: messageInfo.sessionChatId,
+        scriptName: messageInfo.name,
       },
     })
     message.success('剧本标记成功')

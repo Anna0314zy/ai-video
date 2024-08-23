@@ -179,6 +179,6 @@ export const ImageDesign: ImageConfig[] = [
     label: '值',
     prop: 'btnValue',
     type: 'textArea',
-    width: 200,
+    width: 350,
   },
 ]

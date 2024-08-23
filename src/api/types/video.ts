@@ -35,6 +35,7 @@ export interface ShotList {
   voiceStatus?: keyof typeof ShotStatus
   imageUrl?: string
   previewImage?: string
+  midjourneyPrompt?: string
 }
 
 // 音频chat Form

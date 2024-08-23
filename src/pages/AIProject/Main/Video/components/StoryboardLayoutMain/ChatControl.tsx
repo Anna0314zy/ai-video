@@ -1,5 +1,5 @@
-import { Button, Flex, message, Image } from 'antd'
-import { useState, useRef, useMemo } from 'react'
+import { Button, Flex, message, Image, Space } from 'antd'
+import { useState, useRef, useMemo, useCallback, useEffect } from 'react'
 import AudioChatConfig from './AudioChatConfig'
 import VideoChatConfig from './VideoChatConfig'
 import ImageChatConfig from './ImageChatConfig'
@@ -21,6 +21,14 @@ const ChatControl = () => {
   const currentShot = useMemo(() => {
     return shotList.find(v => v.shotId === currentShotId)
   }, [currentShotId, shotList])
+
+  useEffect(() => {
+    if (!formRef.current?.form.getFieldValue('btnValue')) {
+      formRef.current?.form.setFieldsValue({
+        btnValue: currentShot?.midjourneyPrompt,
+      })
+    }
+  }, [currentShot])
   const projectId = Number(useParams().id)
   const formRef = useRef<any>()
   const [prompt, setPrompt] = useState<{
@@ -115,14 +123,32 @@ const ChatControl = () => {
       type: currentSelectType,
     })
   }
+  const [loading, setLoading] = useState(false)
+  const handleTranslate = useCallback(async () => {
+    console.log('handleTranslate')
+    setLoading(true)
+    try {
+      const data = await api.translateToEnglish(formRef.current?.form.getFieldValue('btnValue'))
+      formRef.current?.form.setFieldsValue({
+        btnValue: data,
+      })
+    } finally {
+      setLoading(false)
+    }
+  }, [])
   return (
     <Flex vertical={true} style={style}>
       <Flex align='center'>
         <div>{chatContentConfig()}</div>
         {currentSelectType === EnumUploadType['IMAGE'] ? (
-          <Button type={'primary'} style={{ margin: '0 10px' }} onClick={handleCreatePrompt}>
-            应用
-          </Button>
+          <Space>
+            <Button type={'primary'} loading={loading} disabled={loading} onClick={handleTranslate}>
+              翻译
+            </Button>
+            <Button type={'primary'} onClick={handleCreatePrompt}>
+              应用
+            </Button>
+          </Space>
         ) : (
           <Button type={'primary'} style={{ margin: '0 10px' }} onClick={handleSend}>
             发送

@@ -80,7 +80,7 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
       sessionId: sessionId!,
     })
     let sendKey = SCRIPT_SUBSCRIBE_RESEND_THOROUGH
-    if (key === 'again') sendKey = 'SCRIPT_SUBSCRIBE_AGAIN_THOROUGH'
+    if (key === 'again') sendKey = SCRIPT_SUBSCRIBE_AGAIN_THOROUGH
     stompSocket.send(sendKey, JSON.stringify(params))
   }
   const config: {

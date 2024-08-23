@@ -63,7 +63,7 @@ interface SaveScriptParams {
 }
 //将对话内容保存为剧本及镜头
 export const saveScript = (params: SaveScriptParams) => {
-  return api.post<ScriptPageList>(`${http}/api/text/v1/saveScript`, params)
+  return api.post<ScriptPageList>(`${http}/api/text/v2/saveScript`, params)
 }
 
 //剧本分页查询

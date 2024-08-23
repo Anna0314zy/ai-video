@@ -151,3 +151,9 @@ export const importResourceFile = (params: { shotId: number; originPath: string;
 export const saveShotList = (params: { projectId: number; shotInfoDtoList: Array<any> }) => {
   return api.post<any>(`${http}/api/scriptShot/v1/saveShotList`, params)
 }
+
+//prompt英文翻译接口
+
+export const translateToEnglish = (text: string) => {
+  return api.get<any>(`${http}/api/prompt/v1/translate`, { text })
+}
