@@ -51,23 +51,12 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
     }
   }
   const handleAdd = async () => {
-    const { scriptId, name } = await api.saveScript({
+    await api.saveScript({
       projectId,
       sessionId: sessionId!,
       sessionChatId: messageInfo.id as number,
     })
-    message.success('标记成功')
-    //刷新剧本列表
-    dispatch.aiScript.getScriptPageList({
-      projectId,
-    })
-    dispatch.aiScript.updateMessage({
-      data: {
-        ...messageInfo,
-        scriptId: scriptId,
-        scriptName: name,
-      },
-    })
+    message.success('标记剧本中~请等待')
   }
 
   const handleRefresh = async (key: 'refresh' | 'again') => {

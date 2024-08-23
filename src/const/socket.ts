@@ -24,4 +24,7 @@ export const TTS_THOROUGH = `/user/queue/task/tts`
 
 export const PACKAGE_DOWNLOAD_THOROUGH = `/user/queue/shots/download`
 
+// 标记剧本通知
+export const SCRIPT_ADD_THOROUGH = '/user/queue/save/script/reply'
+
 export const SCRIPT_END_SUBSCRIBE_THOROUGH = '/user/queue/session/chat/reply/completed'

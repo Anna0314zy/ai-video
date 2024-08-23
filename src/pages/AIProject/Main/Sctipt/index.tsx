@@ -1,13 +1,13 @@
 import Header from './Header'
 import ChatContent from './Chat/ChatContent'
 import ChatControl from './Chat/ChatControl'
-import { Layout } from 'antd'
+import { Layout, message } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { convertToMarkdown } from '@/utils'
 import RightPanel from './RightPanel'
 import useStompSocket from '@/hooks/useStompSocket'
-import { SCRIPT_SUBSCRIBE_THOROUGH, SCRIPT_END_SUBSCRIBE_THOROUGH } from '@/const/socket'
+import { SCRIPT_SUBSCRIBE_THOROUGH, SCRIPT_END_SUBSCRIBE_THOROUGH, SCRIPT_ADD_THOROUGH } from '@/const/socket'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 import { v4 as uuidv4 } from 'uuid'
@@ -77,6 +77,20 @@ export default () => {
       })
     }
   }, [])
+  const addScriptSuccess = (message: any) => {
+    //刷新剧本列表
+    dispatch.aiScript.getScriptPageList({
+      projectId: Number(id),
+    })
+    const messageInfo = message.payload
+    dispatch.aiScript.updateMessage({
+      data: {
+        ...messageInfo,
+        id: messageInfo.sessionChatId,
+      },
+    })
+    message.success('剧本标记成功')
+  }
   const { stompSocket } = useStompSocket([
     {
       path: SCRIPT_SUBSCRIBE_THOROUGH,
@@ -85,6 +99,10 @@ export default () => {
     {
       path: SCRIPT_END_SUBSCRIBE_THOROUGH,
       callback: chatEndSocketCallback,
+    },
+    {
+      path: SCRIPT_ADD_THOROUGH,
+      callback: addScriptSuccess,
     },
   ])
 

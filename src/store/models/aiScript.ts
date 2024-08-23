@@ -160,7 +160,7 @@ export default createModel<RootModel>()({
   effects: dispatch => ({
     async getScriptPageList({
       projectId,
-      current,
+      current = 1,
       size = 50,
       scroll = false,
     }: {
