@@ -167,6 +167,27 @@ export default createModel<RootModel>()({
         resourceList:
           params.pageIndex === 1 ? res : { ...res, records: [...(resourceList?.records || []), ...res.records] },
       })
+      // 已确认过的资源回显
+      const finalResource = res.records.find((item: any) => item.isFinal === 'final')
+      if (Object.keys(finalResource).length) {
+        switch (finalResource.type) {
+          case 'video':
+            dispatch.aiVideo.updateData({
+              selectedVideo: finalResource,
+            })
+            break
+          case 'image':
+            dispatch.aiVideo.updateData({
+              selectedImage: finalResource,
+            })
+            break
+          case 'voice':
+            dispatch.aiVideo.updateData({
+              selectedAudio: finalResource,
+            })
+            break
+        }
+      }
     },
     async getMessageList({
       current,
