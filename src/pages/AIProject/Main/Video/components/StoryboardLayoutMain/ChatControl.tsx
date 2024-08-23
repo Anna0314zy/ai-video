@@ -26,7 +26,7 @@ const ChatControl = () => {
     formRef.current?.form.setFieldsValue({
       btnValue: currentShot?.midjourneyPrompt,
     })
-  }, [currentShot, currentSelectType])
+  }, [currentShot?.midjourneyPrompt, currentSelectType])
   const projectId = Number(useParams().id)
   const formRef = useRef<any>()
   const [prompt, setPrompt] = useState<{
