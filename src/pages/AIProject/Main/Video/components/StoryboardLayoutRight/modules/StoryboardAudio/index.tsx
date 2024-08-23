@@ -39,10 +39,9 @@ export default (props: any) => {
           .confirmResource({ shotId: currentShotId, resourceId: selectedAudio.resourceId, type: currentSelectType })
           .then(async () => {
             dispatch.aiVideo.getShotListByProjectId(Number(id))
-            const res = await api.getVoiceDetail({ shotId: currentShotId })
-
+            const res: any = await api.getVoiceDetail({ shotId: currentShotId })
             console.log('%c 🚀 ~ [  ]-28', 'font-size:14px; background:green; color:#fff;', res)
-            setVoiceDetail(res)
+            setVoiceDetail(res.dataList)
           })
       }
       setIsShowResult(!isShowResult)
