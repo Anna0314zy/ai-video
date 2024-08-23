@@ -21,7 +21,7 @@ export default ({ handleChoose, activeObj }: { activeObj: any; handleChoose: (va
     await dispatch.aiScript.getScriptPageList({
       projectId: Number(id),
       scroll,
-      current: current ? current : data?.length > 0 ? Math.round(data.length / size) + 1 : 1,
+      current: current ? current : data?.length > 0 ? Math.floor(data.length / size) + 1 : 1,
     })
   }
   useEffect(() => {
