@@ -14,6 +14,8 @@ export const TEXT_TO_IMAGE_THOROUGH = `/user/queue/task/text2img`
 export const SCRIPT_SUBSCRIBE_THOROUGH = `/user/queue/session/chat/reply`
 // 重新生成
 export const SCRIPT_SUBSCRIBE_RESEND_THOROUGH = `/app/ai/stream/session/resend`
+export const SCRIPT_SUBSCRIBE_AGAIN_THOROUGH = `/app/ai/stream/session/continueOutput`
+
 export const SCRIPT_SEND_THOROUGH = `/app/ai/stream/session/chat`
 
 export const IMAGE_TO_VIDEO_THOROUGH = `/user/queue/task/img2video`

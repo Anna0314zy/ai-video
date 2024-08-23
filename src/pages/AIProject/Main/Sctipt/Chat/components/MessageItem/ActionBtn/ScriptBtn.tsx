@@ -5,7 +5,7 @@ import * as api from '@/api/models/aiScript'
 import { MessageList, Role } from '@/api/types/script'
 import { v4 as uuidv4 } from 'uuid'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
-import { SCRIPT_SUBSCRIBE_RESEND_THOROUGH } from '@/const/socket'
+import { SCRIPT_SUBSCRIBE_RESEND_THOROUGH, SCRIPT_SUBSCRIBE_AGAIN_THOROUGH } from '@/const/socket'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 import { useParams } from 'react-router-dom'
@@ -24,7 +24,7 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
       [key: string]: boolean
     }
   }>({})
-  const handleClick = async (key: 'add' | 'refresh') => {
+  const handleClick = async (key: 'add' | 'refresh' | 'again') => {
     setChatContentLoading((prev: any) => {
       return {
         ...prev,
@@ -36,8 +36,8 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
     try {
       if (key === 'add') {
         await handleAdd()
-      } else if (key === 'refresh') {
-        await handleRefresh()
+      } else {
+        await handleRefresh(key)
       }
     } finally {
       setChatContentLoading((prev: any) => {
@@ -70,7 +70,7 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
     })
   }
 
-  const handleRefresh = async () => {
+  const handleRefresh = async (key: 'refresh' | 'again') => {
     if (!stompSocket) {
       message.error('服务端连接失败')
       return
@@ -90,10 +90,12 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
       id: uuidv4(),
       sessionId: sessionId!,
     })
-    stompSocket.send(SCRIPT_SUBSCRIBE_RESEND_THOROUGH, JSON.stringify(params))
+    let sendKey = SCRIPT_SUBSCRIBE_RESEND_THOROUGH
+    if (key === 'again') sendKey = 'SCRIPT_SUBSCRIBE_AGAIN_THOROUGH'
+    stompSocket.send(sendKey, JSON.stringify(params))
   }
   const config: {
-    key: 'add' | 'refresh'
+    key: 'add' | 'refresh' | 'again'
     value: string
     icon: string
   }[] = [
@@ -106,6 +108,11 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
       key: 'refresh',
       value: '重新生成',
       icon: 'refresh',
+    },
+    {
+      key: 'again',
+      value: '继续输出',
+      icon: '',
     },
   ]
 
