@@ -168,7 +168,7 @@ export default createModel<RootModel>()({
       })
       // 已确认过的资源回显
       const finalResource = res.records.find((item: any) => item.isFinal === 'final')
-      if (Object.keys(finalResource).length) {
+      if (Object.keys(finalResource || {}).length) {
         switch (finalResource.type) {
           case 'video':
             dispatch.aiVideo.updateData({

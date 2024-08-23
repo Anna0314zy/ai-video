@@ -78,55 +78,14 @@ export default (props: IStoryboardVideo) => {
       type: currentSelectType,
     })
     if (currentSelectType === 'image') {
+      if (!Object.keys(selectedImage).length) return
       dispatch.aiVideo.updateData({
         currentSelectType: 'video',
       })
     } else {
+      if (!Object.keys(selectedVideo).length) return
       const res: any = await api.getVideoDetail({ shotId: currentShotId })
       setVideoDetail(res.dataList)
-      // const res: any = [
-      //   {
-      //     name: '音频id',
-      //     description: '138',
-      //     value: '138',
-      //   },
-      //   {
-      //     name: '创建时间',
-      //     description: '2024-08-23T11:38:24',
-      //     value: '2024-08-23T11:38:24',
-      //   },
-      //   {
-      //     name: '语言',
-      //     description: '中文(简体普通话)',
-      //     value: 'Chinese (Mandarin, Simplified)',
-      //   },
-      //   {
-      //     name: '声音',
-      //     description: '云杰',
-      //     value: 'zh-CN-YunjieNeural',
-      //   },
-      //   {
-      //     name: '情感',
-      //     description: '默认',
-      //     value: '',
-      //   },
-      //   {
-      //     name: '语速',
-      //     description: '0.8倍',
-      //     value: '0.8',
-      //   },
-      //   {
-      //     name: '语调',
-      //     description: '非常高',
-      //     value: 'x-high',
-      //   },
-      //   {
-      //     name: '图片地址',
-      //     description: 'https://ai-tool-static-test.ledupeiyou.com/text2img/d7b4d26b-800e-4b1c-944d-b63ae1b94156.png',
-      //     value: 'https://ai-tool-static-test.ledupeiyou.com/text2img/d7b4d26b-800e-4b1c-944d-b63ae1b94156.png',
-      //   },
-      // ]
-      // setVideoDetail(res)
       dispatch.aiVideo.updateData({
         isShowResult: !isShowResult,
       })
