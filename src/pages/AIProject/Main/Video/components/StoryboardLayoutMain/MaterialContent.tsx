@@ -12,7 +12,7 @@ const MaterialContent = ({ data }: { data: ChatMessageList }) => {
       )
     } else if (data.type === EnumUploadType['VIDEO']) {
       return (
-        <video controls style={{ width: '80%' }}>
+        <video controls preload='auto' style={{ width: '80%' }}>
           <source src={cdnPath + data.compressUrl} type='video/mp4' />
           Your browser does not support the video tag.
         </video>

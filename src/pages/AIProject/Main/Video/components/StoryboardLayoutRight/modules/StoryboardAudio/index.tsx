@@ -27,10 +27,12 @@ export default (props: any) => {
   const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
   const [isShowResult, setIsShowResult] = useState(false)
   const [voiceDetail, setVoiceDetail] = useState(false)
-  const [narration, setNarration] = useState('')
+  const [narration, setNarration] = useState(selectedShot?.narration)
+  console.log('%c 🚀 ~ [ narration ]-31', 'font-size:14px; background:green; color:#fff;', narration)
   useEffect(() => {
-    setNarration('')
-  }, [currentShotId])
+    setNarration(selectedShot?.narration)
+  }, [selectedShot?.narration, currentShotId])
+
   const onHandleJumpNext = () => {
     console.log('%c 🚀 ~ [  ]-18', 'font-size:14px; background:green; color:#fff;', selectedVoice)
     if (Object.keys(selectedAudio).length) {
@@ -54,7 +56,6 @@ export default (props: any) => {
 
   const saveShotList = () => {
     // 更新分镜头信息
-
     const cloneShotList = cloneDeep(shotList)
     const res = cloneShotList.map((item: any) => {
       if (item.shotId === currentShotId) {
@@ -95,7 +96,6 @@ export default (props: any) => {
       dispatch.aiVideo.getShotListByProjectId(Number(id))
     })
   }
-
   const modalBox = (item: any) => {
     const destroy = () => {
       modalInstance.destroy()
@@ -156,7 +156,7 @@ export default (props: any) => {
         <TextArea
           style={{ height: 120, resize: 'none' }}
           onBlur={() => saveShotList()}
-          value={narration || selectedShot?.narration}
+          value={narration || ''}
           onChange={(event: any) => {
             onChangeNarration(event)
           }}
