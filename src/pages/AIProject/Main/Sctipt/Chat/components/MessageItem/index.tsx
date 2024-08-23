@@ -1,9 +1,10 @@
 import { MessageList, Role } from '@/api/types/script'
 import HeadLayout from './messageHeadLayout'
-import FileChat from '../FileChat'
+import FileChat from './FileChat'
 import { Flex } from 'antd'
-import ScriptBtn from './ActionBtn/ScriptBtn'
-import './index.less'
+import ScriptBtn from './ScriptBtn'
+import Style from './index.module.less'
+import classNames from 'classnames'
 interface IProps {
   messageInfo: MessageList
   md: any
@@ -12,9 +13,11 @@ export default ({ messageInfo, md }: IProps) => {
   if (!messageInfo.messageContent) return
   return (
     <HeadLayout messageInfo={messageInfo}>
-      <Flex vertical={true} className={`content messageInfo-item-cont ${messageInfo.role}`}>
+      <Flex
+        vertical={true}
+        className={classNames(Style.content, Style['messageInfo-item-cont'], Style[messageInfo.role])}>
         <div
-          className='message-content-inner'
+          className={Style['message-content-inner']}
           dangerouslySetInnerHTML={{
             __html: md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''),
           }}></div>

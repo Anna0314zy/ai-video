@@ -17,7 +17,7 @@ const GptMessage = ({ messageInfo, md, chatIngText }: IProps) => {
   const renderedHtml = useMemo(() => md.render(chatIngText || ''), [chatIngText, md])
 
   return (
-    <div style={{ display: messageInfo?.requesting ? 'block' : 'none' }} className='answering'>
+    <div style={{ display: messageInfo?.requesting ? 'block' : 'none' }}>
       <HeadLayout messageInfo={messageInfo || {}}>
         {!chatIngText ? (
           <div>
