@@ -10,9 +10,7 @@ const ScriptPreview = ({ handleDownload, handleDel, data }: any, ref: any) => {
   const open = (text: string) => {
     modelRef.current?.open()
     const md = new MarkdownIt()
-    console.log('text', `${text}`)
     const html = md.render(text)
-    console.log('%c 🚀 ~ [ html ]-15', 'font-size:14px; background:green; color:#fff;', html)
     setHtml(html)
   }
   // 绑定ref对外引用

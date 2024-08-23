@@ -42,7 +42,6 @@ export default () => {
     if (chatIng && currentSessionId) {
       const data = messageListMap.data?.find(item => item.requesting)
       // 增加一条
-      console.log('chatIng', chatIng, data)
       if (!data) {
         dispatch.aiScript.addMessage({
           requesting: true,

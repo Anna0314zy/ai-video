@@ -34,9 +34,6 @@ export default ({ handleChoose, activeObj }: { activeObj: any; handleChoose: (va
     const messageListLength = (scriptPageListMap.data || []).length
     return total !== null ? messageListLength < total : true
   }, [scriptPageListMap])
-  useEffect(() => {
-    console.log('%c hasMore', 'color:red;', hasMore, size?.height)
-  }, [hasMore, size])
 
   return (
     <div style={{ height: '100%', width: '100%' }} ref={wrapper}>

@@ -6,7 +6,6 @@ import LeftHeader from '../../../components/HeaderLayout/LeftHeader'
 const rightChildren = (project: ProjectList) => {
   const navigate = useNavigate()
   const onClick = () => {
-    console.log()
     navigate(`/project/${project.id}/video`)
   }
 

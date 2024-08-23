@@ -7,7 +7,6 @@ import { downloadFromServer } from '@/utils'
 import Styles from './index.module.less'
 const DownloadScript = ({ data, children }: { data: ScriptPageList; children?: React.ReactNode }) => {
   const handleDownload = useCallback((ext: string = 'md') => {
-    console.log('删除', data)
     const url = `${import.meta.env.VITE_API_SERVER}/api/text/v1/downloadScript?scriptId=${data.scriptId}&ext=${ext}`
     downloadFromServer(url, `${data.name}.${ext}`)
   }, [])

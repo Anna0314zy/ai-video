@@ -31,7 +31,6 @@ const ChatContent = ({ chatIngText }: any) => {
     try {
       const data = get(messageListMap, `data`, [])
       const size = get(messageListMap, `size`)
-      console.log('loadMoreData getChatHistories ', current, data.length, size, Math.floor(data.length / size) + 1)
       await dispatch.aiScript.getChatHistories({
         scroll,
         current: scroll ? Math.floor(data.length / size) + 1 : 1,
@@ -41,7 +40,6 @@ const ChatContent = ({ chatIngText }: any) => {
     }
   }
   useEffect(() => {
-    console.log('currentSessionId loadMoreData', currentSessionId)
     if (currentSessionId) loadMoreData(false, 1)
   }, [currentSessionId])
   const wrapper = useRef<HTMLDivElement>(null)
@@ -51,9 +49,6 @@ const ChatContent = ({ chatIngText }: any) => {
     const messageListLength = (messageListMap.data || []).length
     return total !== null ? messageListLength < total : true
   }, [messageListMap])
-  useEffect(() => {
-    console.log('%c hasMore', 'color:red;', hasMore, size?.height)
-  }, [hasMore, size])
   return (
     <div
       style={{ flex: 1, overflow: 'hidden', backgroundColor: '#F2F3F7', color: '#000000' }}

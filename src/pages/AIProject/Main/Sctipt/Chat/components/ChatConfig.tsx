@@ -11,14 +11,6 @@ const ChatConfig = (_: any, ref: any) => {
   const [listScripType, setListScripType] = useState<{ label: string; value: string }[]>([])
   const [listScripStyle, setListScripStyle] = useState<{ label: string; value: string }[]>([])
   const [form] = Form.useForm()
-
-  const onFinish: FormProps<ScriptPrompt>['onFinish'] = values => {
-    console.log('form Success:', form.getFieldsValue())
-  }
-
-  const onFinishFailed: FormProps<ScriptPrompt>['onFinishFailed'] = errorInfo => {
-    console.log('Failed:', errorInfo)
-  }
   // // 绑定ref对外引用
   useImperativeHandle(ref, () => ({
     form,
@@ -42,7 +34,6 @@ const ChatConfig = (_: any, ref: any) => {
     setListScripType(res.map(v => ({ label: v, value: v })))
     form?.setFieldValue('scriptType', res[0])
     getListScriptStyle()
-    console.log('getListScripType---', res)
   }
   const getListScriptStyle = async () => {
     const res = await api.getListScriptStyle({
@@ -50,13 +41,11 @@ const ChatConfig = (_: any, ref: any) => {
       scriptType: form.getFieldValue('scriptType'),
     })
     setListScripStyle(res.map(v => ({ label: v, value: v })))
-    console.log('getListScriptStyle---', res)
   }
   useEffect(() => {
     getListScripType()
   }, [])
   const onValuesChange = (val: Record<keyof ScriptPrompt, any>) => {
-    console.log('onValuesChange', val, form, Object.keys(val))
     if (Object.keys(val).includes('scriptType')) {
       //请求
       form.setFieldValue('scriptStyle', undefined)
@@ -70,8 +59,6 @@ const ChatConfig = (_: any, ref: any) => {
       labelAlign='left'
       layout='vertical'
       initialValues={{}}
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
       onValuesChange={onValuesChange}
       autoComplete='off'>
       <Flex wrap={true} gap={10}>

@@ -17,13 +17,9 @@ const RightPanel = () => {
   const { id } = useParams() // 获取路由参数 userId
   const projectId = Number(id)
   const dispatch = useDispatch<Dispatch>()
-  const scrollRef = useRef<HTMLDivElement>(null)
   const { scriptPageListMap } = useSelector((state: RootState) => state.aiScript)
   const [loading, setLoading] = useState(false)
   const [activeObj, setActive] = useState<{ [k: string]: boolean }>({})
-  useEffect(() => {
-    console.log('activeObj', activeObj)
-  }, [activeObj])
   const handleChoose = useCallback((val: ScriptPageList) => {
     setActive(prev => ({
       // 重置所有键为 false
