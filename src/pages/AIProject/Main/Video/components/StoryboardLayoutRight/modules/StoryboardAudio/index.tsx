@@ -203,7 +203,7 @@ export default (props: any) => {
                 onClick={() => {
                   dispatch.aiVideo.updateData({ selectedAudio: item })
                 }}
-                actived={item.resourceId === selectedAudio['resourceId']}
+                actived={item.resourceId === selectedAudio['resourceId'] || item.isFinal === 'final'}
               />
             ))
           )}
