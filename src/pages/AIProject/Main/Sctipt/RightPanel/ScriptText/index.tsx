@@ -40,23 +40,23 @@ export default ({ handleChoose, activeObj }: { activeObj: any; handleChoose: (va
 
   return (
     <div style={{ height: '100%', width: '100%' }} ref={wrapper}>
-      {size?.height ? (
-        <InfiniteScroll
-          height={size?.height}
-          dataLength={get(scriptPageListMap, `data`, []).length}
-          next={() => loadMoreData(true)}
-          hasMore={hasMore}
-          loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
-          endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}>
-          {!scriptPageListMap?.total ? (
-            <>
-              <Flex vertical={true} align='center' justify='center' style={{ width: '100%' }}>
-                <IconWidget name='empty' style={{ maxWidth: '100%', objectFit: 'contain' }} />
-                <p>空空如也，快去创造剧本吧~</p>
-              </Flex>
-            </>
-          ) : (
-            get(scriptPageListMap, 'data')?.map(v => {
+      {!scriptPageListMap?.total ? (
+        <>
+          <Flex vertical={true} align='center' justify='center' style={{ width: '100%' }}>
+            <IconWidget name='empty' style={{ maxWidth: '100%', objectFit: 'contain' }} />
+            <p>空空如也，快去创造剧本吧~</p>
+          </Flex>
+        </>
+      ) : (
+        Boolean(size?.height) && (
+          <InfiniteScroll
+            height={size?.height}
+            dataLength={get(scriptPageListMap, `data`, []).length}
+            next={() => loadMoreData(true)}
+            hasMore={hasMore}
+            loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
+            endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}>
+            {get(scriptPageListMap, 'data')?.map(v => {
               return (
                 <MaterialItem
                   icon='excel'
@@ -66,10 +66,10 @@ export default ({ handleChoose, activeObj }: { activeObj: any; handleChoose: (va
                   actived={activeObj[v.scriptId]}
                 />
               )
-            })
-          )}
-        </InfiniteScroll>
-      ) : null}
+            })}
+          </InfiniteScroll>
+        )
+      )}
     </div>
   )
 }
