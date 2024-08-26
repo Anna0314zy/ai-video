@@ -32,7 +32,7 @@ export default ({
   data: PageList
   getList: (params?: { current: number; size: number }) => void
 }) => {
-  const windowUrl = useRef<any>(null)
+  const windowUrl = useRef<any>({})
   const handleClick = useCallback((record: ProjectList, val: 'edit') => {
     const MY_NAMESPACE = '123e4567-e89b-12d3-a456-426614174000'
     const windowName = uuidv3(record.projectName + record.id, MY_NAMESPACE)
@@ -41,11 +41,11 @@ export default ({
     const query = `projectName=${record.projectName}&subjectName=${record.subjectName}`
     let hashBase = `#/project/${record.id}/${record.state === 'ScriptProcessing' ? 'script' : 'video'}`
     const url = `${window.location.origin + window.location.pathname}?${query}${hashBase}`
-    if (windowUrl.current) {
-      windowUrl.current.close()
+    if (windowUrl.current[windowName]) {
+      windowUrl.current[windowName].close()
     }
     // 打开或聚焦具有相同名称的窗口
-    windowUrl.current = window.open(url, '_blank')
+    windowUrl.current[windowName] = window.open(url, windowName)
   }, [])
 
   const columns: TableProps<ProjectList>['columns'] = [
