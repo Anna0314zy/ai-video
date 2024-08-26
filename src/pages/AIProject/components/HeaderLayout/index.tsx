@@ -31,7 +31,7 @@ const HeaderLayout = (props: headerProps) => {
             onClick={() => {
               const params = new URLSearchParams(window.location.search)
               const returnUrl = params.get('returnUrl')
-              if (returnUrl) {
+              if (returnUrl && window.location.href.includes('/script')) {
                 window.location.href = returnUrl
               }
             }}
