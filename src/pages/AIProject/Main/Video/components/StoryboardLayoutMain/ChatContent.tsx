@@ -9,7 +9,7 @@ import MessageLayout from './MessageLayout'
 import MaterialContent from './MaterialContent'
 import MaterialState from './MaterialState'
 import ContentActionBtn from './ContentActionBtn'
-import { VideoDesign, AudioDesign } from '../../../../components/config'
+import { VideoDesign, AudioChineseComp } from '../../../../components/config'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { Divider, Skeleton } from 'antd'
 import { useParams } from 'react-router-dom'
@@ -92,7 +92,7 @@ const ChatContent = () => {
       }
     } else if (currentSelectType === 'voice') {
       // AudioDesign
-      for (const config of AudioDesign) {
+      for (const config of AudioChineseComp) {
         const name = config.label
         const value = String(item[config.prop])
         if (config.prop === 'style') {
