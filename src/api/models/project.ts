@@ -49,3 +49,8 @@ export const getListSubjectName = () => {
 export const getListTermName = () => {
   return api.get<string[]>(`${http}/api/project/v1/listTermName`, {})
 }
+
+// 删除
+export const delProjectList = (projectIdList: Array<number>) => {
+  return api.post<string[]>(`${http}/api/project/delete`, { projectIdList })
+}

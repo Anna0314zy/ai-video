@@ -9,6 +9,7 @@ import MessageLayout from './MessageLayout'
 import MaterialContent from './MaterialContent'
 import MaterialState from './MaterialState'
 import ContentActionBtn from './ContentActionBtn'
+import { VideoDesign, AudioDesign } from '../../../../components/config'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { Divider, Skeleton } from 'antd'
 import { useParams } from 'react-router-dom'
@@ -80,6 +81,29 @@ const ChatContent = () => {
     const messageListLength = (cur.data || []).length
     return total !== null ? messageListLength < total : true
   }, [currentSelectType, messageListMap, currentShotId])
+  const onHandleViewParams = (item: any) => {
+    let result = ''
+    if (currentSelectType === 'video') {
+      // VideoDesign
+      for (const config of VideoDesign) {
+        const name = config.label
+        const value = String(item[config.prop])
+        result += `${name}:${value} `
+      }
+    } else if (currentSelectType === 'voice') {
+      // AudioDesign
+      for (const config of AudioDesign) {
+        const name = config.label
+        const value = String(item[config.prop])
+        if (config.prop === 'style') {
+          result += `${name}:${item[config.prop] ? value : '默认'} `
+        } else {
+          result += `${name}:${value} `
+        }
+      }
+    }
+    return result
+  }
   return (
     <Layout.Content id='script-to-video-wrapper' ref={wrapper}>
       {size?.height && currentShotId && currentSelectType ? (
@@ -100,6 +124,9 @@ const ChatContent = () => {
                   <div>
                     {/* shotId:{item.shotId}-historyId:{item.historyId} */}
                     {item.content || item.text}
+                    <br />
+                    {/* 视频参数 音频参数 */}
+                    {onHandleViewParams(item)}
                   </div>
                   <MaterialContent data={item} />
                   <MaterialState data={item} />

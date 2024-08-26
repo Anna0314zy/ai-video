@@ -1,7 +1,8 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Flex, Table, Button, Tag } from 'antd'
 import type { TableProps } from 'antd'
 import CreateProjectBtn from './CreateProjectBtn'
+import { MinusOutlined } from '@ant-design/icons'
 import Styles from '../index.module.less'
 import IconWidget from '@/components/IconWidget/index'
 import { PageList, ProjectList } from '@/api/models/project'
@@ -28,17 +29,22 @@ const menuData = [
 export default ({
   data,
   getList,
+  delProject,
 }: {
   data: PageList
   getList: (params?: { current: number; size: number }) => void
+  delProject: (keys: any) => void
 }) => {
   const windowUrl = useRef<any>({})
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const handleClick = useCallback((record: ProjectList, val: 'edit') => {
     const MY_NAMESPACE = '123e4567-e89b-12d3-a456-426614174000'
     const windowName = uuidv3(record.projectName + record.id, MY_NAMESPACE)
     let sessionId = 0
     if (record.sessionList?.length) sessionId = record.sessionList[record.sessionList?.length - 1].id
-    const query = `projectName=${record.projectName}&subjectName=${record.subjectName}`
+    const query = `projectName=${record.projectName}&subjectName=${record.subjectName}&returnUrl=${encodeURIComponent(
+      window.location.href,
+    )}`
     let hashBase = `#/project/${record.id}/${record.state === 'ScriptProcessing' ? 'script' : 'video'}`
     const url = `${window.location.origin + window.location.pathname}?${query}${hashBase}`
     if (windowUrl.current[windowName]) {
@@ -128,16 +134,36 @@ export default ({
       ),
     },
   ]
-
+  // delProject
   const wrapper = useRef<HTMLDivElement>(null)
   const wrapperSize = useSize(wrapper)
   const tableHeaderSize = useSize(document.querySelector('#home-ai-project .ant-table-header'))
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    console.log('selectedRowKeys changed: ', newSelectedRowKeys)
+    setSelectedRowKeys(newSelectedRowKeys)
+  }
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  }
   return (
     <>
       <div className={Styles['home-layout']} id='home-ai-project'>
         <Flex className='home-header' justify='space-between' align='center'>
           <div className='home-title'>我的项目</div>
-          <CreateProjectBtn />
+          <div>
+            <Button
+              type='primary'
+              onClick={() => {
+                delProject(selectedRowKeys)
+              }}>
+              <MinusOutlined size={16} />
+              删除项目
+            </Button>
+            &nbsp;
+            <CreateProjectBtn />
+          </div>
         </Flex>
         <div className={Styles['table-content']} ref={wrapper}>
           <Table
@@ -149,6 +175,10 @@ export default ({
               y: (wrapperSize?.height || 300) - (tableHeaderSize?.height || 50) - 24 - 32,
               x: 1000,
             }}
+            rowSelection={rowSelection}
+            onRow={record => ({
+              onClick: () => handleClick(record, 'edit'),
+            })}
             pagination={{
               total: data.total,
               current: data.current,
@@ -160,6 +190,7 @@ export default ({
               showTotal(total) {
                 return `共 ${total} 条记录`
               },
+
               onChange: (page, pageSize) => {
                 getList({
                   current: page,
