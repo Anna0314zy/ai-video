@@ -51,7 +51,8 @@ export default ({
       windowUrl.current.close()
     }
     // 打开或聚焦具有相同名称的窗口
-    windowUrl.current = window.open(url, '_blank')
+    // windowUrl.current =
+    window.open(url, '_blank')
   }, [])
 
   const columns: TableProps<ProjectList>['columns'] = [
