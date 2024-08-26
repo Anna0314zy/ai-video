@@ -27,7 +27,16 @@ const HeaderLayout = (props: headerProps) => {
     <Header style={headerStyle}>
       <Flex style={{ height: '100%', width: '100%' }} align='center' justify='space-between'>
         <Flex align='center'>
-          <LeftOutlined style={{ fontSize: 16, color: 'rgba(87, 87, 102, 1)' }} />
+          <LeftOutlined
+            onClick={() => {
+              const params = new URLSearchParams(window.location.search)
+              const returnUrl = params.get('returnUrl')
+              if (returnUrl) {
+                window.location.href = returnUrl
+              }
+            }}
+            style={{ fontSize: 16, color: 'rgba(87, 87, 102, 1)' }}
+          />
           {leftChildren(currentProjectDetail, props.showHeaderTips)}
         </Flex>
         <Flex align='center' gap='small'>

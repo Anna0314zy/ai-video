@@ -38,7 +38,9 @@ export default ({
     const windowName = uuidv3(record.projectName + record.id, MY_NAMESPACE)
     let sessionId = 0
     if (record.sessionList?.length) sessionId = record.sessionList[record.sessionList?.length - 1].id
-    const query = `projectName=${record.projectName}&subjectName=${record.subjectName}`
+    const query = `projectName=${record.projectName}&subjectName=${record.subjectName}&returnUrl=${encodeURIComponent(
+      window.location.href,
+    )}`
     let hashBase = `#/project/${record.id}/${record.state === 'ScriptProcessing' ? 'script' : 'video'}`
     const url = `${window.location.origin + window.location.pathname}?${query}${hashBase}`
     if (windowUrl.current) {
@@ -149,6 +151,9 @@ export default ({
               y: (wrapperSize?.height || 300) - (tableHeaderSize?.height || 50) - 24 - 32,
               x: 1000,
             }}
+            onRow={record => ({
+              onClick: () => handleClick(record, 'edit'),
+            })}
             pagination={{
               total: data.total,
               current: data.current,
@@ -160,6 +165,7 @@ export default ({
               showTotal(total) {
                 return `共 ${total} 条记录`
               },
+
               onChange: (page, pageSize) => {
                 getList({
                   current: page,
