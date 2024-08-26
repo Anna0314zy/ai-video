@@ -5,7 +5,7 @@ import { EllipsisOutlined } from '@ant-design/icons'
 import Styles from '../Home/index.module.less'
 import IconWidget from '@/components/IconWidget/index'
 import { useNavigate } from 'react-router-dom'
-import { PageList, projectList, ProjectList } from '@/api/models/project'
+import { PageList, projectList, delProjectList } from '@/api/models/project'
 import UserOutlined from '@ant-design/icons/lib/icons/UserOutlined'
 import List from './components/List'
 import Empty from './components/Empty'
@@ -52,13 +52,17 @@ export default () => {
   useEffect(() => {
     getList()
   }, [])
-
+  const delProject = (keys: any) => {
+    delProjectList(keys).then(() => {
+      getList()
+    })
+  }
   return (
     <MyContext.Provider
       value={{
         getList,
       }}>
-      {data?.records?.length ? <List data={data} getList={getList} /> : <Empty />}
+      {data?.records?.length ? <List data={data} getList={getList} delProject={delProject} /> : <Empty />}
     </MyContext.Provider>
   )
 }

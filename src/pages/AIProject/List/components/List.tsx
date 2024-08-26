@@ -1,7 +1,8 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Flex, Table, Button, Tag } from 'antd'
 import type { TableProps } from 'antd'
 import CreateProjectBtn from './CreateProjectBtn'
+import { MinusOutlined } from '@ant-design/icons'
 import Styles from '../index.module.less'
 import IconWidget from '@/components/IconWidget/index'
 import { PageList, ProjectList } from '@/api/models/project'
@@ -28,11 +29,14 @@ const menuData = [
 export default ({
   data,
   getList,
+  delProject,
 }: {
   data: PageList
   getList: (params?: { current: number; size: number }) => void
+  delProject: (keys: any) => void
 }) => {
   const windowUrl = useRef<any>(null)
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const handleClick = useCallback((record: ProjectList, val: 'edit') => {
     const MY_NAMESPACE = '123e4567-e89b-12d3-a456-426614174000'
     const windowName = uuidv3(record.projectName + record.id, MY_NAMESPACE)
@@ -130,16 +134,36 @@ export default ({
       ),
     },
   ]
-
+  // delProject
   const wrapper = useRef<HTMLDivElement>(null)
   const wrapperSize = useSize(wrapper)
   const tableHeaderSize = useSize(document.querySelector('#home-ai-project .ant-table-header'))
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    console.log('selectedRowKeys changed: ', newSelectedRowKeys)
+    setSelectedRowKeys(newSelectedRowKeys)
+  }
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  }
   return (
     <>
       <div className={Styles['home-layout']} id='home-ai-project'>
         <Flex className='home-header' justify='space-between' align='center'>
           <div className='home-title'>我的项目</div>
-          <CreateProjectBtn />
+          <div>
+            <Button
+              type='primary'
+              onClick={() => {
+                delProject(selectedRowKeys)
+              }}>
+              <MinusOutlined size={16} />
+              删除项目
+            </Button>
+            &nbsp;
+            <CreateProjectBtn />
+          </div>
         </Flex>
         <div className={Styles['table-content']} ref={wrapper}>
           <Table
@@ -151,6 +175,7 @@ export default ({
               y: (wrapperSize?.height || 300) - (tableHeaderSize?.height || 50) - 24 - 32,
               x: 1000,
             }}
+            rowSelection={rowSelection}
             onRow={record => ({
               onClick: () => handleClick(record, 'edit'),
             })}
