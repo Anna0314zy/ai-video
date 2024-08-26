@@ -1,5 +1,5 @@
 import { Fragment, useState, useRef, useMemo, useEffect } from 'react'
-import { Layout, Modal, Button } from 'antd'
+import { Layout, Modal, Button, message } from 'antd'
 import { useSelector, useDispatch } from 'react-redux'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
@@ -70,6 +70,20 @@ export default (props: IStoryboardVideo) => {
   const onHandleJumpNextStep = async () => {
     // if (!Object.keys(currentSelect).length) return
     // setCurrentSelect(null)
+
+    if (currentSelectType === 'image') {
+      if (!Object.keys(selectedImage).length) return message.warning('请选择一个资源')
+      dispatch.aiVideo.updateData({
+        currentSelectType: 'video',
+      })
+    } else {
+      if (!Object.keys(selectedVideo).length) return message.warning('请选择一个资源')
+      const res: any = await api.getVideoDetail({ shotId: currentShotId })
+      setVideoDetail(res.dataList)
+      dispatch.aiVideo.updateData({
+        isShowResult: !isShowResult,
+      })
+    }
     const target = resourceList.records?.find((v: any) => v.isFinal === 'final')
     await api.confirmResource({
       shotId: currentShotId,
@@ -77,20 +91,6 @@ export default (props: IStoryboardVideo) => {
         (currentSelectType === 'image' ? selectedImage.resourceId : selectedVideo.resourceId) || target?.resourceId,
       type: currentSelectType,
     })
-    if (currentSelectType === 'image') {
-      if (!Object.keys(selectedImage).length) return
-      dispatch.aiVideo.updateData({
-        currentSelectType: 'video',
-      })
-    } else {
-      if (!Object.keys(selectedVideo).length) return
-      const res: any = await api.getVideoDetail({ shotId: currentShotId })
-      setVideoDetail(res.dataList)
-      dispatch.aiVideo.updateData({
-        isShowResult: !isShowResult,
-      })
-    }
-
     dispatch.aiVideo.getShotListByProjectId(projectId)
   }
 

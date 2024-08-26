@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Input, Modal, Button } from 'antd'
+import { Input, Modal, Button, message } from 'antd'
 import { useParams } from 'react-router-dom'
 import { cloneDeep } from 'lodash-es'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
@@ -48,6 +48,8 @@ export default (props: any) => {
       }
       setIsShowResult(!isShowResult)
       // dispatch.aiVideo.getShotListByProjectId(Number(id))
+    } else {
+      message.warning('请选择一个资源')
     }
   }
   useScrollToBottomHook(scrollAudioRef, 1, () => {
