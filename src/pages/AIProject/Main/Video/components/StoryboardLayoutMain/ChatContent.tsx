@@ -128,7 +128,7 @@ const ChatContent = () => {
                     {/* 视频参数 音频参数 */}
                     {onHandleViewParams(item)}
                   </div>
-                  <MaterialContent data={item} />
+                  <MaterialContent data={item} key={item.compressUrl} />
                   <MaterialState data={item} />
                   <Flex wrap={true} gap={10} style={{ marginTop: '10px' }} className='btns'>
                     {item.options?.map(v => {
