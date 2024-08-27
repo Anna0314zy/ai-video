@@ -138,20 +138,31 @@ export default createModel<RootModel>()({
       const { shotBaseInfoList }: any = await api.getShotListByProjectId(id)
       const { selectedShot } = state.aiVideo
       const len = Object.keys(selectedShot || {}).length
-      //
       const firstUnDone = shotBaseInfoList.find((item: any) => item.status === 'uncompleted')
-
-      dispatch.aiVideo.updateData({
-        shotList: shotBaseInfoList || [],
-        currentShotId: len
-          ? selectedShot.shotId
-          : shotBaseInfoList.length === 1
-          ? shotBaseInfoList[0]?.shotId
-          : firstUnDone?.shotId,
-        selectedShot: len ? selectedShot : shotBaseInfoList.length === 1 ? shotBaseInfoList[0] : firstUnDone,
-        // currentSelectType: selectedShot?.previewImage || shotBaseInfoList[0]?.previewImage ? 'video' : 'image',
+      new Promise<void>(async resolve => {
+        let records: any = []
+        for (let i = 0; i < shotBaseInfoList.length; i++) {
+          const cosUrl = await getCosObjectUrl(shotBaseInfoList[i].previewImage)
+          records.push({ ...shotBaseInfoList[i], cosUrl })
+        }
+        resolve(records)
+      }).then((shotBaseInfoList: any) => {
+        console.log(
+          '%c 🚀 ~ [ shotBaseInfoList ]-151',
+          'font-size:14px; background:green; color:#fff;',
+          shotBaseInfoList,
+        )
+        dispatch.aiVideo.updateData({
+          shotList: shotBaseInfoList || [],
+          currentShotId: len
+            ? selectedShot.shotId
+            : shotBaseInfoList.length === 1
+            ? shotBaseInfoList[0]?.shotId
+            : firstUnDone?.shotId,
+          selectedShot: len ? selectedShot : shotBaseInfoList.length === 1 ? shotBaseInfoList[0] : firstUnDone,
+          // currentSelectType: selectedShot?.previewImage || shotBaseInfoList[0]?.previewImage ? 'video' : 'image',
+        })
       })
-      console.log('%c 🚀 ~ [  ]-145', 'font-size:14px; background:green; color:#fff;', state)
     },
     async getResourceList(params: { shotId: number; pageSize?: number; pageIndex?: number; type: string }, state: any) {
       // console.log('%c 🚀 ~ [  ]-37', 'font-size:14px; background:green; color:#fff;', state.currentSelectType)
