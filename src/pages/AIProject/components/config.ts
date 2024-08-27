@@ -117,9 +117,34 @@ export const AudioDesign: AudioConfig[] = [
     rules: [{ required: true, message: '不能为空' }],
   },
 ]
+export const AudioChineseComp = [
+  {
+    label: '语言',
+    prop: 'language',
+  },
+  {
+    label: '声音',
+    prop: 'shortNameTranslated',
+  },
+  {
+    label: '情感',
+    prop: 'styleTranslated',
+  },
+
+  {
+    label: '声调',
+    prop: 'pitch',
+  },
+  {
+    label: '语速',
+    prop: 'rate',
+  },
+]
+
 export interface VideoConfig extends Omit<IConfig, 'prop'> {
   prop: keyof VideoChatParams
 }
+
 export const VideoDesign: VideoConfig[] = [
   {
     label: '背景运动',

@@ -1,4 +1,6 @@
 import axios from 'axios'
+import COS from 'cos-js-sdk-v5'
+import { getCosCredential } from '@/api/models/common'
 import { getToken } from '@/utils/auth'
 //文件格式
 export enum Ext {
@@ -22,6 +24,7 @@ export function decodeUnicode(str: string): string {
 }
 
 export const downloadFromServer = async (url: string, filename?: string) => {
+  console.log('%c 🚀 ~ [ url ]-27', 'font-size:14px; background:green; color:#fff;', url)
   try {
     // 发起 GET 请求，设置 responseType 为 'blob'
     const response = await axios.get(`${url}`, {
@@ -72,4 +75,48 @@ export function elementScrollIntoView(id: number | string) {
     const ele = document.getElementById(String(id))
     ele?.scrollIntoView({ behavior: 'smooth' })
   }, 100)
+}
+
+export async function accessCosWithTempCredentialsUrl(key: string) {
+  let result = ''
+  try {
+    const tempCreds = await getCosCredential()
+    const cos = new COS({
+      SecretId: tempCreds.credentials.tmpSecretId,
+      SecretKey: tempCreds.credentials.tmpSecretKey,
+      SecurityToken: tempCreds.credentials.sessionToken,
+      ExpiredTime: tempCreds.expiredTime,
+      StartTime: tempCreds.startTime,
+    })
+    // 示例：获取对象内容 这里是测试桶 线上桶用ld-ai-tool-prod-1313601664
+    const bucket = 'ld-ai-tool-test-1313601664'
+    const region = 'ap-beijing' // 根据实际情况选择区域
+
+    cos.getObjectUrl(
+      {
+        Bucket: bucket,
+        Region: region,
+        Key: key || '/text2img/8321373e-12d6-4719-9f38-fd924ad76e80.png',
+      },
+      function (err, data) {
+        if (err) {
+          console.log('%c 🚀 ~ [ err ]-97', 'font-size:14px; background:green; color:#fff;', err)
+        } else {
+          console.log('%c 🚀 ~ [  ]-104', 'font-size:14px; background:green; color:#fff;', JSON.stringify(data.Url))
+          // 创建一个临时的 `<a>` 元素
+          const link = document.createElement('a')
+          link.style.display = 'none'
+          link.setAttribute('href', data.Url)
+          link.setAttribute('download', 'fileName')
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          // window.location.href = data.Url + `?fileName=xxx.mp4`
+        }
+      },
+    )
+    return result
+  } catch (error) {
+    console.log('%c 🚀 ~ [ error ]-104', 'font-size:14px; background:green; color:#fff;', error)
+  }
 }
