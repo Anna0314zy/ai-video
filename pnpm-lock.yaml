@@ -35,6 +35,9 @@ dependencies:
   classnames:
     specifier: ^2.5.1
     version: 2.5.1
+  cos-js-sdk-v5:
+    specifier: ^1.8.4
+    version: 1.8.4
   cos-nodejs-sdk-v5:
     specifier: ^2.14.4
     version: 2.14.5
