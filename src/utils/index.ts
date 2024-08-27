@@ -77,46 +77,90 @@ export function elementScrollIntoView(id: number | string) {
   }, 100)
 }
 
-export async function accessCosWithTempCredentialsUrl(key: string) {
-  let result = ''
-  try {
-    const tempCreds = await getCosCredential()
-    const cos = new COS({
-      SecretId: tempCreds.credentials.tmpSecretId,
-      SecretKey: tempCreds.credentials.tmpSecretKey,
-      SecurityToken: tempCreds.credentials.sessionToken,
-      ExpiredTime: tempCreds.expiredTime,
-      StartTime: tempCreds.startTime,
+// 获取url
+export function getCosObjectUrl(key: string): any {
+  return getCosCredential()
+    .then((tempCreds: any) => createCosInstance(tempCreds))
+    .then((cos: COS) => {
+      return getObjectUrl(cos, key)
     })
-    // 示例：获取对象内容 这里是测试桶 线上桶用ld-ai-tool-prod-1313601664
-    const bucket = 'ld-ai-tool-test-1313601664'
-    const region = 'ap-beijing' // 根据实际情况选择区域
+    .catch(err => {
+      console.error('Error getting COS object URL:', err)
+      throw err
+    })
+}
+// 下载
+export function downloadCosObjectFile(key: string, filename: string): Promise<void> {
+  return getCosCredential()
+    .then((tempCreds: any) => createCosInstance(tempCreds))
+    .then((cos: COS) => downloadObject(cos, key, filename))
+    .catch(err => {
+      console.error('Error downloading COS object:', err)
+      throw err
+    })
+}
 
-    cos.getObjectUrl(
+function createCosInstance(tempCreds: any): COS {
+  return new COS({
+    SecretId: tempCreds.credentials.tmpSecretId,
+    SecretKey: tempCreds.credentials.tmpSecretKey,
+    SecurityToken: tempCreds.credentials.sessionToken,
+    ExpiredTime: tempCreds.expiredTime,
+    StartTime: tempCreds.startTime,
+  })
+}
+
+function getObjectUrl(cos: COS, key: string): string {
+  const bucket = 'ld-ai-tool-test-1313601664'
+  const region = 'ap-beijing'
+  return cos.getObjectUrl(
+    {
+      Bucket: bucket,
+      Region: region,
+      Key: key,
+    },
+    (err, data) => {
+      if (err) {
+        err
+      } else {
+        return data.Url
+      }
+    },
+  )
+}
+
+function downloadObject(cos: COS, key: string, filename: string): Promise<void> {
+  // 获取对象内容 测试桶 ld-ai-tool-test-1313601664 线上桶用ld-ai-tool-prod-1313601664
+  const bucket = 'ld-ai-tool-test-1313601664'
+  const region = 'ap-beijing'
+
+  return new Promise((resolve, reject) => {
+    cos.getObject(
       {
         Bucket: bucket,
         Region: region,
-        Key: key || '/text2img/8321373e-12d6-4719-9f38-fd924ad76e80.png',
+        Key: key,
+        DataType: 'blob',
       },
-      function (err, data) {
+      (err, data: any) => {
         if (err) {
-          console.log('%c 🚀 ~ [ err ]-97', 'font-size:14px; background:green; color:#fff;', err)
+          reject(err)
         } else {
-          console.log('%c 🚀 ~ [  ]-104', 'font-size:14px; background:green; color:#fff;', JSON.stringify(data.Url))
-          // 创建一个临时的 `<a>` 元素
-          const link = document.createElement('a')
-          link.style.display = 'none'
-          link.setAttribute('href', data.Url)
-          link.setAttribute('download', 'fileName')
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          // window.location.href = data.Url + `?fileName=xxx.mp4`
+          createDownloadLink(data.Body, filename)
+          resolve()
         }
       },
     )
-    return result
-  } catch (error) {
-    console.log('%c 🚀 ~ [ error ]-104', 'font-size:14px; background:green; color:#fff;', error)
-  }
+  })
+}
+// Blob下载
+function createDownloadLink(blob: Blob, fileName: string): void {
+  const a = document.createElement('a')
+  const blobUrl = URL.createObjectURL(blob)
+  a.href = blobUrl
+  a.download = fileName
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(blobUrl)
 }

@@ -23,10 +23,10 @@ class PreViewModal {
       content: (
         <div>
           {step === 1 ? (
-            <img style={{ width: 1000 }} className='preview-img' src={`${cdnPath}${item.compressUrl}`} alt='' />
+            <img style={{ width: 1000 }} className='preview-img' src={`${item.cosUrl}`} alt='' />
           ) : (
             <video controls style={{ width: 1000 }}>
-              <source src={`${cdnPath}${item.compressUrl}`} type='video/mp4' />
+              <source src={`${item.cosUrl}`} type='video/mp4' />
               Your browser does not support the video tag.
             </video>
           )}

@@ -2,7 +2,7 @@ import { FC, useContext } from 'react'
 import type { MenuProps } from 'antd'
 import { Flex, Dropdown } from 'antd'
 import { useSelector } from 'react-redux'
-import { downloadFromServer } from '@/utils'
+import { downloadCosObjectFile, getCosObjectUrl } from '@/utils'
 import { fileIcon, videoIcon, voiceIcon, downIcon, moreIcon } from '@/components/IconWidget/Icons'
 import { useDispatch } from 'react-redux'
 import { Dispatch } from '@/store'
@@ -13,6 +13,7 @@ const ResourceItem: FC<any> = props => {
   const { cdnPath, ext, actived, onClick, data, onHandleDeleteResourceItem, onHandlePreviewResourceItem } = props
   const { currentSelectType, currentShotId } = useSelector((state: any) => state.aiVideo)
 
+  // console.log('%c 🚀 ~ [  ]-16', 'font-size:14px; background:green; color:#fff;', data)
   const imageIconEnum: any = {
     image: fileIcon,
     video: videoIcon,
@@ -57,7 +58,7 @@ const ResourceItem: FC<any> = props => {
       <div className='resource-item__content'>
         <div className='resource-item__content__icon f-center'>
           {currentSelectType === 'image' ? (
-            <img className='thumbnail' src={cdnPath + data.compressUrl} alt='' />
+            <img className='thumbnail' src={data.cosUrl} alt='' />
           ) : (
             imageIconEnum[currentSelectType]()
           )}
@@ -70,13 +71,7 @@ const ResourceItem: FC<any> = props => {
       <div className='resource-item__operation'>
         <span
           onClick={() => {
-            downloadFromServer(
-              cdnPath +
-                data.compressUrl +
-                `?id=${data.resourceId}&fileName=${data.name}
-                &ext=${ext}`,
-              `${data.name}.${ext}`,
-            )
+            downloadCosObjectFile(data.compressUrl, data.name)
           }}>
           {downIcon()}
         </span>
