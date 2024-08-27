@@ -6,7 +6,7 @@ import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
 import IconWidget from '@/components/IconWidget'
 import { EnumUploadType, ResourceTypeMap, ResourceType } from '@/api/types/video'
 // import { nickIcon } from '@/components/IconWidget/Icons'
-import { downloadFromServer } from '@/utils'
+import { downloadCosObjectFile, getCosObjectUrl } from '@/utils'
 import Result from '../Result'
 import ResourceItem from '../ResourceItem'
 import * as api from '@/api/models/aiVideo'
@@ -133,10 +133,10 @@ export default (props: IStoryboardVideo) => {
       content: (
         <div>
           {currentSelectType === 'image' ? (
-            <img style={{ width: 1000 }} className='preview-img' src={`${cdnPath}${item.compressUrl}`} alt='' />
+            <img style={{ width: 1000 }} className='preview-img' src={item.cosUrl} alt='' />
           ) : (
             <video controls style={{ width: 1000 }}>
-              <source src={cdnPath + item.compressUrl} type='video/mp4' />
+              <source src={item.cosUrl} type='video/mp4' />
               Your browser does not support the video tag.
             </video>
           )}
@@ -167,13 +167,14 @@ export default (props: IStoryboardVideo) => {
           <Button
             type={'primary'}
             onClick={() => {
-              downloadFromServer(
-                cdnPath +
-                  item.compressUrl +
-                  `?id=${item.resourceId}&fileName=${item.name}
-                &ext=${currentSelectType === 'image' ? 'png' : 'mp4'}`,
-                `${item.name}.${currentSelectType === 'image' ? 'png' : 'mp4'}`,
-              )
+              downloadCosObjectFile(item.compressUrl, item.name)
+              // downloadFromServer(
+              //   cdnPath +
+              //     item.compressUrl +
+              //     `?id=${item.resourceId}&fileName=${item.name}
+              //   &ext=${currentSelectType === 'image' ? 'png' : 'mp4'}`,
+              //   `${item.name}.${currentSelectType === 'image' ? 'png' : 'mp4'}`,
+              // )
             }}>
             下载
           </Button>
@@ -244,7 +245,6 @@ export default (props: IStoryboardVideo) => {
                     // 删除某个资源
                   }}
                   onClick={() => {
-                    console.log('%c 🚀 ~ [  ]-86', 'font-size:14px; background:green; color:#fff;', item)
                     // setCurrentSelect(item)
                     dispatch.aiVideo.updateData({
                       [currentSelectType === 'image' ? 'selectedImage' : 'selectedVideo']: item,

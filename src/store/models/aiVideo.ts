@@ -12,7 +12,7 @@ import {
 import * as api from '@/api/models/aiVideo'
 import { get, set, uniqBy } from 'lodash-es'
 import { PageList } from '@/api/models/project'
-import { elementScrollIntoView } from '@/utils'
+import { elementScrollIntoView, getCosObjectUrl } from '@/utils'
 interface IMessageData {
   data: ChatMessageList[]
   total: number | null
@@ -156,16 +156,27 @@ export default createModel<RootModel>()({
     async getResourceList(params: { shotId: number; pageSize?: number; pageIndex?: number; type: string }, state: any) {
       // console.log('%c 🚀 ~ [  ]-37', 'font-size:14px; background:green; color:#fff;', state.currentSelectType)
       const { resourceList } = state.aiVideo
-      console.log('%c 🚀 ~ [ resourceList ]-153', 'font-size:14px; background:green; color:#fff;', resourceList)
       const res = await api.getResourceList({
         ...params,
         pageIndex: params.pageIndex || 1,
         pageSize: params.pageSize || 50,
       })
-      dispatch.aiVideo.updateData({
-        resourceList:
-          params.pageIndex === 1 ? res : { ...res, records: [...(resourceList?.records || []), ...res.records] },
+      new Promise<void>(async resolve => {
+        let records: any = []
+        for (let i = 0; i < res.records.length; i++) {
+          const cosUrl = await getCosObjectUrl(res.records[i].compressUrl)
+          records.push({ ...res.records[i], cosUrl })
+        }
+        resolve(records)
+      }).then((records: any) => {
+        dispatch.aiVideo.updateData({
+          resourceList:
+            params.pageIndex === 1
+              ? { ...res, records }
+              : { ...res, records: [...(resourceList?.records || []), ...records] },
+        })
       })
+
       // 已确认过的资源回显
       const finalResource = res.records.find((item: any) => item.isFinal === 'final')
       if (Object.keys(finalResource || {}).length) {

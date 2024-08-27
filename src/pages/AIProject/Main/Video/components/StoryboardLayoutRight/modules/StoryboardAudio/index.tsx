@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom'
 import { cloneDeep } from 'lodash-es'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import ResourceItem from '../ResourceItem'
-import { downloadFromServer } from '@/utils'
+import { downloadCosObjectFile } from '@/utils'
 import IconWidget from '@/components/IconWidget'
 
 import { EnumUploadType } from '@/api/types/video'
@@ -113,7 +113,7 @@ export default (props: any) => {
       content: (
         <div style={{ margin: '0 auto' }}>
           <audio controls style={{ backgroundColor: '#fff', padding: '5px', borderRadius: '4px' }}>
-            <source src={cdnPath + item.compressUrl} type='audio/mpeg' />
+            <source src={item.cosUrl} type='audio/mpeg' />
             Your browser does not support the audio element.
           </audio>
         </div>
@@ -138,13 +138,14 @@ export default (props: any) => {
           <Button
             type={'primary'}
             onClick={() => {
-              downloadFromServer(
-                cdnPath +
-                  item.compressUrl +
-                  `?id=${item.resourceId}&fileName=${item.name}
-                &ext=${'mp3'}`,
-                `${item.name}.${'mp3'}`,
-              )
+              downloadCosObjectFile(item.compressUrl, item.name)
+              // downloadFromServer(
+              //   cdnPath +
+              //     item.compressUrl +
+              //     `?id=${item.resourceId}&fileName=${item.name}
+              //   &ext=${'mp3'}`,
+              //   `${item.name}.${'mp3'}`,
+              // )
             }}>
             下载
           </Button>

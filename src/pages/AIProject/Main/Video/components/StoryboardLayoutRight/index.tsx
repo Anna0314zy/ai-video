@@ -15,6 +15,7 @@ export default () => {
   const { currentSelectType, selectedImage, resourceList, currentShotId, selectedShot, shotList } = useSelector(
     (state: RootState) => state.aiVideo,
   )
+  console.log('%c 🚀 ~ [ resourceList ]-16', 'font-size:14px; background:green; color:#fff;', resourceList)
 
   const currentShot = useMemo(() => {
     return shotList.find(item => item.shotId === currentShotId)
