@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { Descriptions } from 'antd'
+import { getCosObjectUrl } from '@/utils'
 import './index.less'
 
 const Result: FC<any> = (props: any) => {
@@ -12,6 +13,7 @@ const Result: FC<any> = (props: any) => {
     console.log('%c 🚀 ~ [ data ]-12', 'font-size:14px; background:green; color:#fff;', data)
     if (type !== 'voice') {
       const Image = data?.find((item: any) => item.name === '图片地址')
+      console.log('%c 🚀 ~ [ Image ]-16', 'font-size:14px; background:green; color:#fff;', Image)
       if (Object.keys(Image).length) {
         setPicUrl(Image.description)
       }

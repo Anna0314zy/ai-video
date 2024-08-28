@@ -79,7 +79,8 @@ export default (props: IStoryboardVideo) => {
     } else {
       if (!Object.keys(selectedVideo).length) return message.warning('请选择一个资源')
       const res: any = await api.getVideoDetail({ shotId: currentShotId })
-      setVideoDetail(res.dataList)
+      console.log('%c 🚀 ~ [ res ]-82', 'font-size:14px; background:green; color:#fff;', res)
+      setVideoDetail(res?.dataList)
       dispatch.aiVideo.updateData({
         isShowResult: !isShowResult,
       })
