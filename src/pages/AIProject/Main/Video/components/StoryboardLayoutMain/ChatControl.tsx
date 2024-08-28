@@ -36,6 +36,8 @@ const ChatControl = () => {
   }>({
     text: '',
   })
+
+  console.log('%c 🚀 ~ [  ]-40', 'font-size:14px; background:green; color:#fff;', prompt)
   const chatContentConfig = () => {
     if (currentSelectType === EnumUploadType['IMAGE']) {
       return <ImageChatConfig ref={formRef}></ImageChatConfig>
@@ -83,6 +85,7 @@ const ChatControl = () => {
     }))
   }
   const onFinish = ({ uploadOptions }: { uploadOptions: IUploadOptions }) => {
+    console.log('%c 🚀 ~ [ uploadOptions ]-86', 'font-size:14px; background:green; color:#fff;', uploadOptions)
     setPrompt(prev => ({
       ...prev,
       fileUrl: uploadOptions.cosFullPath,
