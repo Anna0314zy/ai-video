@@ -129,7 +129,7 @@ const ChatContent = () => {
                     {onHandleViewParams(item)}
                   </div>
                   <div style={{ width: '80%' }}>
-                    <MaterialContent data={item} key={item.compressUrl} />
+                    <MaterialContent data={item} key={(item.compressUrl || '') + (item.originUrl || '')} />
                   </div>
                   <MaterialState data={item} />
                   <Flex wrap={true} gap={10} style={{ marginTop: '10px' }} className='btns'>
