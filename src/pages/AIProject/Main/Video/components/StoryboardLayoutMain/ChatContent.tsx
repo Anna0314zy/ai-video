@@ -117,7 +117,8 @@ const ChatContent = () => {
           endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
           // scrollableTarget={'scrollableDiv'}
           inverse={true}>
-          {get(messageListMap, `${currentSelectType}.${currentShotId}.data`, []).map(item => {
+          {get(messageListMap, `${currentSelectType}.${currentShotId}.data`, []).map((item: any) => {
+            console.log('%c 🚀 ~ [ item ]-121', 'font-size:14px; background:green; color:#fff;', item)
             return (
               <MessageLayout key={item.taskId} data={item}>
                 <Flex vertical={true}>
@@ -131,7 +132,7 @@ const ChatContent = () => {
                   <MaterialContent data={item} />
                   <MaterialState data={item} />
                   <Flex wrap={true} gap={10} style={{ marginTop: '10px' }} className='btns'>
-                    {item.options?.map(v => {
+                    {item.options?.map((v: any) => {
                       return (
                         <ActionBtn
                           key={v.label}

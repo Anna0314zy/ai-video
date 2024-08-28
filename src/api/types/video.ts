@@ -87,6 +87,7 @@ export interface CommonMessage {
   shotId: number
 }
 export interface Text2imageMessage extends CommonMessage {
+  cosUrl?: string
   content?: string
   width?: number
   height?: number
