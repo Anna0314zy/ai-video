@@ -18,6 +18,7 @@ const useFetchWithCache = (axiosFunction: any, refreshInterval: any, storageType
       }
       try {
         const result = await axiosFunction()
+        if (result) return
         // 存储数据和时间戳到 storage
         storage.setItem('getCosCredential', JSON.stringify(result))
         storage.setItem(`getCosCredential_timestamp`, currentTime)

@@ -116,15 +116,7 @@ export default createModel<RootModel>()({
 
       // 根据 scroll 参数决定是否合并新数据
       const newData = scroll ? uniqBy([...old, ...records], 'historyId') : records
-      console.log(
-        '%c 🚀 ~ [  ]-121',
-        'font-size:14px; background:green; color:#fff;',
-        scroll,
-        data,
-        type,
-        shotId,
-        newData,
-      )
+
       // 使用 set 方法更新数据，Redux Toolkit 会处理不可变性
       set(state, `messageListMap.${type}.${shotId}`, {
         data: newData,
@@ -151,12 +143,9 @@ export default createModel<RootModel>()({
         selectedShot: len ? selectedShot : shotBaseInfoList.length === 1 ? shotBaseInfoList[0] : firstUnDone,
         // currentSelectType: selectedShot?.previewImage || shotBaseInfoList[0]?.previewImage ? 'video' : 'image',
       })
-      console.log('%c 🚀 ~ [  ]-145', 'font-size:14px; background:green; color:#fff;', state)
     },
     async getResourceList(params: { shotId: number; pageSize?: number; pageIndex?: number; type: string }, state: any) {
-      // console.log('%c 🚀 ~ [  ]-37', 'font-size:14px; background:green; color:#fff;', state.currentSelectType)
       const { resourceList } = state.aiVideo
-      console.log('%c 🚀 ~ [ resourceList ]-153', 'font-size:14px; background:green; color:#fff;', resourceList)
       const res = await api.getResourceList({
         ...params,
         pageIndex: params.pageIndex || 1,
@@ -243,6 +232,7 @@ export default createModel<RootModel>()({
       } else if (type === EnumUploadType['VIDEO']) {
         res = await api.addVideoTask(data as VideoTaskParams)
       }
+
       if (res) dispatch.aiVideo.addMessage(res)
     },
     async reinstateTask(taskId: string) {

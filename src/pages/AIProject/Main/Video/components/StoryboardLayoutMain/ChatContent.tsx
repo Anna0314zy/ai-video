@@ -20,6 +20,7 @@ const ChatContent = () => {
   const { currentSelectType, currentShotId, messageListMap, containerRef } = useSelector(
     (state: RootState) => state.aiVideo,
   )
+
   const projectId = Number(useParams().id)
   const [loading, setLoading] = useState<{
     [key: string]: {

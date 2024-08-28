@@ -14,7 +14,6 @@ class PreViewModal {
       this.modalInstance.destroy() // 销毁已有的 Modal 实例
     }
 
-    console.log('%c 🚀 ~ [  ]-17', 'font-size:14px; background:green; color:#fff;', '2222222')
     this.modalInstance = Modal.warning({
       title: '图片预览',
       closeIcon: true,

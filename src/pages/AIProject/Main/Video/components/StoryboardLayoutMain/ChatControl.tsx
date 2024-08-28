@@ -113,6 +113,7 @@ const ChatControl = () => {
       base.motionBucketId = base.motionBucketId || 0
       await formRef.current?.form.validateFields()
     }
+
     await dispatch.aiVideo.addChatTask({
       data: base,
       type: currentSelectType,

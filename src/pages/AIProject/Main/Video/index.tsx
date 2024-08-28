@@ -32,7 +32,6 @@ const VideoProcess = () => {
     })
   }
   const packSocketCallback = (message: any) => {
-    console.log('%c 🚀 ~ [ 111 ]-36', 'font-size:14px; background:green; color:#fff;', 11111)
     const fileName = message.payload.split('/').pop()
     downloadCosObjectFile(message.payload, fileName)
   }
