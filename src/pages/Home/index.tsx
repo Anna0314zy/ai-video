@@ -8,7 +8,8 @@ const menuData = [
     label: '我的工程',
   },
 ]
-export default () => {
+
+const Home = () => {
   return (
     <>
       <Layout style={{ height: '100%' }}>
@@ -22,3 +23,4 @@ export default () => {
     </>
   )
 }
+export default Home

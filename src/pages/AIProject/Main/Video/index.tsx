@@ -15,7 +15,7 @@ import {
 } from '@/const/socket'
 import useStompSocket from '@/hooks/useStompSocket'
 import { packageBatch } from '@/api/models/aiVideo'
-import { downloadFromServer } from '@/utils'
+import { downloadFromServer, downloadCosObjectFile } from '@/utils'
 import { useEffect } from 'react'
 const VideoProcess = () => {
   const { shotList } = useSelector((state: RootState) => state.aiVideo)
@@ -32,8 +32,9 @@ const VideoProcess = () => {
     })
   }
   const packSocketCallback = (message: any) => {
+    console.log('%c 🚀 ~ [ 111 ]-36', 'font-size:14px; background:green; color:#fff;', 11111)
     const fileName = message.payload.split('/').pop()
-    downloadFromServer(message.payload, fileName)
+    downloadCosObjectFile(message.payload, fileName)
   }
   useStompSocket([
     {

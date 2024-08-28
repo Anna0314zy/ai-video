@@ -223,7 +223,7 @@ export default createModel<RootModel>()({
       scroll?: boolean
       size?: number
     }) {
-      let data = {
+      let data: any = {
         size: 1,
         current: 1,
         total: 0,
@@ -248,11 +248,20 @@ export default createModel<RootModel>()({
           size,
         })
       }
-      dispatch.aiVideo.initMessage({
-        data,
-        scroll,
-        type,
-        shotId,
+      new Promise<void>(async resolve => {
+        let records: any = []
+        for (let i = 0; i < data.records.length; i++) {
+          const cosUrl = await getCosObjectUrl(data.records[i].compressUrl)
+          records.push({ ...data.records[i], cosUrl })
+        }
+        resolve(records)
+      }).then((records: any) => {
+        dispatch.aiVideo.initMessage({
+          data: { ...data, records },
+          scroll,
+          type,
+          shotId,
+        })
       })
     },
     async addChatTask(params: { data: AudioTaskParams | AddImageTaskParams | VideoTaskParams; type: ResourceType }) {
