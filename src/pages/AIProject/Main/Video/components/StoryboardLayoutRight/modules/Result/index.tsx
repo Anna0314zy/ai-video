@@ -33,7 +33,7 @@ const Result: FC<any> = (props: any) => {
 
   return (
     <div className='result'>
-      <div className='result__video'>{picUrl && <img src={picUrl || ''} alt='' />}</div>
+      <div className='result__video'>{picUrl && <img src={getCosObjectUrl(picUrl) || ''} alt='' />}</div>
       <div className='result__content'>
         <Descriptions items={detail} column={1} colon={false} />
       </div>

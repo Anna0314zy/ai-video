@@ -11,6 +11,7 @@ import { EnumUploadType } from '@/api/types/video'
 import { useParams } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState, Dispatch } from '@/store'
+import { getCosObjectUrl } from '@/utils'
 const style: React.CSSProperties = {
   backgroundColor: '#fff',
   padding: '10px',
@@ -159,7 +160,9 @@ const ChatControl = () => {
             onFinish={onFinish}
             onError={onError}
             type={EnumUploadType['MJIMAGE']}></CommonUpload>
-          {prompt.fileUrl ? <Image src={prompt.fileUrl} style={{ width: '100px', objectFit: 'contain' }} /> : null}
+          {prompt.fileUrl ? (
+            <Image src={getCosObjectUrl(prompt.fileUrl)} style={{ width: '100px', objectFit: 'contain' }} />
+          ) : null}
         </ChatInput>
       )}
     </Flex>
