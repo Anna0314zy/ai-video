@@ -118,7 +118,6 @@ const ChatContent = () => {
           // scrollableTarget={'scrollableDiv'}
           inverse={true}>
           {get(messageListMap, `${currentSelectType}.${currentShotId}.data`, []).map((item: any) => {
-            console.log('%c 🚀 ~ [ item ]-121', 'font-size:14px; background:green; color:#fff;', item)
             return (
               <MessageLayout key={item.taskId} data={item}>
                 <Flex vertical={true}>

@@ -9,8 +9,8 @@ import * as api from '@/api/models/aiVideo'
 import { useParams } from 'react-router-dom'
 import { message } from 'antd'
 import { useDeepCompareEffect } from '@/hooks/useDeepCompareEffect'
+import { getCosObjectUrl } from '@/utils'
 import './index.less'
-import { useEffect } from 'react'
 
 export default () => {
   const { shotList, currentShotId, currentSelectType, selectedShot } = useSelector((state: RootState) => state.aiVideo)
@@ -116,7 +116,7 @@ export default () => {
                             }}
                             key={index}
                             index={index + 1}
-                            img={data.cosUrl}
+                            img={getCosObjectUrl(data.previewImage)}
                             active={data.shotId === currentShotId}
                           />
                         </div>

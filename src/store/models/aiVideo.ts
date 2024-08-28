@@ -12,7 +12,7 @@ import {
 import * as api from '@/api/models/aiVideo'
 import { get, set, uniqBy } from 'lodash-es'
 import { PageList } from '@/api/models/project'
-import { elementScrollIntoView, getCosObjectUrl } from '@/utils'
+import { elementScrollIntoView } from '@/utils'
 interface IMessageData {
   data: ChatMessageList[]
   total: number | null
@@ -138,56 +138,34 @@ export default createModel<RootModel>()({
       const { shotBaseInfoList }: any = await api.getShotListByProjectId(id)
       const { selectedShot } = state.aiVideo
       const len = Object.keys(selectedShot || {}).length
+      //
       const firstUnDone = shotBaseInfoList.find((item: any) => item.status === 'uncompleted')
-      new Promise<void>(async resolve => {
-        let records: any = []
-        for (let i = 0; i < shotBaseInfoList.length; i++) {
-          const cosUrl = await getCosObjectUrl(shotBaseInfoList[i].previewImage)
-          records.push({ ...shotBaseInfoList[i], cosUrl })
-        }
-        resolve(records)
-      }).then((shotBaseInfoList: any) => {
-        console.log(
-          '%c 🚀 ~ [ shotBaseInfoList ]-151',
-          'font-size:14px; background:green; color:#fff;',
-          shotBaseInfoList,
-        )
-        dispatch.aiVideo.updateData({
-          shotList: shotBaseInfoList || [],
-          currentShotId: len
-            ? selectedShot.shotId
-            : shotBaseInfoList.length === 1
-            ? shotBaseInfoList[0]?.shotId
-            : firstUnDone?.shotId,
-          selectedShot: len ? selectedShot : shotBaseInfoList.length === 1 ? shotBaseInfoList[0] : firstUnDone,
-          // currentSelectType: selectedShot?.previewImage || shotBaseInfoList[0]?.previewImage ? 'video' : 'image',
-        })
+
+      dispatch.aiVideo.updateData({
+        shotList: shotBaseInfoList || [],
+        currentShotId: len
+          ? selectedShot.shotId
+          : shotBaseInfoList.length === 1
+          ? shotBaseInfoList[0]?.shotId
+          : firstUnDone?.shotId,
+        selectedShot: len ? selectedShot : shotBaseInfoList.length === 1 ? shotBaseInfoList[0] : firstUnDone,
+        // currentSelectType: selectedShot?.previewImage || shotBaseInfoList[0]?.previewImage ? 'video' : 'image',
       })
+      console.log('%c 🚀 ~ [  ]-145', 'font-size:14px; background:green; color:#fff;', state)
     },
     async getResourceList(params: { shotId: number; pageSize?: number; pageIndex?: number; type: string }, state: any) {
       // console.log('%c 🚀 ~ [  ]-37', 'font-size:14px; background:green; color:#fff;', state.currentSelectType)
       const { resourceList } = state.aiVideo
+      console.log('%c 🚀 ~ [ resourceList ]-153', 'font-size:14px; background:green; color:#fff;', resourceList)
       const res = await api.getResourceList({
         ...params,
         pageIndex: params.pageIndex || 1,
         pageSize: params.pageSize || 50,
       })
-      new Promise<void>(async resolve => {
-        let records: any = []
-        for (let i = 0; i < res.records.length; i++) {
-          const cosUrl = await getCosObjectUrl(res.records[i].compressUrl)
-          records.push({ ...res.records[i], cosUrl })
-        }
-        resolve(records)
-      }).then((records: any) => {
-        dispatch.aiVideo.updateData({
-          resourceList:
-            params.pageIndex === 1
-              ? { ...res, records }
-              : { ...res, records: [...(resourceList?.records || []), ...records] },
-        })
+      dispatch.aiVideo.updateData({
+        resourceList:
+          params.pageIndex === 1 ? res : { ...res, records: [...(resourceList?.records || []), ...res.records] },
       })
-
       // 已确认过的资源回显
       const finalResource = res.records.find((item: any) => item.isFinal === 'final')
       if (Object.keys(finalResource || {}).length) {
@@ -223,7 +201,7 @@ export default createModel<RootModel>()({
       scroll?: boolean
       size?: number
     }) {
-      let data: any = {
+      let data = {
         size: 1,
         current: 1,
         total: 0,
@@ -248,20 +226,11 @@ export default createModel<RootModel>()({
           size,
         })
       }
-      new Promise<void>(async resolve => {
-        let records: any = []
-        for (let i = 0; i < data.records.length; i++) {
-          const cosUrl = await getCosObjectUrl(data.records[i].compressUrl)
-          records.push({ ...data.records[i], cosUrl })
-        }
-        resolve(records)
-      }).then((records: any) => {
-        dispatch.aiVideo.initMessage({
-          data: { ...data, records },
-          scroll,
-          type,
-          shotId,
-        })
+      dispatch.aiVideo.initMessage({
+        data,
+        scroll,
+        type,
+        shotId,
       })
     },
     async addChatTask(params: { data: AudioTaskParams | AddImageTaskParams | VideoTaskParams; type: ResourceType }) {

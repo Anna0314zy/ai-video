@@ -1,7 +1,7 @@
 import React from 'react'
 import { Modal, Button } from 'antd'
 import { connect } from 'react-redux'
-
+import { getCosObjectUrl } from '@/utils'
 class PreViewModal {
   modalInstance: any
   cdnPath: any
@@ -23,10 +23,10 @@ class PreViewModal {
       content: (
         <div>
           {step === 1 ? (
-            <img style={{ width: 1000 }} className='preview-img' src={`${item.cosUrl}`} alt='' />
+            <img style={{ width: 1000 }} className='preview-img' src={`${getCosObjectUrl(item.compressUrl)}`} alt='' />
           ) : (
             <video controls style={{ width: 1000 }}>
-              <source src={`${item.cosUrl}`} type='video/mp4' />
+              <source src={`${getCosObjectUrl(item.compressUrl)}`} type='video/mp4' />
               Your browser does not support the video tag.
             </video>
           )}

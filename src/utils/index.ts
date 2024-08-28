@@ -79,25 +79,20 @@ export function elementScrollIntoView(id: number | string) {
 
 // 获取url
 export function getCosObjectUrl(key: string): any {
-  return getCosCredential()
-    .then((tempCreds: any) => createCosInstance(tempCreds))
-    .then((cos: COS) => {
-      return getObjectUrl(cos, key)
-    })
-    .catch(err => {
-      console.error('Error getting COS object URL:', err)
-      throw err
-    })
+  const tempCreds = JSON.parse(sessionStorage.getItem('getCosCredential') || '')
+  if (Object.keys(tempCreds).length) {
+    const cos = createCosInstance(tempCreds)
+    return getObjectUrl(cos, key)
+  }
 }
+
 // 下载
-export function downloadCosObjectFile(key: string, filename: string): Promise<void> {
-  return getCosCredential()
-    .then((tempCreds: any) => createCosInstance(tempCreds))
-    .then((cos: COS) => downloadObject(cos, key, filename))
-    .catch(err => {
-      console.error('Error downloading COS object:', err)
-      throw err
-    })
+export function downloadCosObjectFile(key: string, filename: string): any {
+  const tempCreds = JSON.parse(sessionStorage.getItem('getCosCredential') || '')
+  if (Object.keys(tempCreds).length) {
+    const cos = createCosInstance(tempCreds)
+    return downloadObject(cos, key, filename)
+  }
 }
 
 function createCosInstance(tempCreds: any): COS {
@@ -129,29 +124,24 @@ function getObjectUrl(cos: COS, key: string): string {
   )
 }
 
-function downloadObject(cos: COS, key: string, filename: string): Promise<void> {
+function downloadObject(cos: COS, key: string, filename: string): any {
   // 获取对象内容 测试桶 ld-ai-tool-test-1313601664 线上桶用ld-ai-tool-prod-1313601664
   const bucket = 'ld-ai-tool-test-1313601664'
   const region = 'ap-beijing'
-
-  return new Promise((resolve, reject) => {
-    cos.getObject(
-      {
-        Bucket: bucket,
-        Region: region,
-        Key: key,
-        DataType: 'blob',
-      },
-      (err, data: any) => {
-        if (err) {
-          reject(err)
-        } else {
-          createDownloadLink(data.Body, filename)
-          resolve()
-        }
-      },
-    )
-  })
+  return cos.getObject(
+    {
+      Bucket: bucket,
+      Region: region,
+      Key: key,
+      DataType: 'blob',
+    },
+    (err, data: any) => {
+      if (err) {
+      } else {
+        createDownloadLink(data.Body, filename)
+      }
+    },
+  )
 }
 // Blob下载
 function createDownloadLink(blob: Blob, fileName: string): void {

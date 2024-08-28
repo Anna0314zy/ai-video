@@ -33,7 +33,6 @@ const Result: FC<any> = (props: any) => {
     setDetail(items)
   }, [data])
 
-  console.log('%c 🚀 ~ [ data ]-7', 'font-size:14px; background:green; color:#fff;', data)
   return (
     <div className='result'>
       <div className='result__video'>{picUrl && <img src={picUrl || ''} alt='' />}</div>
