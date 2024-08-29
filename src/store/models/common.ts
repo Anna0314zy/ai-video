@@ -18,7 +18,7 @@ export default createModel<RootModel>()({
   effects: dispatch => ({
     async getPathConfig() {
       const res = await api.getPathConfig()
-      dispatch.common.updateData({ pathConfig: res })
+      dispatch.common.updateData({ pathConfig: res || {} })
     },
   }),
 })

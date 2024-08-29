@@ -24,7 +24,7 @@ export default (props: any) => {
   const { shotList, selectedAudio, currentShotId, selectedVoice, currentSelectType, selectedShot } = useSelector(
     (state: RootState) => state.aiVideo,
   )
-  const { cdnPath } = useSelector((state: any) => state.common.pathConfig)
+  const { cdnPath } = useSelector((state: RootState) => state.common.pathConfig)
   const [isShowResult, setIsShowResult] = useState(false)
   const [voiceDetail, setVoiceDetail] = useState(false)
   const [narration, setNarration] = useState(selectedShot?.narration)
