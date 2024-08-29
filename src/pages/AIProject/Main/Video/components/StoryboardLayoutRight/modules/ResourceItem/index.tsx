@@ -55,7 +55,7 @@ const ResourceItem: FC<any> = props => {
       <div className='resource-item__content'>
         <div className='resource-item__content__icon f-center'>
           {currentSelectType === 'image' ? (
-            <img className='thumbnail' src={getCosObjectUrl(data.compressUrl)} alt='' />
+            <img className='thumbnail' src={getCosObjectUrl(data.compressUrl || data.originUrl)} alt='' />
           ) : (
             imageIconEnum[currentSelectType]()
           )}

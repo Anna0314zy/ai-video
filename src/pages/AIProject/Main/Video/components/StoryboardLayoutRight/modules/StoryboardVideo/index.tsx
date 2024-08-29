@@ -198,7 +198,7 @@ export default (props: IStoryboardVideo) => {
               data-actived={currentSelectType === item.val}
               onClick={async () => {
                 if (currentShot?.imageStatus !== 'completed' && item.val === 'video') return
-                dispatch.aiVideo.updateData({ currentSelectType: item.val })
+                dispatch.aiVideo.updateData({ currentSelectType: item.val, isShowResult: false })
               }}>
               <div className='btn-step-index f-center'>{item.id}</div>
               {/* Object.keys(selectedImage).length ? nickIcon() :  */}
@@ -235,7 +235,7 @@ export default (props: IStoryboardVideo) => {
             ) : (
               data.map((item: any, index: number) => (
                 <ResourceItem
-                  key={index}
+                  key={item.resourceId}
                   data={item}
                   cdnPath={cdnPath}
                   ext={currentSelectType === 'image' ? 'png' : 'mp4'}
