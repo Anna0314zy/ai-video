@@ -47,6 +47,7 @@ const CommonUpload = ({
     accept: accept,
     // accept: uploadAccept[type],
     customRequest: async (options: any) => {
+      console.log('%c 🚀 ~ [ options ]-50', 'font-size:14px; background:green; color:#fff;', options)
       try {
         const { file } = options
         if (beforeUpload) {
@@ -86,7 +87,7 @@ const CommonUpload = ({
           uploadOptions: {
             fileMd5: Md5,
             fileName: file.name,
-            cosFullPath: CdnHost + cosFullPath,
+            cosFullPath: cosFullPath,
           },
         })
       } catch (e: any) {

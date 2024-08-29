@@ -1,5 +1,5 @@
 import { Fragment, useState, useRef, useMemo, useEffect } from 'react'
-import { Layout, Modal, Button, message } from 'antd'
+import { Layout, Modal, Button, message, Descriptions } from 'antd'
 import { useSelector, useDispatch } from 'react-redux'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
@@ -68,30 +68,31 @@ export default (props: IStoryboardVideo) => {
     },
   ]
   const onHandleJumpNextStep = async () => {
-    // if (!Object.keys(currentSelect).length) return
-    // setCurrentSelect(null)
-
-    if (currentSelectType === 'image') {
-      if (!Object.keys(selectedImage).length) return message.warning('请选择一个资源')
-      dispatch.aiVideo.updateData({
-        currentSelectType: 'video',
-      })
-    } else {
-      if (!Object.keys(selectedVideo).length) return message.warning('请选择一个资源')
-      const res: any = await api.getVideoDetail({ shotId: currentShotId })
-      setVideoDetail(res?.dataList)
-      dispatch.aiVideo.updateData({
-        isShowResult: !isShowResult,
-      })
-    }
+    if (!Object.keys(currentSelectType === 'image' ? selectedImage : selectedVideo)?.length)
+      return message.warning('请选择一个资源')
     const target = resourceList.records?.find((v: any) => v.isFinal === 'final')
-    await api.confirmResource({
-      shotId: currentShotId,
-      resourceId:
-        (currentSelectType === 'image' ? selectedImage.resourceId : selectedVideo.resourceId) || target?.resourceId,
-      type: currentSelectType,
-    })
-    dispatch.aiVideo.getShotListByProjectId(projectId)
+    await api
+      .confirmResource({
+        shotId: currentShotId,
+        resourceId:
+          (currentSelectType === 'image' ? selectedImage.resourceId : selectedVideo.resourceId) || target?.resourceId,
+        type: currentSelectType,
+      })
+      .then(async () => {
+        if (currentSelectType === 'image') {
+          dispatch.aiVideo.updateData({
+            currentSelectType: 'video',
+          })
+        } else {
+          const res: any = await api.getVideoDetail({ shotId: currentShotId })
+          setVideoDetail(res?.dataList || [])
+          dispatch.aiVideo.updateData({
+            isShowResult: !isShowResult,
+          })
+        }
+
+        dispatch.aiVideo.getShotListByProjectId(projectId)
+      })
   }
 
   const onFinish = ({ uploadOptions }: { uploadOptions: IUploadOptions }) => {
@@ -185,6 +186,7 @@ export default (props: IStoryboardVideo) => {
   const onChangeActive = (item: any) => {
     return item.resourceId === (currentSelectType === 'image' ? selectedImage : selectedVideo)['resourceId']
   }
+
   return (
     <Layout className={Styles['storyboard-image']}>
       <Layout.Sider className='storyboard-image-step'>
