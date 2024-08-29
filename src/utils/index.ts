@@ -143,73 +143,53 @@ function downloadObject(cos: COS, key: string, filename: string): any {
   )
 }
 // Blob下载
-async function createDownloadLink(blob: Blob, fileName: string): void {
+async function createDownloadLink(blob: Blob, fileName: string) {
   // 检查浏览器是否支持 showSaveFilePicker
-  if ('showSaveFilePicker' in window) {
-    const opt = {
-      types: [
-        {
-          description: '文件',
-          accept: {
-            'image/png': ['.png'],
-            'image/jpeg': ['.jpg', '.jpeg'],
-            'audio/mpeg': ['.mp3'],
-            'video/mp4': ['.mp4'],
-          },
-        },
-      ],
-      suggestedName: 'xxx.mp4',
-      excludeAcceptOption: true,
-    }
-    try {
-      const _blob = new Blob([await blob.text()], { type: 'video/mp4' })
-      const handle = await window.showSaveFilePicker(opt)
-      console.log('%c 🚀 ~ [ handle ]-165', 'font-size:14px; background:green; color:#fff;', handle)
-      const writable = await handle.createWritable(_blob)
-      console.log('%c 🚀 ~ [ writable ]-166', 'font-size:14px; background:green; color:#fff;', writable)
-      await writable.write() // 写入 Blob
-      await writable.close()
-    } catch (error) {
-      console.log('%c 🚀 ~ [ error ]-169', 'font-size:14px; background:green; color:#fff;', error)
-      // 作为后备方案使用 Blob 下载
-      // const a = document.createElement('a')
-      // const blobUrl = URL.createObjectURL(blob)
-      // a.href = blobUrl
-      // a.download = fileName
-      // document.body.appendChild(a)
-      // a.click()
-      // document.body.removeChild(a)
-      // URL.revokeObjectURL(blobUrl)
-    }
-  } else {
-    const a = document.createElement('a')
-    const blobUrl = URL.createObjectURL(blob)
-    a.href = blobUrl
-    a.download = fileName
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(blobUrl)
-  }
+  // if ('showSaveFilePicker' in window) {
+  //   const opt = {
+  //     types: [
+  //       {
+  //         description: '文件',
+  //         accept: {
+  //           'image/png': ['.png'],
+  //           'image/jpeg': ['.jpg', '.jpeg'],
+  //           'audio/mpeg': ['.mp3'],
+  //           'video/mp4': ['.mp4'],
+  //         },
+  //       },
+  //     ],
+  //     suggestedName: 'xxx.mp4',
+  //     excludeAcceptOption: true,
+  //   }
+  //   try {
+  //     const _blob = new Blob([await blob.text()], { type: 'video/mp4' })
+  //     // @ts-ignore
+  //     const handle = await window.showSaveFilePicker(opt)
+  //     console.log('%c 🚀 ~ [ handle ]-165', 'font-size:14px; background:green; color:#fff;', handle)
+  //     const writable = await handle.createWritable(_blob)
+  //     console.log('%c 🚀 ~ [ writable ]-166', 'font-size:14px; background:green; color:#fff;', writable)
+  //     await writable.write() // 写入 Blob
+  //     await writable.close()
+  //   } catch (error) {
+  //     console.log('%c 🚀 ~ [ error ]-169', 'font-size:14px; background:green; color:#fff;', error)
+  //     // 作为后备方案使用 Blob 下载
+  //     // const a = document.createElement('a')
+  //     // const blobUrl = URL.createObjectURL(blob)
+  //     // a.href = blobUrl
+  //     // a.download = fileName
+  //     // document.body.appendChild(a)
+  //     // a.click()
+  //     // document.body.removeChild(a)
+  //     // URL.revokeObjectURL(blobUrl)
+  //   }
+  // } else {
+  const a = document.createElement('a')
+  const blobUrl = URL.createObjectURL(blob)
+  a.href = blobUrl
+  a.download = fileName
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(blobUrl)
+  // }
 }
-
-// async function saveFile(blob: Blob, fileName: string): Promise<void> {
-
-// }
-
-// function createDownloadLink(blob: Blob, fileName: string): void {
-//   const a = document.createElement('a')
-//   const blobUrl = URL.createObjectURL(blob)
-//   a.href = blobUrl
-//   a.download = fileName
-//   document.body.appendChild(a)
-//   a.click()
-//   document.body.removeChild(a)
-//   URL.revokeObjectURL(blobUrl)
-// }
-
-// // 示例用法
-// const onHandleSaveFile = async () => {
-//   const content = new Blob(['文件内容'], { type: 'text/plain' })
-//   await saveFile(content, 'example.txt')
-// }
