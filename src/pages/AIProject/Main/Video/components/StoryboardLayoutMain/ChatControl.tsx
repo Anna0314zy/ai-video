@@ -37,7 +37,6 @@ const ChatControl = () => {
     text: '',
   })
 
-  console.log('%c 🚀 ~ [  ]-40', 'font-size:14px; background:green; color:#fff;', prompt)
   const chatContentConfig = () => {
     if (currentSelectType === EnumUploadType['IMAGE']) {
       return <ImageChatConfig ref={formRef}></ImageChatConfig>
