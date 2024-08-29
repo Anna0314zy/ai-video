@@ -71,25 +71,28 @@ export default (props: IStoryboardVideo) => {
     if (!Object.keys(selectedImage)?.length || !Object.keys(selectedVideo)?.length)
       return message.warning('请选择一个资源')
     const target = resourceList.records?.find((v: any) => v.isFinal === 'final')
-    await api.confirmResource({
-      shotId: currentShotId,
-      resourceId:
-        (currentSelectType === 'image' ? selectedImage.resourceId : selectedVideo.resourceId) || target?.resourceId,
-      type: currentSelectType,
-    })
-    if (currentSelectType === 'image') {
-      dispatch.aiVideo.updateData({
-        currentSelectType: 'video',
+    await api
+      .confirmResource({
+        shotId: currentShotId,
+        resourceId:
+          (currentSelectType === 'image' ? selectedImage.resourceId : selectedVideo.resourceId) || target?.resourceId,
+        type: currentSelectType,
       })
-    } else {
-      const res: any = await api.getVideoDetail({ shotId: currentShotId })
-      setVideoDetail(res?.dataList || [])
-      dispatch.aiVideo.updateData({
-        isShowResult: !isShowResult,
-      })
-    }
+      .then(async () => {
+        if (currentSelectType === 'image') {
+          dispatch.aiVideo.updateData({
+            currentSelectType: 'video',
+          })
+        } else {
+          const res: any = await api.getVideoDetail({ shotId: currentShotId })
+          setVideoDetail(res?.dataList || [])
+          dispatch.aiVideo.updateData({
+            isShowResult: !isShowResult,
+          })
+        }
 
-    dispatch.aiVideo.getShotListByProjectId(projectId)
+        dispatch.aiVideo.getShotListByProjectId(projectId)
+      })
   }
 
   const onFinish = ({ uploadOptions }: { uploadOptions: IUploadOptions }) => {
