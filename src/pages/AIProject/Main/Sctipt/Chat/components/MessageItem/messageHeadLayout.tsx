@@ -19,7 +19,7 @@ const HeadLayout = ({ messageInfo, children }: { messageInfo: MessageList; child
       style={messageInfo.role === Role.user ? myStyle : undefined}
       justify={messageInfo.role === Role.user ? 'flex-start' : 'flex-end'}>
       <div className={classNames(Style.avatar, Style[messageInfo.role])}>
-        {messageInfo.role === Role.Gpt ? <Image src={chatGpt} preview={false}></Image> : userInfo.username.slice(0, 1)}
+        {messageInfo.role === Role.Gpt ? <Image src={chatGpt} preview={false}></Image> : userInfo?.username.slice(0, 1)}
       </div>
       <Flex className={classNames(Style['message-item-content'], Style[messageInfo.role])} vertical={true} flex={1}>
         <div className={classNames(Style['message-time'], Style[messageInfo.role])}>

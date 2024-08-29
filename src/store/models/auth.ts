@@ -5,7 +5,7 @@ import { LoginUrl } from '@/config/login'
 import { getToken, setToken } from '@/utils/auth'
 interface AuthState {
   token: string
-  userInfo: api.UserInfo
+  userInfo?: api.UserInfo
 }
 
 export default createModel<RootModel>()({
