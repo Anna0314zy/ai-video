@@ -13,6 +13,7 @@ const useFetchWithCache = (axiosFunction: any, refreshInterval: any, storageType
       const currentTime: any = Date.now()
       // 超过缓存时间从新请求
       if (cachedData && cachedTimestamp && currentTime - cachedTimestamp < refreshInterval) {
+        console.log('%c 🚀 ~ [  ]-17', 'font-size:14px; background:green; color:#fff;', cachedData)
         setData(JSON.parse(cachedData))
         return
       }
