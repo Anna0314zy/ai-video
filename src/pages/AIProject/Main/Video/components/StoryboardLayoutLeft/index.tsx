@@ -70,12 +70,12 @@ export default () => {
 
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId='shot'>
-          {provided => (
+          {(provided: any) => (
             <Flex className='shot' {...provided.droppableProps} ref={provided.innerRef} vertical={true}>
               {shotList?.map((data: any, index) => {
                 return (
                   <Draggable key={data.shotId} draggableId={String(data.shotId)} index={index}>
-                    {provided => (
+                    {(provided: any) => (
                       <RightClick
                         onInster={type => {
                           onInsterShot(type, index)

@@ -24,7 +24,6 @@ export function decodeUnicode(str: string): string {
 }
 
 export const downloadFromServer = async (url: string, filename?: string) => {
-  console.log('%c 🚀 ~ [ url ]-27', 'font-size:14px; background:green; color:#fff;', url)
   try {
     // 发起 GET 请求，设置 responseType 为 'blob'
     const response = await axios.get(`${url}`, {

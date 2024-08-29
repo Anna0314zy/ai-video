@@ -13,7 +13,6 @@ const ResourceItem: FC<any> = props => {
   const { cdnPath, ext, actived, onClick, data, onHandleDeleteResourceItem, onHandlePreviewResourceItem } = props
   const { currentSelectType, currentShotId } = useSelector((state: any) => state.aiVideo)
 
-  // console.log('%c 🚀 ~ [  ]-16', 'font-size:14px; background:green; color:#fff;', data)
   const imageIconEnum: any = {
     image: fileIcon,
     video: videoIcon,
@@ -43,8 +42,6 @@ const ResourceItem: FC<any> = props => {
               type: data.type,
               shotId: currentShotId,
             })
-
-            console.log('%c 🚀 ~ [  ]-23', 'font-size:14px; background:green; color:#fff;', '删除资源')
           }}>
           <AntdIcon style={{ fontSize: '20px' }} icon={'delete'}></AntdIcon>
           <span style={{ marginLeft: '8px' }}>删除</span>

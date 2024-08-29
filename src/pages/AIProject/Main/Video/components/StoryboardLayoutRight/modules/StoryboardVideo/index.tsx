@@ -79,7 +79,6 @@ export default (props: IStoryboardVideo) => {
     } else {
       if (!Object.keys(selectedVideo).length) return message.warning('请选择一个资源')
       const res: any = await api.getVideoDetail({ shotId: currentShotId })
-      console.log('%c 🚀 ~ [ res ]-82', 'font-size:14px; background:green; color:#fff;', res)
       setVideoDetail(res?.dataList)
       dispatch.aiVideo.updateData({
         isShowResult: !isShowResult,
@@ -120,7 +119,6 @@ export default (props: IStoryboardVideo) => {
   }
 
   const modalBox = (item: any) => {
-    console.log('%c 🚀 ~ [ item ]-123', 'font-size:14px; background:green; color:#fff;', item)
     const destroy = () => {
       modalInstance.destroy()
       // modalInstance = null

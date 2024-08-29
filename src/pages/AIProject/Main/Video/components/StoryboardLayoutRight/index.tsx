@@ -36,8 +36,6 @@ export default () => {
   }
 
   const onChangeGetNewData = (pageIndex?: number) => {
-    console.log('%c 🚀 ~ [ pageIndex ]-34', 'font-size:14px; background:green; color:#fff;', pageIndex)
-
     getResourceList(pageIndex)
     // getResourceList()
   }

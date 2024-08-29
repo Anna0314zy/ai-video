@@ -28,13 +28,11 @@ export default (props: any) => {
   const [isShowResult, setIsShowResult] = useState(false)
   const [voiceDetail, setVoiceDetail] = useState(false)
   const [narration, setNarration] = useState(selectedShot?.narration)
-  console.log('%c 🚀 ~ [ narration ]-31', 'font-size:14px; background:green; color:#fff;', narration)
   useEffect(() => {
     setNarration(selectedShot?.narration)
   }, [selectedShot?.narration, currentShotId])
 
   const onHandleJumpNext = () => {
-    console.log('%c 🚀 ~ [  ]-18', 'font-size:14px; background:green; color:#fff;', selectedVoice)
     if (Object.keys(selectedAudio).length) {
       if (!isShowResult) {
         api
@@ -42,7 +40,6 @@ export default (props: any) => {
           .then(async () => {
             dispatch.aiVideo.getShotListByProjectId(Number(id))
             const res: any = await api.getVoiceDetail({ shotId: currentShotId })
-            console.log('%c 🚀 ~ [  ]-28', 'font-size:14px; background:green; color:#fff;', res)
             setVoiceDetail(res.dataList)
           })
       }
@@ -89,7 +86,6 @@ export default (props: any) => {
   }
   const onChangeNarration = (event: any) => {
     setNarration(event.target.value)
-    console.log('%c 🚀 ~ [ value ]-60', 'font-size:14px; background:green; color:#fff;', event)
   }
   // onHandleDeleteResourceItem 删除某一项
   const onHandleDeleteResourceItem = (item: any) => {
@@ -194,7 +190,6 @@ export default (props: any) => {
                 cdnPath={cdnPath}
                 ext={'mp3'}
                 onHandlePreviewResourceItem={() => {
-                  console.log('%c 🚀 ~ [  ]-195', 'font-size:14px; background:green; color:#fff;', '1111')
                   modalBox(item)
                   // 预览
                 }}

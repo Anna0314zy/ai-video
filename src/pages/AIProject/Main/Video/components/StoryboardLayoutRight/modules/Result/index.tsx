@@ -10,10 +10,8 @@ const Result: FC<any> = (props: any) => {
   const [picUrl, setPicUrl] = useState('')
   useEffect(() => {
     if (!data.length) return
-    console.log('%c 🚀 ~ [ data ]-12', 'font-size:14px; background:green; color:#fff;', data)
     if (type !== 'voice') {
       const Image = data?.find((item: any) => item.name === '图片地址')
-      console.log('%c 🚀 ~ [ Image ]-16', 'font-size:14px; background:green; color:#fff;', Image)
       if (Object.keys(Image).length) {
         setPicUrl(Image.description)
       }
@@ -35,7 +33,7 @@ const Result: FC<any> = (props: any) => {
 
   return (
     <div className='result'>
-      <div className='result__video'>{picUrl && <img src={picUrl || ''} alt='' />}</div>
+      <div className='result__video'>{picUrl && <img src={getCosObjectUrl(picUrl) || ''} alt='' />}</div>
       <div className='result__content'>
         <Descriptions items={detail} column={1} colon={false} />
       </div>
