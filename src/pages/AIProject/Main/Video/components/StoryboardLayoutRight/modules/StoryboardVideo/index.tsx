@@ -1,5 +1,5 @@
 import { Fragment, useState, useRef, useMemo, useEffect } from 'react'
-import { Layout, Modal, Button, message } from 'antd'
+import { Layout, Modal, Button, message, Descriptions } from 'antd'
 import { useSelector, useDispatch } from 'react-redux'
 import { useScrollToBottomHook } from '@/hooks/useScrollBottom'
 import CommonUpload, { IUploadOptions } from '@/components/CommonUpload'
@@ -68,7 +68,7 @@ export default (props: IStoryboardVideo) => {
     },
   ]
   const onHandleJumpNextStep = async () => {
-    if (!Object.keys(selectedImage)?.length || !Object.keys(selectedVideo)?.length)
+    if (!Object.keys(currentSelectType === 'image' ? selectedImage : selectedVideo)?.length)
       return message.warning('请选择一个资源')
     const target = resourceList.records?.find((v: any) => v.isFinal === 'final')
     await api
@@ -186,6 +186,7 @@ export default (props: IStoryboardVideo) => {
   const onChangeActive = (item: any) => {
     return item.resourceId === (currentSelectType === 'image' ? selectedImage : selectedVideo)['resourceId']
   }
+
   return (
     <Layout className={Styles['storyboard-image']}>
       <Layout.Sider className='storyboard-image-step'>
