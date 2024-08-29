@@ -134,10 +134,15 @@ export default (props: IStoryboardVideo) => {
       content: (
         <div>
           {currentSelectType === 'image' ? (
-            <img style={{ width: 1000 }} className='preview-img' src={getCosObjectUrl(item.compressUrl)} alt='' />
+            <img
+              style={{ width: 1000 }}
+              className='preview-img'
+              src={getCosObjectUrl(item.compressUrl || item.originUrl)}
+              alt=''
+            />
           ) : (
             <video controls style={{ width: 1000 }}>
-              <source src={getCosObjectUrl(item.compressUrl)} type='video/mp4' />
+              <source src={getCosObjectUrl(item.compressUrl || item.originUrl)} type='video/mp4' />
               Your browser does not support the video tag.
             </video>
           )}
