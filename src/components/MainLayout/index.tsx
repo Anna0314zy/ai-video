@@ -38,7 +38,7 @@ export default function MainLayout() {
             <div className='header-left'>
               <img className='icon-logo' src='./logo.ico' />
               <span className='header-title'>
-                内容AI工具 {window.location.pathname?.split('/')?.[2] === 'text' && '(测试环境)'}
+                内容AI工具 {window.location.pathname?.split('/')?.[2] === 'test' && '(测试环境)'}
               </span>
             </div>
             <div className='header-right'>
