@@ -132,6 +132,7 @@ export default createModel<RootModel>()({
       const len = Object.keys(selectedShot || {}).length
       //
       const firstUnDone = shotBaseInfoList.find((item: any) => item.status === 'uncompleted')
+      console.log('%c 🚀 ~ [ firstUnDone ]-135', 'font-size:14px; background:green; color:#fff;', firstUnDone)
 
       dispatch.aiVideo.updateData({
         shotList: shotBaseInfoList || [],
@@ -139,8 +140,16 @@ export default createModel<RootModel>()({
           ? selectedShot.shotId
           : shotBaseInfoList.length === 1
           ? shotBaseInfoList[0]?.shotId
-          : firstUnDone?.shotId,
-        selectedShot: len ? selectedShot : shotBaseInfoList.length === 1 ? shotBaseInfoList[0] : firstUnDone,
+          : firstUnDone
+          ? firstUnDone?.shotId
+          : shotBaseInfoList[0]?.shotId,
+        selectedShot: len
+          ? selectedShot
+          : shotBaseInfoList.length === 1
+          ? shotBaseInfoList[0]
+          : firstUnDone
+          ? firstUnDone
+          : shotBaseInfoList[0],
         // currentSelectType: selectedShot?.previewImage || shotBaseInfoList[0]?.previewImage ? 'video' : 'image',
       })
     },
