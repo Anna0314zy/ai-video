@@ -81,7 +81,13 @@ export function getCosObjectUrl(key: string): any {
   const tempCreds = JSON.parse(sessionStorage.getItem('getCosCredential') || '')
   if (Object.keys(tempCreds).length) {
     const cos = createCosInstance(tempCreds)
-    return getObjectUrl(cos, key)
+    const url = getObjectUrl(cos, key)
+    // VITE_CDN_SERVER  替换cdn
+    const newUrl = url?.replace(
+      'https://ld-ai-tool-test-1313601664.cos.ap-beijing.myqcloud.com',
+      `${import.meta.env.VITE_CDN_SERVER}`,
+    )
+    return newUrl
   }
 }
 
@@ -117,14 +123,7 @@ function getObjectUrl(cos: COS, key: string): string {
       if (err) {
         err
       } else {
-        // VITE_CDN_SERVER  替换cdn
-        const newUrl = data.Url.replace(
-          'https://ld-ai-tool-test-1313601664.cos.ap-beijing.myqcloud.com',
-          `${import.meta.env.VITE_CDN_SERVER}`,
-        )
-
-        console.log('%c 🚀 ~ [ newUrl ]-126', 'font-size:14px; background:green; color:#fff;', newUrl)
-        return newUrl
+        return data.Url
       }
     },
   )
