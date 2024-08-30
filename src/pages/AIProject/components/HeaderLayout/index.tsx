@@ -38,6 +38,9 @@ const HeaderLayout = (props: headerProps) => {
             style={{ fontSize: 16, color: 'rgba(87, 87, 102, 1)' }}
           />
           {leftChildren(currentProjectDetail, props.showHeaderTips)}
+          <span style={{ color: '#000', fontSize: '14px', fontWeight: 700 }}>
+            {window.location.pathname?.split('/')?.[2] === 'text' && '(测试环境)'}
+          </span>
         </Flex>
         <Flex align='center' gap='small'>
           {rightChildren(currentProjectDetail)}

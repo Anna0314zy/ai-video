@@ -43,13 +43,13 @@ const ModelCreate = (_: any, ref: any) => {
     ])
 
     setSubjectNames(
-      a.map(v => ({
+      a?.map(v => ({
         label: v,
         value: v,
       })),
     )
     setListTermNames(
-      b.map(v => ({
+      b?.map(v => ({
         label: v,
         value: v,
       })),
