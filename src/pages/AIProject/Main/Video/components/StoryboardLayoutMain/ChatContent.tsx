@@ -124,7 +124,7 @@ const ChatContent = () => {
                 <Flex vertical={true}>
                   <div>
                     {/* shotId:{item.shotId}-historyId:{item.historyId} */}
-                    <p style={{ width: 832, wordWrap: 'break-word' }}> {item.content || item.text}</p>
+                    <p style={{ width: '60vw', wordWrap: 'break-word' }}> {item.content || item.text}</p>
 
                     <br />
                     {/* 视频参数 音频参数 */}

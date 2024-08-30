@@ -34,7 +34,9 @@ const useFetchWithCache = (axiosFunction: any, refreshInterval: any, storageType
 
     const intervalId = setInterval(() => {
       fetchData()
-    }, refreshInterval)
+
+      console.log('%c 🚀 ~ [ 111 ]-38', 'font-size:14px; background:green; color:#fff;', '[][][][]')
+    }, 60000)
 
     return () => clearInterval(intervalId)
     //

@@ -155,6 +155,7 @@ export default (props: any) => {
           style={{ height: 120, resize: 'none' }}
           onBlur={() => saveShotList()}
           value={narration || ''}
+          maxLength={1024}
           onChange={(event: any) => {
             onChangeNarration(event)
           }}

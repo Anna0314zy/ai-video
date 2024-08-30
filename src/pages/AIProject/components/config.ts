@@ -11,6 +11,7 @@ export interface IConfig {
   width?: number
   min?: number
   max?: number
+  maxLength?: number
   formatter?: any
   disabled?: boolean
   rules?: Rule[]
@@ -175,7 +176,7 @@ export const VideoDesign: VideoConfig[] = [
     prop: 'seed',
     type: 'inputNumber',
     width: 200,
-    max: 18,
+    maxLength: 18,
     rules: [
       {
         required: true, // 允许空字符串
@@ -206,6 +207,6 @@ export const ImageDesign: ImageConfig[] = [
     prop: 'btnValue',
     type: 'textArea',
     width: 350,
-    max: 500,
+    maxLength: 500,
   },
 ]
