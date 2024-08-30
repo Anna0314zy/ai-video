@@ -106,6 +106,7 @@ export default () => {
                           <FrameItem
                             item={data}
                             onClick={() => {
+                              if (currentShotId === data.shotId) return
                               dispatch.aiVideo.updateData({
                                 currentShotId: data.shotId,
                                 selectedShot: data || {},

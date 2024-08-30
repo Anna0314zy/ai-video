@@ -15,7 +15,7 @@ export function WidgetItem({ data, onChange, value, disabled }: IProps) {
     case 'input':
       return <Input style={{ width: data.width || '120px' }} disabled={disabled || data.disabled} />
     case 'textArea':
-      return <Input.TextArea disabled={disabled} style={{ width: data.width || '120px' }} />
+      return <Input.TextArea disabled={disabled} style={{ width: data.width || '120px' }} maxLength={max} />
     case 'inputNumber':
       return (
         <InputNumber

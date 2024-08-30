@@ -205,5 +205,6 @@ export const ImageDesign: ImageConfig[] = [
     prop: 'btnValue',
     type: 'textArea',
     width: 350,
+    max: 500,
   },
 ]
