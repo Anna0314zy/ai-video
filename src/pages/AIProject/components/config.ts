@@ -175,6 +175,7 @@ export const VideoDesign: VideoConfig[] = [
     prop: 'seed',
     type: 'inputNumber',
     width: 200,
+    max: 18,
     rules: [
       {
         required: true, // 允许空字符串

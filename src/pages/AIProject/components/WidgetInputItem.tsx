@@ -13,7 +13,7 @@ export function WidgetItem({ data, onChange, value, disabled }: IProps) {
     case 'select':
       return <Select style={{ width: data.width || '120px' }} disabled={disabled} options={options} />
     case 'input':
-      return <Input style={{ width: data.width || '120px' }} disabled={disabled || data.disabled} />
+      return <Input style={{ width: data.width || '120px' }} disabled={disabled || data.disabled} maxLength={max} />
     case 'textArea':
       return <Input.TextArea disabled={disabled} style={{ width: data.width || '120px' }} maxLength={max} />
     case 'inputNumber':
@@ -23,8 +23,8 @@ export function WidgetItem({ data, onChange, value, disabled }: IProps) {
           controls={false}
           disabled={disabled || data.disabled}
           addonAfter={addonAfter}
-          min={min}
-          max={max}
+          minLength={min}
+          maxLength={max}
         />
       )
     case 'slider':
