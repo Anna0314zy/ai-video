@@ -18,7 +18,7 @@ export default () => {
 
   const currentShot = useMemo(() => {
     return shotList.find(item => item.shotId === currentShotId)
-  }, [currentShotId])
+  }, [currentShotId, shotList])
 
   useEffect(() => {}, [resourceList.length])
   // 触底加载状态

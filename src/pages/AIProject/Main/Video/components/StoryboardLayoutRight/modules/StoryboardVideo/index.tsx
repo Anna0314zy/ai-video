@@ -40,7 +40,7 @@ export default (props: IStoryboardVideo) => {
   }, [currentShotId])
   const currentShot = useMemo(() => {
     return shotList.find(item => item.shotId === currentShotId)
-  }, [currentShotId])
+  }, [currentShotId, shotList])
 
   useEffect(() => {
     // 如果在画面这里 则默认显示 video
