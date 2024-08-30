@@ -47,9 +47,9 @@ export default ({
     )}`
     let hashBase = `#/project/${record.id}/${record.state === 'ScriptProcessing' ? 'script' : 'video'}`
     const url = `${window.location.origin + window.location.pathname}?${query}${hashBase}`
-    if (windowUrl.current[windowName]) {
-      windowUrl.current[windowName].focus()
-    }
+    // if (windowUrl.current[windowName]) {
+    //   windowUrl.current[windowName].focus()
+    // }
     // 打开或聚焦具有相同名称的窗口
     windowUrl.current[windowName] = window.open(url, windowName)
   }, [])
