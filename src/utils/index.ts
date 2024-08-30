@@ -117,7 +117,14 @@ function getObjectUrl(cos: COS, key: string): string {
       if (err) {
         err
       } else {
-        return data.Url
+        // VITE_CDN_SERVER  替换cdn
+        const newUrl = data.Url.replace(
+          'https://ld-ai-tool-test-1313601664.cos.ap-beijing.myqcloud.com',
+          `${import.meta.env.VITE_CDN_SERVER}`,
+        )
+
+        console.log('%c 🚀 ~ [ newUrl ]-126', 'font-size:14px; background:green; color:#fff;', newUrl)
+        return newUrl
       }
     },
   )
