@@ -7,15 +7,17 @@ interface IProps {
   disabled?: boolean
 }
 export function WidgetItem({ data, onChange, value, disabled }: IProps) {
-  const { type, options, addonAfter, min, max, formatter } = data
+  const { type, options, addonAfter, min, max, formatter, maxLength } = data
 
   switch (type) {
     case 'select':
       return <Select style={{ width: data.width || '120px' }} disabled={disabled} options={options} />
     case 'input':
-      return <Input style={{ width: data.width || '120px' }} disabled={disabled || data.disabled} />
+      return (
+        <Input style={{ width: data.width || '120px' }} disabled={disabled || data.disabled} maxLength={maxLength} />
+      )
     case 'textArea':
-      return <Input.TextArea disabled={disabled} style={{ width: data.width || '120px' }} />
+      return <Input.TextArea disabled={disabled} style={{ width: data.width || '120px' }} maxLength={maxLength} />
     case 'inputNumber':
       return (
         <InputNumber
@@ -25,6 +27,7 @@ export function WidgetItem({ data, onChange, value, disabled }: IProps) {
           addonAfter={addonAfter}
           min={min}
           max={max}
+          maxLength={maxLength}
         />
       )
     case 'slider':

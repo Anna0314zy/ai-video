@@ -98,7 +98,7 @@ export default () => {
                           })
                         }}
                         onDownload={async () => {
-                          await api.packageBatch([currentShotId])
+                          await api.packageBatchItem(currentShotId)
                           message.success('打包中...请稍后~')
                           // 下载资源
                         }}>
@@ -106,6 +106,7 @@ export default () => {
                           <FrameItem
                             item={data}
                             onClick={() => {
+                              if (currentShotId === data.shotId) return
                               dispatch.aiVideo.updateData({
                                 currentShotId: data.shotId,
                                 selectedShot: data || {},

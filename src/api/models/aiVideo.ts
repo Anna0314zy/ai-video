@@ -157,3 +157,6 @@ export const saveShotList = (params: { projectId: number; shotInfoDtoList: Array
 export const translateToEnglish = (text: string) => {
   return api.get<any>(`${http}/api/prompt/v1/translate`, { text })
 }
+export const packageBatchItem = (shotId: number) => {
+  return api.post<any>(`${http}/api/scriptShot/v1/packageSingle/${shotId}`)
+}

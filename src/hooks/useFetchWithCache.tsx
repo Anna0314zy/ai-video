@@ -34,7 +34,7 @@ const useFetchWithCache = (axiosFunction: any, refreshInterval: any, storageType
 
     const intervalId = setInterval(() => {
       fetchData()
-    }, refreshInterval)
+    }, 60000)
 
     return () => clearInterval(intervalId)
     //
