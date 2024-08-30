@@ -105,8 +105,8 @@ function createCosInstance(tempCreds: any): COS {
 }
 
 function getObjectUrl(cos: COS, key: string): string {
-  const bucket = 'ld-ai-tool-test-1313601664'
-  const region = 'ap-beijing'
+  const bucket = `${import.meta.env.VITE_BUCKET}`
+  const region = `${import.meta.env.VITE_REGION}`
   return cos.getObjectUrl(
     {
       Bucket: bucket,
@@ -125,8 +125,9 @@ function getObjectUrl(cos: COS, key: string): string {
 
 function downloadObject(cos: COS, key: string, filename: string): any {
   // 获取对象内容 测试桶 ld-ai-tool-test-1313601664 线上桶用ld-ai-tool-prod-1313601664
-  const bucket = 'ld-ai-tool-test-1313601664'
-  const region = 'ap-beijing'
+  const bucket = `${import.meta.env.VITE_BUCKET}`
+  const region = `${import.meta.env.VITE_REGION}`
+
   return cos.getObject(
     {
       Bucket: bucket,
