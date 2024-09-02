@@ -29,10 +29,9 @@ const HeaderLayout = (props: headerProps) => {
         <Flex align='center'>
           <LeftOutlined
             onClick={() => {
-              const params = new URLSearchParams(window.location.search)
-              const returnUrl = params.get('returnUrl')
-              if (returnUrl && window.location.href.includes('/script')) {
-                window.location.href = returnUrl
+              if (window.location.href.includes('/script')) {
+                // zy 老师要求写死
+                window.location.href = 'https://static.xuepeiyou.com/ai-content-platform/prod/index.html'
               }
             }}
             style={{ fontSize: 16, color: 'rgba(87, 87, 102, 1)' }}

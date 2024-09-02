@@ -42,9 +42,7 @@ export default ({
     const windowName = uuidv3(record.projectName + record.id, MY_NAMESPACE)
     let sessionId = 0
     if (record.sessionList?.length) sessionId = record.sessionList[record.sessionList?.length - 1].id
-    const query = `projectName=${record.projectName}&subjectName=${record.subjectName}&returnUrl=${encodeURIComponent(
-      window.location.href,
-    )}`
+    const query = `projectName=${record.projectName}&subjectName=${record.subjectName}`
     let hashBase = `#/project/${record.id}/${record.state === 'ScriptProcessing' ? 'script' : 'video'}`
     const url = `${window.location.origin + window.location.pathname}?${query}${hashBase}`
     // if (windowUrl.current[windowName]) {
