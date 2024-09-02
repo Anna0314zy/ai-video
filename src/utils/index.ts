@@ -83,10 +83,7 @@ export function getCosObjectUrl(key: string): any {
     const cos = createCosInstance(tempCreds)
     const url = getObjectUrl(cos, key)
     // VITE_CDN_SERVER  替换cdn
-    const newUrl = url?.replace(
-      'https://ld-ai-tool-test-1313601664.cos.ap-beijing.myqcloud.com',
-      `${import.meta.env.VITE_CDN_SERVER}`,
-    )
+    const newUrl = url?.replace(`${import.meta.env.VITE_COS_URL}`, `${import.meta.env.VITE_CDN_SERVER}`)
     return newUrl
   }
 }
