@@ -5,11 +5,10 @@ const useFetchWithCache = (axiosFunction: any, refreshInterval: any, storageType
   const [error, setError] = useState(null)
 
   const storage = storageType === 'local' ? localStorage : sessionStorage
-
   useEffect(() => {
     const fetchData = async () => {
-      const cachedData = storage.getItem('getCosCredential')
-      const cachedTimestamp: any = storage.getItem(`getCosCredential_timestamp`)
+      const cachedData = storage.getItem(`${import.meta.env.VITE_STORAGE_COS_KEY}`)
+      const cachedTimestamp: any = storage.getItem(`${import.meta.env.VITE_STORAGE_COS_TIME}`)
       const currentTime: any = Date.now()
       // 超过缓存时间从新请求
       if (cachedData && cachedTimestamp && currentTime - cachedTimestamp < refreshInterval) {
@@ -21,8 +20,8 @@ const useFetchWithCache = (axiosFunction: any, refreshInterval: any, storageType
         const result = await axiosFunction()
         if (!result) return
         // 存储数据和时间戳到 storage
-        storage.setItem('getCosCredential', JSON.stringify(result))
-        storage.setItem(`getCosCredential_timestamp`, currentTime)
+        storage.setItem(`${import.meta.env.VITE_STORAGE_COS_KEY}`, JSON.stringify(result))
+        storage.setItem(`${import.meta.env.VITE_STORAGE_COS_TIME}`, currentTime)
 
         setData(result)
       } catch (err: any) {
