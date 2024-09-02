@@ -78,7 +78,7 @@ export function elementScrollIntoView(id: number | string) {
 
 // 获取url
 export function getCosObjectUrl(key: string): any {
-  const tempCreds = JSON.parse(sessionStorage.getItem('getCosCredential') || '')
+  const tempCreds = JSON.parse(sessionStorage.getItem(`${import.meta.env.VITE_STORAGE_COS_KEY}`) || '')
   if (Object.keys(tempCreds).length) {
     const cos = createCosInstance(tempCreds)
     const url = getObjectUrl(cos, key)
@@ -90,7 +90,7 @@ export function getCosObjectUrl(key: string): any {
 
 // 下载
 export function downloadCosObjectFile(key: string, filename: string): any {
-  const tempCreds = JSON.parse(sessionStorage.getItem('getCosCredential') || '')
+  const tempCreds = JSON.parse(sessionStorage.getItem(`${import.meta.env.VITE_STORAGE_COS_KEY}`) || '')
   if (Object.keys(tempCreds).length) {
     const cos = createCosInstance(tempCreds)
     return downloadObject(cos, key, filename)
