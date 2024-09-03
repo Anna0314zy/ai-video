@@ -1,7 +1,7 @@
-import { message } from 'antd'
+// import { message } from 'antd'
 import StompSocket from '@/utils/stompSocket'
 import { SEND_THOROUGH } from '@/const/socket'
-import { useRef, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 const useStompSocket = (
@@ -12,13 +12,13 @@ const useStompSocket = (
   sendThorough = SEND_THOROUGH,
 ) => {
   // let stompSocket = useRef<any>(null)
-  const [stompSocket, setStom] = useState<any>()
+  const [stompSocket, setStomp] = useState<any>()
   const { accountId } = useSelector((state: RootState) => state.auth.userInfo)
 
   useEffect(() => {
     const stomp = new StompSocket({
       baseUrl: import.meta.env.VITE_SOCKET_BASE,
-      sendThorough: SEND_THOROUGH,
+      sendThorough: sendThorough,
       subscribeThorough: subscribeThorough.map(v => `${v.path}/${accountId}`),
     })
 
@@ -27,7 +27,7 @@ const useStompSocket = (
         item.callback(message)
       })
     })
-    setStom(stomp)
+    setStomp(stomp)
 
     return () => {
       subscribeThorough.forEach(item => {
