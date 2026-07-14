@@ -5,15 +5,14 @@
 现象：
 
 - 页面请求地址是 `undefined/api/...`。
-- 登录地址异常。
 - Socket 无法连接。
-- COS 上传/下载失败。
+-七牛云上传/下载失败。
 
 检查：
 
-- `env/` 目录是否存在。
+- `apps/web/env/` 目录是否存在。
 - 当前命令的 mode 是否和环境文件匹配，例如 `pnpm run dev` 对应 `vite --mode dev`。
-- 是否配置了 `VITE_API_SERVER`、`VITE_SOCKET_BASE`、`VITE_APP_LOGIN`、COS/CDN 相关变量。
+- 是否配置了 `VITE_API_SERVER`、`VITE_SOCKET_BASE`、七牛云/CDN 相关变量。
 
 ## 启动失败：端口 5155 被占用
 
@@ -35,14 +34,15 @@ port: 5155
 
 - `localStorage.token` 不存在或已过期。
 - 后端返回业务码 `30001`。
-- `VITE_APP_LOGIN` 配置错误。
-- SSO 回跳没有正确带回前端地址。
+- 用户已存在，但密码与用户表中的密码哈希不匹配。
+- `JWT_SECRET` 变更后旧 token 失效。
 
 排查入口：
 
-- `src/config/login.ts`
-- `src/utils/auth.ts`
-- `src/api/index.ts`
+- `apps/web/src/config/login.ts`
+- `apps/web/src/utils/auth.ts`
+- `apps/web/src/api/index.ts`
+- `apps/server/src/modules/auth/auth.service.ts`
 - 浏览器 Network 中的 `/api/account/userInfo/get`
 
 ## 项目列表为空
@@ -55,8 +55,8 @@ port: 5155
 
 排查入口：
 
-- `src/pages/AIProject/List/index.tsx`
-- `src/api/models/project.ts`
+- `apps/web/src/pages/AIProject/List/index.tsx`
+- `apps/web/src/api/models/project.ts`
 - 浏览器 Network 中的 `/api/project/page`
 
 ## 剧本页一直 Loading
@@ -81,10 +81,10 @@ port: 5155
 
 排查入口：
 
-- `src/hooks/useStompSocket.ts`
-- `src/utils/stompSocket.ts`
-- `src/const/socket.ts`
-- `src/pages/AIProject/Main/Sctipt/Chat/ChatControl.tsx`
+- `apps/web/src/hooks/useStompSocket.ts`
+- `apps/web/src/utils/stompSocket.ts`
+- `apps/web/src/const/socket.ts`
+- `apps/web/src/pages/AIProject/Main/Sctipt/Chat/ChatControl.tsx`
 - 浏览器 Console 中的 WebSocket 日志。
 
 ## 剧本确认后没有进入视频页
@@ -97,7 +97,7 @@ port: 5155
 
 排查入口：
 
-- `src/pages/AIProject/Main/Sctipt/RightPanel/index.tsx`
+- `apps/web/src/pages/AIProject/Main/Sctipt/RightPanel/index.tsx`
 - `/api/text/v1/confirmScript`
 
 ## 镜头页没有分镜列表
@@ -110,8 +110,8 @@ port: 5155
 
 排查入口：
 
-- `src/pages/AIProject/Main/Video/index.tsx`
-- `src/store/models/aiVideo.ts`
+- `apps/web/src/pages/AIProject/Main/Video/index.tsx`
+- `apps/web/src/store/models/aiVideo.ts`
 - `/api/scriptShot/v1/shotListByProjectId`
 
 ## 图片/音频/视频任务状态不更新
@@ -133,26 +133,26 @@ port: 5155
 
 排查入口：
 
-- `src/pages/AIProject/Main/Video/index.tsx`
-- `src/store/models/aiVideo.ts`
-- `src/const/socket.ts`
+- `apps/web/src/pages/AIProject/Main/Video/index.tsx`
+- `apps/web/src/store/models/aiVideo.ts`
+- `apps/web/src/const/socket.ts`
 
 ## 上传失败
 
 可能原因：
 
-- COS 临时凭证获取失败。
+- 七牛云 uploadToken 获取失败。
 - `common.pathConfig` 未加载。
-- `VITE_BUCKET` 或 `VITE_REGION` 配置错误。
-- 上传类型没有匹配到 COS 路径。
+- `VITE_QINIU_BUCKET_NAME`、`VITE_QINIU_PUBLIC_DOMAIN` 或服务端七牛云密钥配置错误。
+- 上传类型没有匹配到七牛云路径。
 
 排查入口：
 
-- `src/components/CommonUpload/index.tsx`
-- `src/api/models/common.ts`
-- `src/store/models/common.ts`
-- `/api/cos/v1/credential`
-- `/api/cos/v1/pathConfig`
+- `apps/web/src/components/CommonUpload/index.tsx`
+- `apps/web/src/api/models/common.ts`
+- `apps/web/src/store/models/common.ts`
+- `/api/qiniu/v1/upload-token`
+- `/api/qiniu/v1/pathConfig`
 
 ## 打包导出没有下载
 
@@ -162,13 +162,13 @@ port: 5155
 
 - `packageBatch(shotIds)` 是否成功。
 - 是否订阅 `/user/queue/shots/download/{accountId}`。
-- 通知 payload 是否是 COS key。
-- sessionStorage 中是否存在 COS 临时凭证。
+- 通知 payload 是否是七牛云 key。
+- sessionStorage 中是否存在七牛云 uploadToken。
 
 排查入口：
 
-- `src/pages/AIProject/Main/Video/index.tsx`
-- `src/utils/index.ts`
+- `apps/web/src/pages/AIProject/Main/Video/index.tsx`
+- `apps/web/src/utils/index.ts`
 - `/api/scriptShot/v1/packageBatch`
 
 ## 发布失败
@@ -176,12 +176,12 @@ port: 5155
 可能原因：
 
 - `dist/` 不存在，需要先构建。
-- `src/script/cos.config.json` 缺失。
-- COS 密钥、Bucket 或 Region 错误。
+- `apps/web/src/script/qiniu.config.json` 缺失，或 CI 未注入 `QINIU_ACCESS_KEY` / `QINIU_SECRET_KEY`。
+- 七牛云密钥、Bucket 或上传域名错误。
 - 当前环境在 `publish.config.json` 中不存在。
 
 排查入口：
 
-- `src/script/hotUpdate.cjs`
-- `src/script/publish.config.json`
+- `apps/web/src/script/hotUpdate.cjs`
+- `apps/web/src/script/publish.config.json`
 - `package.json` 中的 release 脚本。

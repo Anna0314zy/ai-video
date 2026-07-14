@@ -9,7 +9,7 @@
 | Node.js | 建议使用 Node 20，与 `@types/node` 主版本一致。 |
 | pnpm | 项目脚本使用 `pnpm`。 |
 | 浏览器 | Chrome 或其他现代浏览器。 |
-| 后端环境 | 需要能访问对应的 API、SSO、Socket 和 COS 服务。 |
+| 后端环境 | 需要能访问对应的 API、SSO、Socket 和七牛云服务。 |
 
 ## 安装依赖
 
@@ -19,8 +19,22 @@ pnpm install
 
 ## 启动开发服务
 
+首次启动后端前先初始化本地数据库：
+
 ```bash
-pnpm run dev
+pnpm --filter @ai-video/server db:generate
+pnpm --filter @ai-video/server db:push
+```
+
+可以提前创建一个可登录用户，也可以直接在登录页首次输入用户名和密码自动注册：
+
+```bash
+USERNAME=admin PASSWORD=your-password pnpm --filter @ai-video/server user:create
+```
+
+```bash
+pnpm run dev:web
+pnpm run dev:server
 ```
 
 开发服务端口固定为 `5155`：
@@ -42,7 +56,7 @@ server: {
 envDir: 'env'
 ```
 
-因此环境文件应放在项目根目录的 `env/` 下，例如 `env/.env.dev`、`env/.env.test`、`env/.env.prod`。当前仓库未提交这些文件。
+因此前端环境文件放在 `apps/web/env/` 下，例如 `apps/web/env/.env.dev`、`apps/web/env/.env.test`、`apps/web/env/.env.prod`。
 
 代码中使用到的环境变量如下：
 
@@ -50,44 +64,37 @@ envDir: 'env'
 | --- | --- |
 | `VITE_API_SERVER` | 后端 API 基础地址。 |
 | `VITE_SOCKET_BASE` | SockJS/STOMP 连接地址。 |
-| `VITE_APP_LOGIN` | SSO 登录地址。 |
-| `VITE_BUCKET` | COS Bucket。 |
-| `VITE_REGION` | COS Region。 |
-| `VITE_COS_URL` | COS 原始访问域名，用于替换 CDN 域名。 |
+| `VITE_QINIU_BUCKET_NAME` | 七牛云 Bucket，当前为 `qiqi123456`。 |
+| `VITE_QINIU_PUBLIC_DOMAIN` | 七牛云公开访问域名或 CDN 域名。 |
 | `VITE_CDN_SERVER` | CDN 域名。 |
-| `VITE_STORAGE_COS_KEY` | session/local storage 中缓存 COS 凭证的数据键。 |
-| `VITE_STORAGE_COS_TIME` | session/local storage 中缓存 COS 凭证时间戳的键。 |
+| `VITE_STORAGE_QINIU_KEY` | session/local storage 中缓存七牛云 uploadToken 的数据键。 |
+| `VITE_STORAGE_QINIU_TIME` | session/local storage 中缓存七牛云 uploadToken 时间戳的键。 |
 
-## 本地代理
+## 本地接口
 
-开发环境配置了两个代理：
+开发环境默认连接新的 NestJS 后端：
 
-| 本地路径 | 目标 |
+| 项 | 目标 |
 | --- | --- |
-| `/api` | `https://ai-tool-test.ledupeiyou.com` |
-| `/test` | `https://test-class-api-online.saasp.vdyoo.com` |
+| HTTP API | `http://localhost:4000` |
+| Swagger | `http://localhost:4000/api-docs` |
+| SockJS/STOMP | `http://localhost:4000/api/ws` |
 
-实际业务接口大多使用 `VITE_API_SERVER` 拼接完整地址。代理主要用于需要走本地同源路径的场景。
+旧服务端不可用，业务接口不再代理到旧服务；如需修改地址，请调整 `apps/web/env/.env.*` 中的 `VITE_API_SERVER` 和 `VITE_SOCKET_BASE`。
 
 ## 本地验证
 
 建议至少执行：
 
 ```bash
-pnpm run lint
-pnpm run build:test
+pnpm run build:server
+pnpm run build:web
 ```
 
 如果缺少环境文件，构建可能在类型或运行时配置阶段暴露问题。先补齐环境变量，再验证主流程。
 
 ## 登录说明
 
-前端通过 `localStorage.token` 读取 Token，并在 Axios 请求和 STOMP 连接中携带。
-
-登录跳转地址由 `src/config/login.ts` 生成：
-
-```ts
-VITE_APP_LOGIN + '?frontUrl=' + 当前页面地址
-```
+前端登录页为 `#/login`，默认用户名为 `admin`，提交用户名和密码到新 Nest 后端。用户名不存在时后端会使用本次密码创建用户；用户名已存在时后端校验 `User` 表中的密码哈希。登录成功后返回 JWT，前端保存到 `localStorage.token`，并在 Axios 请求和 STOMP 连接中携带。
 
 接口返回 `code = 30001` 时，前端会清除本地 Token 并跳转登录页。

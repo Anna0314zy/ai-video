@@ -19,7 +19,7 @@
 | 样式 | Less、CSS Modules |
 | 请求 | Axios、fetch-event-source |
 | 实时消息 | SockJS + STOMP |
-| 文件/COS | `@ld/file-upload`、`cos-js-sdk-v5`、`cos-nodejs-sdk-v5` |
+| 文件/七牛云 | 七牛云 uploadToken + 浏览器直传 |
 
 ## 主要能力
 
@@ -28,25 +28,25 @@
 | 项目管理 | `/` | 展示“我的项目”，支持新建、分页、删除和进入编辑。 |
 | 剧本设计 | `#/project/:id/script` | 根据项目和配置生成 Prompt，发起 AI 剧本对话，保存/导入/确认剧本。 |
 | 镜头设计 | `#/project/:id/video` | 基于分镜生成图片、音频、视频，管理资源历史和终选资源。 |
-| 打包导出 | 视频页右上角 | 后端打包所有分镜资源，前端收到 Socket 通知后从 COS 下载。 |
+| 打包导出 | 视频页右上角 | 后端打包所有分镜资源，前端收到 Socket 通知后从七牛云下载。 |
 
 ## 代码目录
 
 | 路径 | 说明 |
 | --- | --- |
-| `src/main.tsx` | 应用入口，挂载 Ant Design 配置和 Redux Provider。 |
-| `src/App.tsx` | 路由入口，并预取 COS 临时凭证。 |
-| `src/router/index.tsx` | Hash 路由配置。 |
-| `src/api/` | Axios 实例、接口模块和接口类型。 |
-| `src/store/` | Rematch store 和业务状态模型。 |
-| `src/pages/Home/` | 首页布局。 |
-| `src/pages/AIProject/List/` | 项目列表、新建项目、删除项目。 |
-| `src/pages/AIProject/Main/Sctipt/` | 剧本设计页面。目录名当前拼写为 `Sctipt`。 |
-| `src/pages/AIProject/Main/Video/` | 镜头设计页面。 |
-| `src/components/` | 通用布局、上传、弹窗、图标、输入等组件。 |
-| `src/hooks/` | Socket、鉴权、缓存请求、滚动等 hooks。 |
-| `src/utils/` | Token、下载、COS、文本转换等工具。 |
-| `src/script/` | 构建后 COS 上传和发布配置。 |
+| `apps/web/src/main.tsx` | 应用入口，挂载 Ant Design 配置和 Redux Provider。 |
+| `apps/web/src/App.tsx` | 路由入口，并预取七牛云 uploadToken。 |
+| `apps/web/src/router/index.tsx` | Hash 路由配置。 |
+| `apps/web/src/api/` | Axios 实例、接口模块和接口类型。 |
+| `apps/web/src/store/` | Rematch store 和业务状态模型。 |
+| `apps/web/src/pages/Home/` | 首页布局。 |
+| `apps/web/src/pages/AIProject/List/` | 项目列表、新建项目、删除项目。 |
+| `apps/web/src/pages/AIProject/Main/Sctipt/` | 剧本设计页面。目录名当前拼写为 `Sctipt`。 |
+| `apps/web/src/pages/AIProject/Main/Video/` | 镜头设计页面。 |
+| `apps/web/src/components/` | 通用布局、上传、弹窗、图标、输入等组件。 |
+| `apps/web/src/hooks/` | Socket、鉴权、缓存请求、滚动等 hooks。 |
+| `apps/web/src/utils/` | Token、下载、七牛云、文本转换等工具。 |
+| `apps/web/src/script/` | 构建后七牛云上传和发布配置。 |
 
 ## 系统边界
 
@@ -55,7 +55,7 @@
 - 页面路由、表单、列表、聊天区、分镜资源交互。
 - 调用后端接口创建项目、查询项目、生成 Prompt、发起任务、确认资源。
 - 通过 WebSocket 接收 AI 生成、任务进度、打包下载等通知。
-- 使用 COS 临时凭证上传/下载资源。
+- 使用七牛云 uploadToken上传/下载资源。
 
 后端负责：
 

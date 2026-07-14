@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  accountId    String   @unique
+  username     String
+  passwordHash String   @default("")
+  passwordSalt String   @default("")
+  workcode     String?
+  email        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  projects Project[]
+}
+
+model Project {
+  id              Int      @id @default(autoincrement())
+  projectName     String
+  projectType     String?
+  subjectName     String?
+  termName        String?
+  gradeName       String?
+  curriculumNo    Int?
+  textbookVersion String?
+  state           String   @default("SCRIPT_INIT")
+  shotNum         Int      @default(0)
+  username        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  ownerId  Int?
+  owner    User?     @relation(fields: [ownerId], references: [id])
+  sessions Session[]
+  scripts  Script[]
+  shots    Shot[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  projectId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project  Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  messages SessionMessage[]
+  scripts  Script[]
+}
+
+model SessionMessage {
+  id        Int      @id @default(autoincrement())
+  sessionId Int
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model Script {
+  id        Int      @id @default(autoincrement())
+  projectId Int
+  sessionId Int?
+  title     String   @default("本地剧本")
+  content   String   @default("")
+  confirmed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  session Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+}
+
+model Shot {
+  id        Int      @id @default(autoincrement())
+  projectId Int
+  title     String?
+  content   String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  resources Resource[]
+}
+
+model Resource {
+  id        Int      @id @default(autoincrement())
+  shotId    Int?
+  type      String
+  url       String?
+  origin    String?
+  confirmed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shot Shot? @relation(fields: [shotId], references: [id], onDelete: SetNull)
+}
+
+model GenerationTask {
+  id        Int      @id @default(autoincrement())
+  taskId    String   @unique
+  provider  String
+  type      String
+  state     String   @default("PENDING")
+  request   String?
+  result    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FileAsset {
+  id        Int      @id @default(autoincrement())
+  fileName  String
+  url       String?
+  bucket    String?
+  region    String?
+  createdAt DateTime @default(now())
+}

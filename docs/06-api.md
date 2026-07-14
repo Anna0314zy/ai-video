@@ -1,8 +1,16 @@
 # 接口说明
 
+本地启动 NestJS 后端后，可以通过 Swagger 页面查看和测试接口：
+
+```text
+http://localhost:4000/api-docs
+```
+
+项目、会话和剧本接口已经接入 Prisma，本地默认使用 SQLite。Swagger 页面中的主要 HTTP 接口已补充 DTO 示例，可直接填写参数调试。
+
 ## 请求封装
 
-普通接口统一经过 `src/api/index.ts`：
+普通接口统一经过 `apps/web/src/api/index.ts`：
 
 - `api.get<T>(url, params, configs)`
 - `api.post<T>(url, data, configs)`
@@ -22,7 +30,7 @@
 
 ## Auth API
 
-文件：`src/api/models/auth.ts`
+文件：`apps/web/src/api/models/auth.ts`
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
@@ -35,7 +43,7 @@
 
 ## Project API
 
-文件：`src/api/models/project.ts`
+文件：`apps/web/src/api/models/project.ts`
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
@@ -48,7 +56,7 @@
 
 ## Script API
 
-文件：`src/api/models/aiScript.ts`
+文件：`apps/web/src/api/models/aiScript.ts`
 
 | 方法/常量 | 路径 | 说明 |
 | --- | --- | --- |
@@ -70,7 +78,7 @@
 
 ## Video / Resource API
 
-文件：`src/api/models/aiVideo.ts`
+文件：`apps/web/src/api/models/aiVideo.ts`
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
@@ -103,16 +111,16 @@
 
 ## Common API
 
-文件：`src/api/models/common.ts`
+文件：`apps/web/src/api/models/common.ts`
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| `getCosCredential` | `/api/cos/v1/credential` | 获取 COS 临时凭证。 |
-| `getPathConfig` | `/api/cos/v1/pathConfig` | 获取 COS 上传路径配置。 |
+| `getQiniuUploadToken` | `/api/qiniu/v1/upload-token` | 获取七牛云 uploadToken。 |
+| `getPathConfig` | `/api/qiniu/v1/pathConfig` | 获取七牛云上传路径配置。 |
 
 ## Socket 通道
 
-文件：`src/const/socket.ts`
+文件：`apps/web/src/const/socket.ts`
 
 | 常量 | 通道 | 说明 |
 | --- | --- | --- |

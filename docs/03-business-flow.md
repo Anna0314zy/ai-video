@@ -143,13 +143,13 @@ sequenceDiagram
   participant VideoPage as 镜头页
   participant API as Video API
   participant WS as STOMP
-  participant COS as COS
+  participant七牛云as七牛云
 
   User->>VideoPage: 点击打包导出
   VideoPage->>API: packageBatch(shotIds)
   API-->>VideoPage: 接受打包请求
   WS-->>VideoPage: /user/queue/shots/download/{accountId}
-  VideoPage->>COS: downloadCosObjectFile(key, fileName)
+  VideoPage->>七牛云: downloadQiniuObjectFile(key, fileName)
 ```
 
 前端只发起打包请求和下载文件，具体打包过程由后端完成。

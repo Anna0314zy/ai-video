@@ -1,10 +1,24 @@
 # 数据模型
 
-本文档基于前端类型和接口字段整理，不代表完整数据库表结构。
+本文档基于前端类型、接口字段和当前 Prisma schema 整理。数据库 schema 位于 `apps/server/prisma/schema.prisma`，本地开发默认使用 SQLite。
+
+## 当前数据库实体
+
+| 实体 | 说明 |
+| --- | --- |
+| `User` | 用户基础信息，关联项目。 |
+| `Project` | AI 内容项目，保存项目名称、学科、年级、状态、镜头数量等信息。 |
+| `Session` | 剧本/聊天会话，关联项目。 |
+| `SessionMessage` | 会话消息历史。 |
+| `Script` | 已保存剧本，关联项目和可选会话。 |
+| `Shot` | 分镜信息，关联项目。 |
+| `Resource` | 图片、视频、音频等资源，关联可选分镜。 |
+| `GenerationTask` | 第三方生成任务记录。 |
+| `FileAsset` | 上传或外部存储文件记录。 |
 
 ## ProjectList
 
-来源：`src/api/models/project.ts`
+来源：`apps/web/src/api/models/project.ts`
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -43,7 +57,7 @@
 
 ## MessageList
 
-来源：`src/api/types/script.ts`
+来源：`apps/web/src/api/types/script.ts`
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -96,7 +110,7 @@
 
 ## ShotList
 
-来源：`src/api/types/video.ts`
+来源：`apps/web/src/api/types/video.ts`
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -147,12 +161,12 @@
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | `cdnPath` | `string` | CDN 域名或路径。 |
-| `cosPathConfigList` | `Array` | 不同上传类型对应的 COS 目录配置。 |
+| `qiniuPathConfigList` | `Array` | 不同上传类型对应的七牛云目录配置。 |
 
-`cosPathConfigList` 元素：
+`qiniuPathConfigList` 元素：
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | `type` | `image | video | voice | mjImage` | 上传类型。 |
 | `name` | `string` | 展示名。 |
-| `path` | `string` | COS 目录。 |
+| `path` | `string` | 七牛云目录。 |
