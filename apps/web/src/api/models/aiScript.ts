@@ -18,7 +18,13 @@ export const createChat = (params: { projectId: number }) => {
 }
 // 获取会话的历史记录
 
-export const getChatHistories = (params: { sessionId: number; current: number; size: number }) => {
+export const getChatHistories = (params: {
+  sessionId: number
+  current: number
+  size: number
+  beforeCreated?: number | string
+  beforeId?: number
+}) => {
   return api.post<{ records: MessageList[]; size: number; total: number; current: number }>(
     `${http}/api/session/chat/getHistories`,
     params,

@@ -96,6 +96,15 @@ export class SessionHistoriesDto extends PageDto {
   @ApiProperty({ example: 1, description: '会话 ID' })
   @IsNumber()
   sessionId!: number
+
+  @ApiPropertyOptional({ example: 1721030000000, description: '加载该创建时间之前的消息，毫秒时间戳或 ISO 时间字符串' })
+  @IsOptional()
+  beforeCreated?: number | string
+
+  @ApiPropertyOptional({ example: 1001, description: '加载该消息 ID 之前的消息，用于同时间戳排序兜底' })
+  @IsOptional()
+  @IsNumber()
+  beforeId?: number
 }
 
 export class GenerateShotPromptDto {
@@ -170,6 +179,10 @@ export class StreamChatDto {
 }
 
 export class ResendMessageDto {
+  @ApiProperty({ example: 1, description: '会话 ID' })
+  @IsNumber()
+  sessionId!: number
+
   @ApiProperty({ example: 1001, description: '需要重新生成的消息 ID' })
   @IsNumber()
   sessionChatId!: number

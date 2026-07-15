@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import crypto from 'node:crypto'
 import { PrismaService } from '../../prisma/prisma.service.js'
 import { AppException } from '../../common/app-exception.js'
+import type { LlmMessage } from '../../llm/llm-provider.js'
 
 interface CurrentUser {
   id: number
@@ -28,25 +29,45 @@ export class ScriptService {
     return session.id
   }
 
-  async histories(params: { sessionId: number; current?: number; size?: number }) {
+  async histories(params: { sessionId: number; current?: number; size?: number; beforeCreated?: number | string; beforeId?: number }) {
     const current = params.current || 1
     const size = params.size || 10
     const sessionId = Number(params.sessionId)
     if (!Number.isFinite(sessionId) || sessionId <= 0) throw new AppException('validation')
 
-    const where = { sessionId }
-    const [total, records] = await this.prisma.$transaction([
-      this.prisma.sessionMessage.count({ where }),
-      this.prisma.sessionMessage.findMany({
+    const cursor = parseBeforeCursor(params.beforeCreated, params.beforeId)
+    const where = cursor
+      ? {
+          sessionId,
+          OR: [
+            { createdAt: { lt: cursor.createdAt } },
+            {
+              createdAt: cursor.createdAt,
+              id: { lt: cursor.id },
+            },
+          ],
+        }
+      : { sessionId }
+    const total = await this.prisma.sessionMessage.count({ where })
+    const records = cursor
+      ? await this.prisma.sessionMessage.findMany({
+          where,
+          orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+          take: size,
+        })
+      : await this.prisma.sessionMessage.findMany({
         where,
-        orderBy: { createdAt: 'asc' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         skip: (current - 1) * size,
         take: size,
-      }),
-    ])
+      })
+    const sortedRecords = [...records].sort((a, b) => {
+      const createdDiff = a.createdAt.getTime() - b.createdAt.getTime()
+      return createdDiff || a.id - b.id
+    })
 
     return {
-      records: records.map(mapSessionMessage),
+      records: sortedRecords.map(mapSessionMessage),
       current,
       size,
       total,
@@ -92,6 +113,49 @@ export class ScriptService {
       promptRequestLogId: task.id,
       taskId: task.taskId,
     }
+  }
+
+  async buildResendMessages(params: { sessionId?: number; sessionChatId?: number | string }): Promise<LlmMessage[]> {
+    const sessionId = Number(params.sessionId)
+    const targetId = Number(params.sessionChatId)
+    if (!Number.isFinite(sessionId) || sessionId <= 0 || !Number.isFinite(targetId) || targetId <= 0) {
+      throw new AppException('validation')
+    }
+
+    const target = await this.prisma.sessionMessage.findFirst({
+      where: {
+        id: targetId,
+        sessionId,
+      },
+    })
+    if (!target) throw new AppException('not-found')
+
+    const context = await this.prisma.sessionMessage.findMany({
+      where: {
+        sessionId,
+        OR: [
+          { createdAt: { lt: target.createdAt } },
+          {
+            createdAt: target.createdAt,
+            id: { lt: target.id },
+          },
+        ],
+      },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      take: 20,
+    })
+
+    return [
+      ...context.reverse().map(message => ({
+        role: normalizeMessageRole(message.role),
+        content: message.content,
+      })),
+      {
+        role: 'user',
+        content:
+          '请基于以上对话上下文，重新生成上一条助手回复。只输出新的剧本内容，不要解释，不要提到无法看到上下文，不要输出“重新生成”说明。',
+      },
+    ]
   }
 
   async pageScript(params: { current?: number; size?: number; projectId?: number }) {
@@ -154,6 +218,14 @@ export class ScriptService {
   }
 }
 
+function parseBeforeCursor(beforeCreated?: number | string, beforeId?: number) {
+  if (!beforeCreated || !beforeId) return null
+  const createdAt = typeof beforeCreated === 'number' ? new Date(beforeCreated) : new Date(beforeCreated)
+  const id = Number(beforeId)
+  if (Number.isNaN(createdAt.getTime()) || !Number.isFinite(id) || id <= 0) return null
+  return { createdAt, id }
+}
+
 function mapSessionMessage(message: any) {
   return {
     ...message,
@@ -170,6 +242,12 @@ function mapScript(script: any) {
     scriptText: script.content,
     created: script.createdAt?.toISOString?.() || script.created,
   }
+}
+
+function normalizeMessageRole(role: string): LlmMessage['role'] {
+  if (role === 'assistant' || role === 'system' || role === 'user') return role
+  if (role === 'gpt') return 'assistant'
+  return 'user'
 }
 
 function toOptionalNumber(value: unknown) {

@@ -1,7 +1,9 @@
 import { createRequire } from 'node:module'
 import { randomUUID } from 'node:crypto'
 import type { LlmService } from '../../llm/llm.service.js'
+import type { LlmMessage } from '../../llm/llm-provider.js'
 import type { PrismaService } from '../../prisma/prisma.service.js'
+import { withScriptMarkdownSystemPrompt } from '../script/script-markdown.js'
 
 const require = createRequire(import.meta.url)
 const sockjs = require('sockjs')
@@ -158,13 +160,15 @@ async function handleScriptChat(body: string, destination: string) {
   const requestId = payload.requestId || randomUUID()
   if (!accountId || !Number.isFinite(sessionId) || !llmService || !prismaService) return
 
-  const prompt = getScriptPromptFromPayload(payload, destination)
-  if (prompt) {
+  const generation = await buildScriptGeneration(payload, destination, sessionId)
+  if (!generation) return
+
+  if (generation.userMessageContent) {
     await prismaService.sessionMessage.create({
       data: {
         sessionId,
         role: 'user',
-        content: prompt,
+        content: generation.userMessageContent,
       },
     })
   }
@@ -173,7 +177,7 @@ async function handleScriptChat(body: string, destination: string) {
   const completedDestination = `/user/queue/session/chat/reply/completed/${accountId}`
   let content = ''
 
-  for await (const chunk of llmService.streamScript([{ role: 'user', content: prompt }])) {
+  for await (const chunk of llmService.streamScript(withScriptMarkdownSystemPrompt(generation.messages))) {
     if (chunk.content) {
       content += chunk.content
       publish(replyDestination, {
@@ -206,14 +210,98 @@ async function handleScriptChat(body: string, destination: string) {
   })
 }
 
-function getScriptPromptFromPayload(
+async function buildScriptGeneration(
   payload: { text?: string; sessionChatId?: number | string },
   destination: string,
-) {
-  if (payload.text) return payload.text
-  if (destination === '/app/ai/stream/session/resend') return `重新生成 ${payload.sessionChatId || ''}`
-  if (destination === '/app/ai/stream/session/continueOutput') return `继续输出 ${payload.sessionChatId || ''}`
-  return ''
+  sessionId: number,
+): Promise<{ messages: LlmMessage[]; userMessageContent?: string } | null> {
+  const text = payload.text?.trim()
+  if (destination === '/app/ai/stream/session/chat') {
+    if (!text) return null
+    return {
+      messages: [{ role: 'user', content: text }],
+      userMessageContent: text,
+    }
+  }
+
+  if (destination === '/app/ai/stream/session/resend') {
+    return buildReplayGeneration(sessionId, payload.sessionChatId, 'resend')
+  }
+
+  if (destination === '/app/ai/stream/session/continueOutput') {
+    return buildReplayGeneration(sessionId, payload.sessionChatId, 'continue')
+  }
+
+  return null
+}
+
+async function buildReplayGeneration(
+  sessionId: number,
+  sessionChatId: number | string | undefined,
+  mode: 'resend' | 'continue',
+): Promise<{ messages: LlmMessage[] }> {
+  if (!prismaService) throw new Error('消息服务未就绪')
+
+  const targetId = Number(sessionChatId)
+  if (!Number.isFinite(targetId) || targetId <= 0) throw new Error('缺少需要处理的消息')
+
+  const target = await prismaService.sessionMessage.findFirst({
+    where: {
+      id: targetId,
+      sessionId,
+    },
+  })
+  if (!target) throw new Error('未找到需要处理的消息')
+
+  const contextWhere =
+    mode === 'continue'
+      ? {
+          sessionId,
+          OR: [
+            { createdAt: { lt: target.createdAt } },
+            {
+              createdAt: target.createdAt,
+              id: { lte: target.id },
+            },
+          ],
+        }
+      : {
+          sessionId,
+          OR: [
+            { createdAt: { lt: target.createdAt } },
+            {
+              createdAt: target.createdAt,
+              id: { lt: target.id },
+            },
+          ],
+        }
+
+  const context = await prismaService.sessionMessage.findMany({
+    where: contextWhere,
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    take: 20,
+  })
+
+  const messages = context.reverse().map(message => ({
+    role: normalizeMessageRole(message.role),
+    content: message.content,
+  }))
+
+  messages.push({
+    role: 'user',
+    content:
+      mode === 'continue'
+        ? '请从上一条助手回复的结尾继续输出，保持原有风格和结构。只输出续写内容，不要解释，不要提到无法看到上下文。'
+        : '请基于以上对话上下文，重新生成上一条助手回复。只输出新的剧本内容，不要解释，不要提到无法看到上下文，不要输出“重新生成”说明。',
+  })
+
+  return { messages }
+}
+
+function normalizeMessageRole(role: string): LlmMessage['role'] {
+  if (role === 'assistant' || role === 'system' || role === 'user') return role
+  if (role === 'gpt') return 'assistant'
+  return 'user'
 }
 
 function publish(destination: string, payload: unknown) {

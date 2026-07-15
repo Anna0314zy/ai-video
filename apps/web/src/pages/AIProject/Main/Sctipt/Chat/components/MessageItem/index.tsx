@@ -5,7 +5,7 @@ import { Flex } from 'antd'
 import ScriptBtn from './ScriptBtn'
 import Style from './index.module.less'
 import classNames from 'classnames'
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { ScriptSocketPayload } from '@/hooks/useScriptSocket'
 interface IProps {
   messageInfo: MessageList
@@ -14,6 +14,10 @@ interface IProps {
   onContinue: (params: ScriptSocketPayload) => boolean
 }
 const MessageItem = ({ messageInfo, md, onResend, onContinue }: IProps) => {
+  const renderedHtml = useMemo(() => {
+    return md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : '')
+  }, [md, messageInfo.messageContent])
+
   if (!messageInfo.messageContent) return null
   return (
     <HeadLayout messageInfo={messageInfo}>
@@ -23,7 +27,7 @@ const MessageItem = ({ messageInfo, md, onResend, onContinue }: IProps) => {
         <div
           className={Style['message-content-inner']}
           dangerouslySetInnerHTML={{
-            __html: md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''),
+            __html: renderedHtml,
           }}></div>
         {messageInfo.role === Role.user && <FileChat messageInfo={messageInfo}></FileChat>}
         {messageInfo.role === Role.Gpt && (

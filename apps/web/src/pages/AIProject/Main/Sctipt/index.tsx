@@ -35,6 +35,7 @@ export default () => {
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
   const [chatIngText, setChatIngText] = useState('')
+  const [streamScrollKey, setStreamScrollKey] = useState(0)
   const streamBufferRef = useRef('')
   const streamFlushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const currentStreamRef = useRef<{
@@ -129,6 +130,7 @@ export default () => {
         requestId,
       }
       setChatIngText('')
+      setStreamScrollKey(key => key + 1)
       streamBufferRef.current = ''
       return sender({
         ...params,
@@ -160,6 +162,7 @@ export default () => {
         <Content style={contentStyle}>
           <ChatContent
             chatIngText={chatIngText}
+            streamScrollKey={streamScrollKey}
             onResend={handleResendMessage}
             onContinue={handleContinueOutput}
           />

@@ -14,7 +14,9 @@ import {
 } from '../../common/swagger-dto.js'
 import { AppException } from '../../common/app-exception.js'
 import { LlmService } from '../../llm/llm.service.js'
+import type { LlmMessage } from '../../llm/llm-provider.js'
 import { ScriptService } from './script.service.js'
+import { withScriptMarkdownSystemPrompt } from './script-markdown.js'
 
 @ApiTags('剧本 Script')
 @Controller()
@@ -130,17 +132,26 @@ export class ScriptController {
   @ApiOperation({ summary: 'SSE 重新生成消息' })
   @ApiBody({ type: ResendMessageDto })
   resend(@Body() body: ResendMessageDto) {
-    return this.streamFromPrompt(`重新生成 ${body.sessionChatId || ''}`)
+    return new Observable(subscriber => {
+      void (async () => {
+        const messages = await this.scriptService.buildResendMessages(body)
+        await this.streamMessagesToSubscriber(messages, subscriber)
+      })().catch(error => subscriber.error(error))
+    })
   }
 
   private streamFromPrompt(prompt: string) {
     return new Observable(subscriber => {
       void (async () => {
-        for await (const chunk of this.llmService.streamScript([{ role: 'user', content: prompt }])) {
-          subscriber.next({ data: chunk.content })
-          if (chunk.done) subscriber.complete()
-        }
+        await this.streamMessagesToSubscriber([{ role: 'user', content: prompt }], subscriber)
       })().catch(error => subscriber.error(error))
     })
+  }
+
+  private async streamMessagesToSubscriber(messages: LlmMessage[], subscriber: any) {
+    for await (const chunk of this.llmService.streamScript(withScriptMarkdownSystemPrompt(messages))) {
+      subscriber.next({ data: chunk.content })
+      if (chunk.done) subscriber.complete()
+    }
   }
 }

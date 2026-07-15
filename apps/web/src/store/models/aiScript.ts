@@ -7,6 +7,16 @@ import { RootState } from '..'
 import { get, set, uniqBy } from 'lodash-es'
 import { elementScrollIntoView, convertToMarkdown } from '@/utils'
 import { v4 as uuidv4 } from 'uuid'
+
+const getMessageCreatedTime = (message: MessageList) => {
+  if (typeof message.created === 'number') return message.created
+  return Number(new Date(message.created || 0))
+}
+
+const sortMessagesByCreated = (messages: MessageList[]) => {
+  return [...messages].sort((a, b) => getMessageCreatedTime(a) - getMessageCreatedTime(b))
+}
+
 interface AiScriptState {
   scriptPageListMap: {
     data: ScriptPageList[]
@@ -70,7 +80,7 @@ export default createModel<RootModel>()({
         }
         return item
       })
-      set(state, `messageListMap.data`, uniqBy([...transformedData, payload], 'id'))
+      set(state, `messageListMap.data`, sortMessagesByCreated(uniqBy([...transformedData, payload], 'id')))
     },
     deleteMessageByResourceId(state, params: { scriptId: number }) {
       const { scriptId } = params
@@ -107,7 +117,7 @@ export default createModel<RootModel>()({
       const params = Array.isArray(data) ? data : [data]
       const oldData: MessageList[] = get(state, `messageListMap.data`, [])
       const total = get(state, `messageListMap.total`) || 0
-      set(state, `messageListMap.data`, [...oldData, ...params])
+      set(state, `messageListMap.data`, sortMessagesByCreated([...oldData, ...params]))
       set(state, `messageListMap.total`, total + params.length)
       elementScrollIntoView(params[0].id)
     },
@@ -122,12 +132,13 @@ export default createModel<RootModel>()({
       const records = data?.records || []
       // 获取旧数据
       const old = get(state, `messageListMap.data`, [])
+      const oldTotal = get(state, `messageListMap.total`)
       // 根据 scroll 参数决定是否合并新数据
-      const newData = scroll ? uniqBy([...old, ...records], 'id') : records
+      const newData = scroll ? sortMessagesByCreated(uniqBy([...records, ...old], 'id')) : sortMessagesByCreated(records)
       // 使用 set 方法更新数据，Redux Toolkit 会处理不可变性
       set(state, `messageListMap`, {
         data: newData,
-        total: data.total,
+        total: scroll ? oldTotal ?? data.total : data.total,
         size: data.size,
       })
     },
@@ -174,7 +185,14 @@ export default createModel<RootModel>()({
       { current = 1, size = 30, scroll = false }: { current: number; size?: number; scroll?: boolean },
       state: RootState,
     ) {
-      const res = await api.getChatHistories({ sessionId: state.aiScript.currentSessionId!, current, size })
+      const firstMessage = state.aiScript.messageListMap.data?.[0]
+      const res = await api.getChatHistories({
+        sessionId: state.aiScript.currentSessionId!,
+        current,
+        size,
+        beforeCreated: scroll ? firstMessage?.created : undefined,
+        beforeId: scroll ? Number(firstMessage?.id) : undefined,
+      })
 
       const records = res.records || []
       const data = records.map(v => {
