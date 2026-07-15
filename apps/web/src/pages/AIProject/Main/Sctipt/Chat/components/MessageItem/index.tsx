@@ -7,6 +7,7 @@ import Style from './index.module.less'
 import classNames from 'classnames'
 import { memo, useMemo } from 'react'
 import { ScriptSocketPayload } from '@/hooks/useScriptSocket'
+import { normalizeMarkdownSource } from '@/utils'
 interface IProps {
   messageInfo: MessageList
   md: any
@@ -15,7 +16,7 @@ interface IProps {
 }
 const MessageItem = ({ messageInfo, md, onResend, onContinue }: IProps) => {
   const renderedHtml = useMemo(() => {
-    return md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : '')
+    return md.render(normalizeMarkdownSource(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''))
   }, [md, messageInfo.messageContent])
 
   if (!messageInfo.messageContent) return null

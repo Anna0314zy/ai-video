@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import classNames from 'classnames'
 import Style from './index.module.less'
+import { normalizeMarkdownSource } from '@/utils'
 interface IProps {
   messageInfo: MessageList
   md: any
@@ -16,7 +17,7 @@ interface IProps {
 const GptMessage = ({ messageInfo, md, chatIngText }: IProps) => {
   const { chatIng } = useSelector((state: RootState) => state.aiScript)
   const renderedHtml = useMemo(() => {
-    return md.render(typeof chatIngText === 'string' ? chatIngText : '')
+    return md.render(normalizeMarkdownSource(typeof chatIngText === 'string' ? chatIngText : ''))
   }, [md, chatIngText])
 
   return (

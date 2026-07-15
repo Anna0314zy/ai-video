@@ -51,19 +51,17 @@ export const downloadFromServer = async (url: string, filename?: string) => {
 }
 
 export function convertToMarkdown(text: string) {
-  // 处理文本中的特殊字符
-  // 将 \s 替换为普通空格
-  // 将 \t 替换为 Markdown 表格列分隔符
-  // 将 \n 替换为 Markdown 行分隔符
-  const replacedText = text
-    .replace(/\\s/g, '  ') // 替换 \s 为普通空格
-    .replace(/\\t/g, '  ') // 替换 \t 为管道符
-  // .split('\\n') // 按 \n 分隔行
+  return text
+    .replace(/\\r\\n/g, '\n')
+    .replace(/\\n/g, '\n')
+    .replace(/\\t/g, '\t')
+    .replace(/\\s/g, ' ')
+}
 
-  // 生成 Markdown 表格
-  // console.log(replacedText.replace(/(\\S)\\n/g, '$1  \n'))
-
-  return replacedText.replace(/(\S)\\n/g, '$1  \n').replace(/\\n/g, '  \n')
+export function normalizeMarkdownSource(text: string) {
+  const trimmed = text.trim()
+  const match = trimmed.match(/^```(?:markdown|md|text)?\s*\n([\s\S]*?)\n```$/i)
+  return match ? match[1] : text
 }
 
 export function elementScrollIntoView(id: number | string) {

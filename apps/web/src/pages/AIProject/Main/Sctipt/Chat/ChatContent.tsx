@@ -1,5 +1,7 @@
 import { MessageList, Role } from '@/api/types/script'
 import MarkdownIt from 'markdown-it'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github.css'
 import MessageItem from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageItem'
 import GptMessage from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageItem/GptMessage'
 import { useCallback, useMemo, useEffect, useRef, useState } from 'react'
@@ -21,6 +23,37 @@ const CHAT_HISTORY_PAGE_SIZE = 15
 const ESTIMATED_MESSAGE_HEIGHT = 120
 const LOAD_OLDER_OVERSCAN_COUNT = 2
 
+const escapeHtml = (value: string) => {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
+const createMarkdownRenderer = () => {
+  return new MarkdownIt({
+    linkify: true,
+    breaks: true,
+    highlight(code, language) {
+      if (language && hljs.getLanguage(language)) {
+        try {
+          const highlighted = hljs.highlight(code, {
+            language,
+            ignoreIllegals: true,
+          }).value
+          return `<pre class="hljs"><code class="language-${language}">${highlighted}</code></pre>`
+        } catch {
+          return `<pre class="hljs"><code>${escapeHtml(code)}</code></pre>`
+        }
+      }
+
+      return `<pre class="hljs"><code>${escapeHtml(code)}</code></pre>`
+    },
+  })
+}
+
 const VirtuosoItem = (props: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     {...props}
@@ -34,7 +67,7 @@ const VirtuosoItem = (props: React.HTMLAttributes<HTMLDivElement>) => (
 )
 
 const ChatContent = ({ chatIngText, streamScrollKey, onResend, onContinue }: ChatContentProps) => {
-  const md = useMemo(() => new MarkdownIt(), [])
+  const md = useMemo(() => createMarkdownRenderer(), [])
   const { messageListMap, currentSessionId, chatIng } = useSelector((state: RootState) => state.aiScript)
   const dispatch = useDispatch<Dispatch>()
   const virtuosoRef = useRef<VirtuosoHandle>(null)
@@ -189,6 +222,10 @@ const ChatContent = ({ chatIngText, streamScrollKey, onResend, onContinue }: Cha
           }
           increaseViewportBy={{ top: 600, bottom: 200 }}
           startReached={loadOlderMessages}
+          computeItemKey={index => {
+            const item = displayMessages[index - firstLoadedIndex]
+            return item ? String(item.id) : `placeholder-${index}`
+          }}
           atTopStateChange={atTop => {
             if (atTop) loadOlderMessages()
           }}
