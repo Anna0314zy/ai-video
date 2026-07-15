@@ -5,12 +5,16 @@ import { Flex } from 'antd'
 import ScriptBtn from './ScriptBtn'
 import Style from './index.module.less'
 import classNames from 'classnames'
+import { memo } from 'react'
+import { ScriptSocketPayload } from '@/hooks/useScriptSocket'
 interface IProps {
   messageInfo: MessageList
   md: any
+  onResend: (params: ScriptSocketPayload) => boolean
+  onContinue: (params: ScriptSocketPayload) => boolean
 }
-export default ({ messageInfo, md }: IProps) => {
-  if (!messageInfo.messageContent) return
+const MessageItem = ({ messageInfo, md, onResend, onContinue }: IProps) => {
+  if (!messageInfo.messageContent) return null
   return (
     <HeadLayout messageInfo={messageInfo}>
       <Flex
@@ -22,8 +26,16 @@ export default ({ messageInfo, md }: IProps) => {
             __html: md.render(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''),
           }}></div>
         {messageInfo.role === Role.user && <FileChat messageInfo={messageInfo}></FileChat>}
-        {messageInfo.role === Role.Gpt && <ScriptBtn messageInfo={messageInfo} />}
+        {messageInfo.role === Role.Gpt && (
+          <ScriptBtn
+            messageInfo={messageInfo}
+            onResend={onResend}
+            onContinue={onContinue}
+          />
+        )}
       </Flex>
     </HeadLayout>
   )
 }
+
+export default memo(MessageItem)

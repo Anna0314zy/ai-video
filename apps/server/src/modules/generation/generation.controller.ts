@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Inject, Param, Post, Query } from '@nestjs/common'
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
+import { AppException } from '../../common/app-exception.js'
 import { AudioTaskDto, ImagePromptDto, ImageToVideoTaskDto, TextToImageTaskDto, TextToVideoTaskDto } from '../../common/swagger-dto.js'
 import { GenerationService } from './generation.service.js'
 
@@ -19,7 +20,7 @@ export class GenerationController {
   @ApiOperation({ summary: '创建文生图任务' })
   @ApiBody({ type: TextToImageTaskDto })
   addTextToImageTask(@Body() body: TextToImageTaskDto) {
-    return this.generationService.addTextToImageTask()
+    return this.generationService.addTextToImageTask(body)
   }
 
   @Post('api/text2video/v1/generateVideo/addTask')
@@ -33,21 +34,21 @@ export class GenerationController {
   @ApiOperation({ summary: '创建图生视频任务' })
   @ApiBody({ type: ImageToVideoTaskDto })
   addImageToVideoTask(@Body() body: ImageToVideoTaskDto) {
-    return this.generationService.addImageToVideoTask()
+    return this.generationService.addImageToVideoTask(body)
   }
 
   @Post('api/prompt/v1/generateImage/parse')
   @ApiOperation({ summary: '生成图片 prompt' })
   @ApiBody({ type: ImagePromptDto })
   generateImagePrompt(@Body() body: ImagePromptDto) {
-    return JSON.stringify(body)
+    throw new AppException('feature-not-configured', '图片 prompt 生成 provider 尚未配置')
   }
 
   @Get('api/prompt/v1/translate')
   @ApiOperation({ summary: 'Prompt 翻译' })
   @ApiQuery({ name: 'text', example: '一只纸飞机飞过教室', description: '待翻译文本' })
   translate(@Query('text') text: string) {
-    return text
+    throw new AppException('feature-not-configured', 'Prompt 翻译 provider 尚未配置')
   }
 
   @Get('api/tts/v1/languages')
@@ -83,13 +84,13 @@ export class GenerationController {
   @ApiOperation({ summary: '创建 TTS 音频任务' })
   @ApiBody({ type: AudioTaskDto })
   addAudioTask(@Body() body: AudioTaskDto) {
-    return { taskId: `tts-${Date.now()}`, state: 'PENDING', ...body }
+    return this.generationService.addAudioTask(body)
   }
 
   @Post('api/queue/v1/task/reinstateTask')
   @ApiOperation({ summary: '任务重试' })
   @ApiQuery({ name: 'taskId', example: 'task-001', description: '任务 ID' })
   reinstateTask(@Query('taskId') taskId: string) {
-    return { taskId, state: 'PENDING' }
+    return this.generationService.reinstateTask(taskId)
   }
 }

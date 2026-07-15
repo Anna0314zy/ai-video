@@ -177,108 +177,145 @@ export class ResendMessageDto {
 
 export class DeleteScriptDto {
   @ApiProperty({ example: [1, 2], description: '剧本 ID 列表', type: [Number] })
+  @IsArray()
+  @IsNumber({}, { each: true })
   scriptIdList!: number[]
 }
 
 export class ConfirmScriptDto {
   @ApiProperty({ example: 1, description: '项目 ID' })
+  @IsNumber()
   projectId!: number
 
   @ApiProperty({ example: 1, description: '确认使用的剧本 ID' })
+  @IsNumber()
   scriptId!: number
 }
 
 export class TextToVideoTaskDto {
   @ApiProperty({ example: '一只纸飞机飞过教室', description: '文生视频 prompt' })
+  @IsString()
   prompt!: string
 }
 
 export class TextToImageTaskDto {
   @ApiProperty({ example: '卡通风格太阳系科普海报', description: '文生图 prompt' })
+  @IsString()
   prompt!: string
 
   @ApiPropertyOptional({ example: 1, description: '分镜 ID' })
+  @IsOptional()
+  @IsNumber()
   shotId?: number
 }
 
 export class ImageToVideoTaskDto {
   @ApiProperty({ example: 'image/demo.png', description: '七牛云图片对象 key 或图片 URL' })
+  @IsString()
   imageUrl!: string
 
   @ApiPropertyOptional({ example: '镜头缓慢推进', description: '图生视频 prompt' })
+  @IsOptional()
+  @IsString()
   prompt?: string
 }
 
 export class ImagePromptDto {
   @ApiProperty({ example: '可爱的卡通太阳系插画', description: '图片生成中文 prompt' })
+  @IsString()
   prompt!: string
 }
 
 export class AudioTaskDto {
   @ApiProperty({ example: '大家好，今天我们学习太阳系。', description: '需要合成的音频文本' })
+  @IsString()
   text!: string
 }
 
 export class QiniuUploadTokenQueryDto {
   @ApiPropertyOptional({ example: 'qiqi123456', description: '七牛云 bucketName，不传使用服务端默认配置' })
+  @IsOptional()
+  @IsString()
   bucketName?: string
 }
 
 export class FileUploadDto {
   @ApiPropertyOptional({ example: 'demo.png', description: '上传文件名。Swagger 调试占位，真实上传使用 multipart/form-data。' })
+  @IsOptional()
+  @IsString()
   fileName?: string
 }
 
 export class SaveImageResourceDto {
   @ApiProperty({ example: 1, description: '分镜 ID' })
+  @IsNumber()
   shotId!: number
 
   @ApiProperty({ example: 'image/demo.png', description: '七牛云图片对象 key' })
+  @IsString()
   originUrl!: string
 
   @ApiPropertyOptional({ example: 'image/demo-small.png', description: '压缩图对象 key' })
+  @IsOptional()
+  @IsString()
   compressUrl?: string
 }
 
 export class ResourcePageQueryDto {
   @ApiPropertyOptional({ example: 1, description: '当前页码' })
+  @IsOptional()
+  @IsNumber()
   pageIndex?: number
 
   @ApiPropertyOptional({ example: 10, description: '每页条数' })
+  @IsOptional()
+  @IsNumber()
   pageSize?: number
 
   @ApiPropertyOptional({ example: 1, description: '项目或分镜 ID' })
+  @IsOptional()
+  @IsNumber()
   shotId?: number
 
   @ApiPropertyOptional({ example: 'image', description: '资源类型：image/video/voice' })
+  @IsOptional()
+  @IsString()
   type?: string
 }
 
 export class ResourceImportDto {
   @ApiProperty({ example: 1, description: '分镜 ID' })
+  @IsNumber()
   shotId!: number
 
   @ApiProperty({ example: 'voice/demo.mp3', description: '七牛云对象 key' })
+  @IsString()
   originPath!: string
 
   @ApiProperty({ example: 'voice', description: '资源类型：image/video/voice' })
+  @IsString()
   type!: string
 }
 
 export class ShotListQueryDto {
   @ApiProperty({ example: 1, description: '项目 ID' })
+  @IsNumber()
   projectId!: number
 }
 
 export class SaveShotListDto {
   @ApiProperty({ example: 1, description: '项目 ID' })
+  @IsNumber()
   projectId!: number
 
   @ApiProperty({ example: [], description: '分镜列表' })
+  @IsArray()
   shotInfoDtoList!: unknown[]
 }
 
 export class PackageBatchDto {
   @ApiProperty({ example: [1, 2, 3], description: '分镜 ID 列表', type: [Number] })
+  @IsArray()
+  @IsNumber({}, { each: true })
   shotIds!: number[]
 }

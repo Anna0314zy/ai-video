@@ -24,7 +24,6 @@ interface AiScriptState {
   }
   chatIng: boolean
   chatIngText: string
-  stompSocket: any
 }
 export default createModel<RootModel>()({
   state: {
@@ -44,7 +43,6 @@ export default createModel<RootModel>()({
     currentProjectDetail: {} as ProjectList,
     chatIng: false,
     chatIngText: '',
-    stompSocket: null,
   } as AiScriptState,
   reducers: {
     updateData(state, payload: Partial<AiScriptState>) {
@@ -72,7 +70,7 @@ export default createModel<RootModel>()({
         }
         return item
       })
-      set(state, `messageListMap.data`, uniqBy([payload, ...transformedData], 'id'))
+      set(state, `messageListMap.data`, uniqBy([...transformedData, payload], 'id'))
     },
     deleteMessageByResourceId(state, params: { scriptId: number }) {
       const { scriptId } = params
@@ -109,7 +107,7 @@ export default createModel<RootModel>()({
       const params = Array.isArray(data) ? data : [data]
       const oldData: MessageList[] = get(state, `messageListMap.data`, [])
       const total = get(state, `messageListMap.total`) || 0
-      set(state, `messageListMap.data`, [...params, ...oldData])
+      set(state, `messageListMap.data`, [...oldData, ...params])
       set(state, `messageListMap.total`, total + params.length)
       elementScrollIntoView(params[0].id)
     },

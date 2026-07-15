@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
+import crypto from 'node:crypto'
 import { PrismaService } from '../../prisma/prisma.service.js'
 import { AppException } from '../../common/app-exception.js'
 
@@ -45,7 +46,7 @@ export class ScriptService {
     ])
 
     return {
-      records,
+      records: records.map(mapSessionMessage),
       current,
       size,
       total,
@@ -66,11 +67,31 @@ export class ScriptService {
       data: {
         projectId: project.id,
         sessionId: toOptionalNumber(params.sessionId),
-        title: params.scriptName || params.title || '本地剧本',
+        title: params.scriptName || params.title || '未命名剧本',
         content: params.scriptText || params.content || '',
       },
     })
     return mapScript(script)
+  }
+
+  async createShotPromptLog(body: any) {
+    const prompt = JSON.stringify(body)
+    const task = await this.prisma.generationTask.create({
+      data: {
+        taskId: `shot-prompt-${crypto.randomUUID()}`,
+        provider: 'internal',
+        type: 'shot-prompt-parse',
+        state: 'SUCCESS',
+        request: JSON.stringify(body || {}),
+        result: JSON.stringify({ prompt }),
+      },
+    })
+
+    return {
+      prompt,
+      promptRequestLogId: task.id,
+      taskId: task.taskId,
+    }
   }
 
   async pageScript(params: { current?: number; size?: number; projectId?: number }) {
@@ -93,6 +114,51 @@ export class ScriptService {
       total,
       records: records.map(mapScript),
     }
+  }
+
+  async previewScript(scriptId: number) {
+    const script = await this.prisma.script.findUnique({ where: { id: Number(scriptId) } })
+    if (!script) throw new AppException('not-found')
+    return mapScript(script)
+  }
+
+  async deleteScripts(scriptIdList: number[]) {
+    const ids = scriptIdList.map(Number).filter(id => Number.isFinite(id) && id > 0)
+    await this.prisma.script.deleteMany({ where: { id: { in: ids } } })
+    return { scriptIdList: ids }
+  }
+
+  async confirmScript(params: { projectId: number; scriptId: number }) {
+    const projectId = Number(params.projectId)
+    const scriptId = Number(params.scriptId)
+    const script = await this.prisma.script.findFirst({ where: { id: scriptId, projectId } })
+    if (!script) throw new AppException('not-found')
+
+    const updated = await this.prisma.$transaction(async tx => {
+      await tx.script.updateMany({
+        where: { projectId },
+        data: { confirmed: false },
+      })
+      const confirmedScript = await tx.script.update({
+        where: { id: scriptId },
+        data: { confirmed: true },
+      })
+      await tx.project.update({
+        where: { id: projectId },
+        data: { state: 'ScriptConfirmed' },
+      })
+      return confirmedScript
+    })
+
+    return mapScript(updated)
+  }
+}
+
+function mapSessionMessage(message: any) {
+  return {
+    ...message,
+    messageContent: message.content,
+    created: message.createdAt?.getTime?.() || message.created,
   }
 }
 

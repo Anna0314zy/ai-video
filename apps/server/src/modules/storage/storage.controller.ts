@@ -4,11 +4,15 @@ import { createHmac } from 'node:crypto'
 import { AppException } from '../../common/app-exception.js'
 import { FileUploadDto, SaveImageResourceDto } from '../../common/swagger-dto.js'
 import { ConfigService } from '../../config/config.service.js'
+import { PrismaService } from '../../prisma/prisma.service.js'
 
 @ApiTags('存储 Storage')
 @Controller()
 export class StorageController {
-  constructor(@Inject(ConfigService) private readonly configService: ConfigService) {}
+  constructor(
+    @Inject(ConfigService) private readonly configService: ConfigService,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+  ) {}
 
   @Get('api/qiniu/v1/upload-token')
   @ApiOperation({ summary: '获取七牛云 uploadToken', description: '服务端用 .env 中的七牛云密钥签发临时上传 token。' })
@@ -61,23 +65,54 @@ export class StorageController {
   @Post('api/file/v1/upload')
   @ApiOperation({ summary: '兼容文件上传接口', description: '真实素材上传走七牛云直传，此接口保留 fileId/fileName 兼容结构。' })
   @ApiBody({ type: FileUploadDto })
-  upload() {
+  async upload(@Body() body: FileUploadDto) {
+    if (!body.fileName) {
+      throw new AppException('validation', 'fileName 不能为空；真实文件上传请使用七牛云直传')
+    }
+
+    const asset = await this.prisma.fileAsset.create({
+      data: {
+        fileName: body.fileName,
+        bucket: this.configService.value.storage.bucketName,
+        region: this.configService.value.storage.provider,
+      },
+    })
+
     return {
-      fileId: Date.now(),
-      fileName: 'uploaded-file',
+      fileId: asset.id,
+      fileName: asset.fileName,
+      url: asset.url,
     }
   }
 
   @Post('api/text2image/v1/image/resource/save')
   @ApiOperation({ summary: '保存图片资源' })
   @ApiBody({ type: SaveImageResourceDto })
-  saveImageResource(@Body() body: SaveImageResourceDto) {
+  async saveImageResource(@Body() body: SaveImageResourceDto) {
+    const resource = await this.prisma.resource.create({
+      data: {
+        shotId: body.shotId,
+        type: 'image',
+        url: body.compressUrl || body.originUrl,
+        origin: body.originUrl,
+      },
+    })
+
     return {
       current: 1,
       size: 10,
-      total: 0,
-      records: [],
+      total: 1,
+      records: [mapResource(resource)],
     }
+  }
+}
+
+function mapResource(resource: any) {
+  return {
+    ...resource,
+    resourceId: resource.id,
+    originPath: resource.origin,
+    created: resource.createdAt?.toISOString?.(),
   }
 }
 

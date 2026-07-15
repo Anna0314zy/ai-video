@@ -32,5 +32,9 @@ const ERROR_MAP: Record<AppErrorKind, { code: number; message: string }> = {
 
 export function mapErrorToResponse(error: AppErrorLike): ApiResponse<null> {
   const mapped = ERROR_MAP[error.kind] || ERROR_MAP.unknown
-  return fail(mapped.code, mapped.message)
+  return fail(mapped.code, canExposeMessage(error.kind) && error.message ? error.message : mapped.message)
+}
+
+function canExposeMessage(kind: AppErrorKind) {
+  return kind === 'validation' || kind === 'feature-not-configured' || kind === 'not-found'
 }

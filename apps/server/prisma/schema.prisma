@@ -68,7 +68,7 @@ model Script {
   id        Int      @id @default(autoincrement())
   projectId Int
   sessionId Int?
-  title     String   @default("本地剧本")
+  title     String   @default("未命名剧本")
   content   String   @default("")
   confirmed Boolean  @default(false)
   createdAt DateTime @default(now())

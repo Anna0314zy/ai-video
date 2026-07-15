@@ -8,6 +8,12 @@ importers:
 
   .:
     devDependencies:
+      '@commitlint/cli':
+        specifier: ^19.3.0
+        version: 19.4.0(@types/node@20.14.15)(typescript@5.5.4)
+      '@commitlint/config-conventional':
+        specifier: ^19.2.2
+        version: 19.2.2
       husky:
         specifier: ^8.0.3
         version: 8.0.3

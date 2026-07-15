@@ -1,7 +1,12 @@
 import { createRequire } from 'node:module'
+import { randomUUID } from 'node:crypto'
+import type { LlmService } from '../../llm/llm.service.js'
+import type { PrismaService } from '../../prisma/prisma.service.js'
 
 const require = createRequire(import.meta.url)
 const sockjs = require('sockjs')
+let llmService: LlmService | undefined
+let prismaService: PrismaService | undefined
 
 interface SockJsConnection {
   id: string
@@ -27,7 +32,9 @@ const subscriptions = new Map<string, Set<Subscription>>()
 const connectionSubscriptions = new Map<string, Set<Subscription>>()
 let messageId = 0
 
-export function attachStompBroker(httpServer: unknown) {
+export function attachStompBroker(httpServer: unknown, llm: LlmService, prisma: PrismaService) {
+  llmService = llm
+  prismaService = prisma
   const server = sockjs.createServer({
     prefix: '/api/ws',
     log: () => undefined,
@@ -79,7 +86,7 @@ function subscribe(connection: SockJsConnection, frame: StompFrame) {
   if (!destination) return
 
   const subscription: Subscription = {
-    id: frame.headers.id || `${connection.id}-${Date.now()}`,
+    id: frame.headers.id || `${connection.id}-${randomUUID()}`,
     destination,
     connection,
   }
@@ -113,8 +120,23 @@ function removeConnection(connection: SockJsConnection) {
 }
 
 function handleSend(frame: StompFrame) {
-  if (frame.headers.destination === '/app/ai/stream/session/chat') {
-    handleScriptChat(frame.body)
+  if (
+    frame.headers.destination === '/app/ai/stream/session/chat' ||
+    frame.headers.destination === '/app/ai/stream/session/resend' ||
+    frame.headers.destination === '/app/ai/stream/session/continueOutput'
+  ) {
+    void handleScriptChat(frame.body, frame.headers.destination).catch(error => {
+      const payload = safeJsonParse(frame.body) as { accountId?: string; sessionId?: number; requestId?: string }
+      if (payload.accountId) {
+        publish(`/user/queue/session/chat/reply/completed/${payload.accountId}`, {
+          type: 'script.failed',
+          isSuccess: false,
+          sessionId: payload.sessionId,
+          requestId: payload.requestId,
+          message: error instanceof Error ? error.message : '生成失败',
+        })
+      }
+    })
     return
   }
 
@@ -123,32 +145,75 @@ function handleSend(frame: StompFrame) {
   }
 }
 
-function handleScriptChat(body: string) {
+async function handleScriptChat(body: string, destination: string) {
   const payload = safeJsonParse(body) as {
     accountId?: string
     text?: string
     sessionId?: number
+    requestId?: string
+    sessionChatId?: number | string
   }
   const accountId = payload.accountId
-  if (!accountId) return
+  const sessionId = Number(payload.sessionId)
+  const requestId = payload.requestId || randomUUID()
+  if (!accountId || !Number.isFinite(sessionId) || !llmService || !prismaService) return
 
-  const content = buildScriptReply(payload.text || '')
-  const replyDestination = `/user/queue/session/chat/reply/${accountId}`
-  const completedDestination = `/user/queue/session/chat/reply/completed/${accountId}`
-
-  for (const chunk of splitChunks(content, 16)) {
-    publish(replyDestination, chunk)
+  const prompt = getScriptPromptFromPayload(payload, destination)
+  if (prompt) {
+    await prismaService.sessionMessage.create({
+      data: {
+        sessionId,
+        role: 'user',
+        content: prompt,
+      },
+    })
   }
 
+  const replyDestination = `/user/queue/session/chat/reply/${accountId}`
+  const completedDestination = `/user/queue/session/chat/reply/completed/${accountId}`
+  let content = ''
+
+  for await (const chunk of llmService.streamScript([{ role: 'user', content: prompt }])) {
+    if (chunk.content) {
+      content += chunk.content
+      publish(replyDestination, {
+        type: 'script.chunk',
+        sessionId,
+        requestId,
+        content: chunk.content,
+      })
+    }
+  }
+
+  const assistantMessage = await prismaService.sessionMessage.create({
+    data: {
+      sessionId,
+      role: 'assistant',
+      content,
+    },
+  })
+
   publish(completedDestination, {
+    type: 'script.completed',
     isSuccess: true,
-    id: Date.now(),
-    sessionChatId: Date.now(),
-    sessionId: payload.sessionId,
+    requestId,
+    id: assistantMessage.id,
+    sessionChatId: assistantMessage.id,
+    sessionId,
     role: 'assistant',
     messageContent: content,
-    created: Date.now(),
+    created: assistantMessage.createdAt.getTime(),
   })
+}
+
+function getScriptPromptFromPayload(
+  payload: { text?: string; sessionChatId?: number | string },
+  destination: string,
+) {
+  if (payload.text) return payload.text
+  if (destination === '/app/ai/stream/session/resend') return `重新生成 ${payload.sessionChatId || ''}`
+  if (destination === '/app/ai/stream/session/continueOutput') return `继续输出 ${payload.sessionChatId || ''}`
+  return ''
 }
 
 function publish(destination: string, payload: unknown) {
@@ -202,16 +267,4 @@ function safeJsonParse(value: string): unknown {
   } catch {
     return value
   }
-}
-
-function buildScriptReply(prompt: string) {
-  return prompt ? `已收到你的剧本需求：${prompt}` : '已收到你的剧本需求。'
-}
-
-function splitChunks(value: string, size: number) {
-  const chunks: string[] = []
-  for (let index = 0; index < value.length; index += size) {
-    chunks.push(value.slice(index, index + size))
-  }
-  return chunks.length ? chunks : ['']
 }

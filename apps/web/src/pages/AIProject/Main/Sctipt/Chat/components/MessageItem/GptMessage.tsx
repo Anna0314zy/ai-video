@@ -1,20 +1,17 @@
 import { MessageList } from '@/api/types/script'
 import HeadLayout from './messageHeadLayout'
 import { Spin } from 'antd'
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 interface IProps {
   messageInfo: MessageList
-  md: any
   typeRef?: any
   chatIngText?: string
   chatIng?: boolean
 }
-const GptMessage = ({ messageInfo, md, chatIngText }: IProps) => {
+const GptMessage = ({ messageInfo, chatIngText }: IProps) => {
   const { chatIng } = useSelector((state: RootState) => state.aiScript)
-  // 缓存渲染后的 HTML
-  const renderedHtml = useMemo(() => md.render(chatIngText || ''), [chatIngText, md])
 
   return (
     <div style={{ display: messageInfo?.requesting ? 'block' : 'none' }}>
@@ -26,10 +23,9 @@ const GptMessage = ({ messageInfo, md, chatIngText }: IProps) => {
         ) : null}
         <div
           id={String(messageInfo.id)}
-          style={{ display: !chatIng ? 'none' : 'block' }}
-          dangerouslySetInnerHTML={{
-            __html: renderedHtml,
-          }}></div>
+          style={{ display: !chatIng ? 'none' : 'block', whiteSpace: 'pre-wrap', textAlign: 'left' }}>
+          {chatIngText}
+        </div>
       </HeadLayout>
     </div>
   )

@@ -1,4 +1,4 @@
-import { MessageList } from '@/api/types/script'
+import { MessageList, Role } from '@/api/types/script'
 import MarkdownIt from 'markdown-it'
 import MessageItem from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageItem'
 import GptMessage from '@/pages/AIProject/Main/Sctipt/Chat/components/MessageItem/GptMessage'
@@ -9,22 +9,30 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { get } from 'lodash-es'
 import { useSize } from 'ahooks'
 import { Divider, Skeleton } from 'antd'
-const style = {
-  color: '#000',
-  height: '100%',
-  overflow: 'auto',
-  padding: '10px',
+import { ScriptSocketPayload } from '@/hooks/useScriptSocket'
+
+interface ChatContentProps {
+  chatIngText: string
+  onResend: (params: ScriptSocketPayload) => boolean
+  onContinue: (params: ScriptSocketPayload) => boolean
 }
-const ChatContent = ({ chatIngText }: any) => {
-  let md: MarkdownIt | null = null
-  if (!md) md = new MarkdownIt()
-  const { messageListMap, currentSessionId } = useSelector((state: RootState) => state.aiScript)
+
+const ChatContent = ({ chatIngText, onResend, onContinue }: ChatContentProps) => {
+  const md = useMemo(() => new MarkdownIt(), [])
+  const { messageListMap, currentSessionId, chatIng } = useSelector((state: RootState) => state.aiScript)
   const dispatch = useDispatch<Dispatch>()
   const [loading, setLoading] = useState(false)
-  const lastMessage = useMemo(() => {
-    return messageListMap.data?.find(v => v.requesting) || {}
-  }, [messageListMap])
-  const loadMoreData = async (scroll: boolean, current?: number) => {
+  const streamingMessage = useMemo<MessageList | null>(() => {
+    if (!chatIng || !currentSessionId) return null
+    return {
+      requesting: true,
+      created: Date.now(),
+      role: Role.Gpt,
+      id: `streaming-${currentSessionId}`,
+      sessionId: currentSessionId,
+    }
+  }, [chatIng, currentSessionId])
+  const loadMoreData = async (scroll: boolean) => {
     if (loading) return
     // setLoading(true)
     // 如果是滚动 需要计算从哪一页开始请求
@@ -40,7 +48,7 @@ const ChatContent = ({ chatIngText }: any) => {
     }
   }
   useEffect(() => {
-    if (currentSessionId) loadMoreData(false, 1)
+    if (currentSessionId) loadMoreData(false)
   }, [currentSessionId])
   const wrapper = useRef<HTMLDivElement>(null)
   const size = useSize(wrapper)
@@ -58,17 +66,25 @@ const ChatContent = ({ chatIngText }: any) => {
         <InfiniteScroll
           height={size?.height}
           dataLength={get(messageListMap, `data`, []).length}
-          style={{ display: 'flex', flexDirection: 'column-reverse' }}
+          style={{ display: 'flex', flexDirection: 'column' }}
           next={() => loadMoreData(true)}
           hasMore={hasMore}
           loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
           endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
           // scrollableTarget={'scrollableDiv'}
-          inverse={true}>
-          <GptMessage md={md} messageInfo={lastMessage as MessageList} chatIngText={chatIngText}></GptMessage>
+          inverse={false}>
           {get(messageListMap, `data`, []).map(item => {
-            return <MessageItem md={md} key={String(item.id)} messageInfo={item}></MessageItem>
+            return (
+              <MessageItem
+                md={md}
+                key={String(item.id)}
+                messageInfo={item}
+                onResend={onResend}
+                onContinue={onContinue}
+              />
+            )
           })}
+          {streamingMessage ? <GptMessage messageInfo={streamingMessage} chatIngText={chatIngText} /> : null}
         </InfiniteScroll>
       ) : null}
     </div>

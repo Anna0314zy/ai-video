@@ -2,17 +2,16 @@ import Header from './Header'
 import ChatContent from './Chat/ChatContent'
 import ChatControl from './Chat/ChatControl'
 import { Layout, message } from 'antd'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { convertToMarkdown } from '@/utils'
 import RightPanel from './RightPanel'
-import useStompSocket from '@/hooks/useStompSocket'
-import { SCRIPT_SUBSCRIBE_THOROUGH, SCRIPT_END_SUBSCRIBE_THOROUGH, SCRIPT_ADD_THOROUGH } from '@/const/socket'
-import { useDispatch, useSelector } from 'react-redux'
-import { Dispatch, RootState } from '@/store'
+import { useDispatch } from 'react-redux'
+import { Dispatch } from '@/store'
+import useScriptSocket, { ScriptSocketPayload } from '@/hooks/useScriptSocket'
 import { v4 as uuidv4 } from 'uuid'
-import { Role } from '@/api/types/script'
 const { Sider, Content } = Layout
+const STREAM_FLUSH_INTERVAL = 50
 const contentStyle: React.CSSProperties = {
   textAlign: 'center',
   height: '100%',
@@ -35,35 +34,54 @@ const layoutStyle: React.CSSProperties = {
 export default () => {
   const { id } = useParams() // 获取路由参数 userId
   const dispatch = useDispatch<Dispatch>()
-  const { chatIng, messageListMap, currentSessionId } = useSelector((state: RootState) => state.aiScript)
   const [chatIngText, setChatIngText] = useState('')
+  const streamBufferRef = useRef('')
+  const streamFlushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const currentStreamRef = useRef<{
+    sessionId?: number
+    requestId?: string
+  }>({})
+
+  const flushStreamBuffer = useCallback(() => {
+    const nextContent = streamBufferRef.current
+    streamBufferRef.current = ''
+    streamFlushTimerRef.current = null
+    if (nextContent) setChatIngText(prev => prev + nextContent)
+  }, [])
 
   useEffect(() => {
-    if (chatIng && currentSessionId) {
-      const data = messageListMap.data?.find(item => item.requesting)
-      // 增加一条
-      if (!data) {
-        dispatch.aiScript.addMessage({
-          requesting: true,
-          created: Date.now(),
-          role: Role.Gpt,
-          id: uuidv4(),
-          sessionId: currentSessionId!,
-        })
-      }
+    return () => {
+      if (streamFlushTimerRef.current) clearTimeout(streamFlushTimerRef.current)
     }
-  }, [chatIng])
+  }, [])
+
+  const isCurrentStreamMessage = useCallback((payload: any) => {
+    return (
+      payload &&
+      payload.sessionId === currentStreamRef.current.sessionId &&
+      payload.requestId === currentStreamRef.current.requestId
+    )
+  }, [])
+
   const socketCallback = useCallback((message: any) => {
+    const payload = message.payload
+    if (!isCurrentStreamMessage(payload)) return
     dispatch.aiScript.updateData({
       chatIng: true,
     })
-    setChatIngText(prev => {
-      return convertToMarkdown(prev + message.payload)
-    })
-  }, [])
+    streamBufferRef.current += payload.content || ''
+    if (!streamFlushTimerRef.current) {
+      streamFlushTimerRef.current = setTimeout(flushStreamBuffer, STREAM_FLUSH_INTERVAL)
+    }
+  }, [dispatch, flushStreamBuffer, isCurrentStreamMessage])
 
   const chatEndSocketCallback = useCallback((message: any) => {
-    // TODO
+    if (!isCurrentStreamMessage(message.payload)) return
+    if (streamFlushTimerRef.current) {
+      clearTimeout(streamFlushTimerRef.current)
+      streamFlushTimerRef.current = null
+    }
+    streamBufferRef.current = ''
     setChatIngText('')
     dispatch.aiScript.updateData({
       chatIng: false,
@@ -75,8 +93,8 @@ export default () => {
         messageContent: convertToMarkdown(message.payload.messageContent || ''),
       })
     }
-  }, [])
-  const addScriptSuccess = (messageData: any) => {
+  }, [dispatch, isCurrentStreamMessage])
+  const addScriptSuccess = useCallback((messageData: any) => {
     //刷新剧本列表
     const messageInfo = messageData.payload
     if (messageInfo.isSuccess) {
@@ -95,33 +113,57 @@ export default () => {
     } else {
       message.error(messageInfo.errorMsg)
     }
-  }
-  const { stompSocket } = useStompSocket([
-    {
-      path: SCRIPT_SUBSCRIBE_THOROUGH,
-      callback: socketCallback,
-    },
-    {
-      path: SCRIPT_END_SUBSCRIBE_THOROUGH,
-      callback: chatEndSocketCallback,
-    },
-    {
-      path: SCRIPT_ADD_THOROUGH,
-      callback: addScriptSuccess,
-    },
-  ])
+  }, [dispatch, id])
 
-  useEffect(() => {
-    if (stompSocket) dispatch.aiScript.updateData({ stompSocket })
-  }, [stompSocket])
+  const { sendChat, resendMessage, continueOutput, connected } = useScriptSocket({
+    onChunk: socketCallback,
+    onCompleted: chatEndSocketCallback,
+    onScriptAdded: addScriptSuccess,
+  })
+
+  const sendWithRequestId = useCallback(
+    (sender: (params: ScriptSocketPayload) => boolean, params: ScriptSocketPayload) => {
+      const requestId = uuidv4()
+      currentStreamRef.current = {
+        sessionId: params.sessionId,
+        requestId,
+      }
+      setChatIngText('')
+      streamBufferRef.current = ''
+      return sender({
+        ...params,
+        requestId,
+      })
+    },
+    [],
+  )
+
+  const handleSendChat = useCallback(
+    (params: ScriptSocketPayload) => sendWithRequestId(sendChat, params),
+    [sendChat, sendWithRequestId],
+  )
+
+  const handleResendMessage = useCallback(
+    (params: ScriptSocketPayload) => sendWithRequestId(resendMessage, params),
+    [resendMessage, sendWithRequestId],
+  )
+
+  const handleContinueOutput = useCallback(
+    (params: ScriptSocketPayload) => sendWithRequestId(continueOutput, params),
+    [continueOutput, sendWithRequestId],
+  )
 
   return (
     <Layout style={layoutStyle}>
       <Header />
       <Layout style={{ height: '100%' }}>
         <Content style={contentStyle}>
-          <ChatContent chatIngText={chatIngText} />
-          <ChatControl stompSocket={stompSocket} chatIngText={chatIngText} />
+          <ChatContent
+            chatIngText={chatIngText}
+            onResend={handleResendMessage}
+            onContinue={handleContinueOutput}
+          />
+          <ChatControl connected={connected} onSend={handleSendChat} />
         </Content>
         <Sider width={'24.4vw'} style={sliderStyle}>
           <RightPanel></RightPanel>

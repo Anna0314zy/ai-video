@@ -2,23 +2,24 @@ import { Space, message, Tag } from 'antd'
 import ActionBtn from '@/pages/AIProject/components/ActionBtn'
 import { useMemo, useState } from 'react'
 import * as api from '@/api/models/aiScript'
-import { MessageList, Role } from '@/api/types/script'
-import { v4 as uuidv4 } from 'uuid'
+import { MessageList } from '@/api/types/script'
 import AntdIcon from '@/components/IconWidget/AntdIcon'
-import { SCRIPT_SUBSCRIBE_RESEND_THOROUGH, SCRIPT_SUBSCRIBE_AGAIN_THOROUGH } from '@/const/socket'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 import { useParams } from 'react-router-dom'
-interface IProps {
-  name: string
-  onClick: (item: MessageList) => void
+import { ScriptSocketPayload } from '@/hooks/useScriptSocket'
+
+interface ScriptBtnProps {
+  messageInfo: MessageList
+  onResend: (params: ScriptSocketPayload) => boolean
+  onContinue: (params: ScriptSocketPayload) => boolean
 }
-const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
+
+const ScriptBtn = ({ messageInfo, onResend, onContinue }: ScriptBtnProps) => {
   const dispatch = useDispatch<Dispatch>()
   const { id } = useParams() // 获取路由参数 userId
   const projectId = Number(id)
-  const { currentSessionId: sessionId, chatIng, stompSocket } = useSelector((state: RootState) => state.aiScript)
-  const accountId = useSelector((state: RootState) => state.auth.userInfo.accountId)
+  const { currentSessionId: sessionId, chatIng } = useSelector((state: RootState) => state.aiScript)
   const [chatContentLoading, setChatContentLoading] = useState<{
     [key: string]: {
       [key: string]: boolean
@@ -60,28 +61,20 @@ const ScriptBtn = ({ messageInfo }: { messageInfo: MessageList }) => {
   }
 
   const handleRefresh = async (key: 'refresh' | 'again') => {
-    if (!stompSocket) {
-      message.error('服务端连接失败')
-      return
-    }
     dispatch.aiScript.updateData({
       chatIng: true,
     })
-    let params: any = {
+    const params: ScriptSocketPayload = {
       sessionId,
       sessionChatId: messageInfo.id,
-      accountId,
     }
-    dispatch.aiScript.addMessage({
-      requesting: true,
-      created: Date.now(),
-      role: Role.Gpt,
-      id: uuidv4(),
-      sessionId: sessionId!,
-    })
-    let sendKey = SCRIPT_SUBSCRIBE_RESEND_THOROUGH
-    if (key === 'again') sendKey = SCRIPT_SUBSCRIBE_AGAIN_THOROUGH
-    stompSocket.send(sendKey, JSON.stringify(params))
+    const sent = key === 'again' ? onContinue(params) : onResend(params)
+    if (!sent) {
+      dispatch.aiScript.updateData({
+        chatIng: false,
+      })
+      message.error('服务端连接失败')
+    }
   }
   const config: {
     key: 'add' | 'refresh' | 'again'

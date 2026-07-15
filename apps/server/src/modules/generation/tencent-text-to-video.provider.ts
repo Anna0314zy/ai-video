@@ -1,4 +1,5 @@
 import type { GenerationProvider, GenerationTask, GenerationTaskRequest } from './generation-provider.js'
+import { randomUUID } from 'node:crypto'
 
 export class TencentTextToVideoProvider implements GenerationProvider {
   readonly name = 'tencent'
@@ -6,7 +7,7 @@ export class TencentTextToVideoProvider implements GenerationProvider {
 
   async createTask(request: GenerationTaskRequest): Promise<GenerationTask> {
     return {
-      taskId: `tencent-text-video-${Date.now()}`,
+      taskId: `tencent-text-video-${randomUUID()}`,
       provider: this.name,
       kind: this.kind,
       state: 'PENDING' as const,

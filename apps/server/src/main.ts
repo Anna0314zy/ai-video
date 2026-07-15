@@ -6,7 +6,9 @@ import { AppModule } from './app.module.js'
 import { AppErrorFilter } from './common/app-error.filter.js'
 import { ResponseInterceptor } from './common/response.interceptor.js'
 import { ConfigService } from './config/config.service.js'
+import { LlmService } from './llm/llm.service.js'
 import { attachStompBroker } from './modules/notification/stomp-broker.js'
+import { PrismaService } from './prisma/prisma.service.js'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -17,6 +19,9 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
     }),
   )
   app.useGlobalFilters(new AppErrorFilter())
@@ -31,7 +36,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig)
   SwaggerModule.setup('api-docs', app, document)
 
-  attachStompBroker(app.getHttpServer())
+  attachStompBroker(app.getHttpServer(), app.get(LlmService), app.get(PrismaService))
 
   await app.listen(config.port)
   console.log(`AI content platform server is running on ${config.port}`)

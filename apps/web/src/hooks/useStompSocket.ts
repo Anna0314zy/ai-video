@@ -1,42 +1,54 @@
-// import { message } from 'antd'
-import StompSocket from '@/utils/stompSocket'
-import { SEND_THOROUGH } from '@/const/socket'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
-const useStompSocket = (
-  subscribeThorough: {
-    path: string
-    callback: Function
-  }[],
-  sendThorough = SEND_THOROUGH,
-) => {
-  // let stompSocket = useRef<any>(null)
-  const [stompSocket, setStomp] = useState<any>()
+import { useSocket } from './useSocket'
+
+type StompSubscription = {
+  path: string
+  callback: (message: any) => void
+}
+
+const useStompSocket = (subscribeThorough: StompSubscription[]) => {
+  const callbacksRef = useRef(new Map<string, StompSubscription['callback']>())
   const { accountId } = useSelector((state: RootState) => state.auth.userInfo)
+  const { send, subscribe, connected, reconnecting, error } = useSocket()
+  const subscriptionPathKey = useMemo(() => subscribeThorough.map(item => item.path).join('|'), [subscribeThorough])
 
   useEffect(() => {
-    const stomp = new StompSocket({
-      baseUrl: import.meta.env.VITE_SOCKET_BASE,
-      sendThorough: sendThorough,
-      subscribeThorough: subscribeThorough.map(v => `${v.path}/${accountId}`),
-    })
-
+    callbacksRef.current.clear()
     subscribeThorough.forEach(item => {
-      stomp.on(`${item.path}/${accountId}`, (message: any) => {
-        item.callback(message)
+      callbacksRef.current.set(`${item.path}/${accountId}`, item.callback)
+    })
+  }, [accountId, subscribeThorough])
+
+  useEffect(() => {
+    if (!accountId) return
+
+    const unsubscribeList = subscribeThorough.map(item => {
+      const path = `${item.path}/${accountId}`
+      return subscribe(path, message => {
+        callbacksRef.current.get(path)?.(message)
       })
     })
-    setStomp(stomp)
 
     return () => {
-      subscribeThorough.forEach(item => {
-        stomp.unsubscribe(item.path)
-      })
+      unsubscribeList.forEach(unsubscribe => unsubscribe())
     }
-  }, [])
+  }, [accountId, subscribe, subscriptionPathKey])
+
+  const stableSend = useCallback(
+    (path: string, params: string | object) => {
+      return send(path, params)
+    },
+    [send],
+  )
+
   return {
-    stompSocket,
+    send: stableSend,
+    connected,
+    reconnecting,
+    error,
   }
 }
+
 export default useStompSocket

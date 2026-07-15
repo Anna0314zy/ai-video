@@ -8,7 +8,7 @@ export class AppErrorFilter implements ExceptionFilter {
     const response = host.switchToHttp().getResponse()
 
     if (exception instanceof AppException) {
-      response.status(200).json(mapErrorToResponse({ kind: exception.kind }))
+      response.status(200).json(mapErrorToResponse({ kind: exception.kind, message: exception.message }))
       return
     }
 

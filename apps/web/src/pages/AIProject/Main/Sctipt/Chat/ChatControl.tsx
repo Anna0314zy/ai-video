@@ -10,17 +10,22 @@ import * as api from '@/api/models/aiScript'
 import { Role } from '@/api/types/script'
 import { FormInstance } from 'antd'
 import { convertToMarkdown } from '@/utils'
-import { SCRIPT_SEND_THOROUGH } from '@/const/socket'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dispatch, RootState } from '@/store'
 import { useParams } from 'react-router-dom'
 import { getQueryParam } from '@/utils'
-const ChatControl = ({ stompSocket }: any) => {
+import { ScriptSocketPayload } from '@/hooks/useScriptSocket'
+
+interface ChatControlProps {
+  connected: boolean
+  onSend: (params: ScriptSocketPayload) => boolean
+}
+
+const ChatControl = ({ connected, onSend }: ChatControlProps) => {
   const { id } = useParams() // 获取路由参数 userId
   const projectId = Number(id)
   const subjectName = getQueryParam('subjectName') as string
   const dispatch = useDispatch<Dispatch>()
-  const { accountId } = useSelector((state: RootState) => state.auth.userInfo)
   const { currentSessionId: sessionId, chatIng } = useSelector((state: RootState) => state.aiScript)
   const handleCreateChat = async () => {
     const data = await api.createChat({
@@ -75,7 +80,7 @@ const ChatControl = ({ stompSocket }: any) => {
     })
   }
   const handleSendMessage = async () => {
-    if (!stompSocket) {
+    if (!connected) {
       message.error('服务端连接失败')
       return
     }
@@ -86,33 +91,30 @@ const ChatControl = ({ stompSocket }: any) => {
       sessionId,
       text: prompt.text,
       promptRequestLogId: prompt.promptRequestLogId,
-      accountId,
     }
     if (prompt.fileId) params.attachmentFileId = prompt.fileId
     // 如果有requesting 删除requesting
-    dispatch.aiScript.addMessage([
-      {
-        requesting: true,
-        created: Date.now(),
-        role: Role.Gpt,
-        id: uuidv4(),
-        sessionId: sessionId!,
-        userSend: true,
+    dispatch.aiScript.addMessage({
+      messageContent: convertToMarkdown(prompt.text || ''),
+      role: Role.user,
+      attachmentFileInfo: {
+        fileId: prompt.fileId,
+        fileName: prompt.fileName,
       },
-      {
-        messageContent: convertToMarkdown(prompt.text || ''),
-        role: Role.user,
-        attachmentFileInfo: {
-          fileId: prompt.fileId,
-          fileName: prompt.fileName,
-        },
-        id: uuidv4(),
-        created: Date.now(),
-        sessionId: sessionId!,
-      },
-    ])
+      id: uuidv4(),
+      created: Date.now(),
+      sessionId: sessionId!,
+      userSend: true,
+    })
 
-    if (stompSocket) stompSocket.send(SCRIPT_SEND_THOROUGH, JSON.stringify(params))
+    const sent = onSend(params)
+    if (!sent) {
+      dispatch.aiScript.updateData({
+        chatIng: false,
+      })
+      message.error('服务端连接失败')
+      return
+    }
     setPrompt(prev => {
       return {
         ...prev,

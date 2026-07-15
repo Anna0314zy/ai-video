@@ -12,6 +12,7 @@ import {
   SessionHistoriesDto,
   StreamChatDto,
 } from '../../common/swagger-dto.js'
+import { AppException } from '../../common/app-exception.js'
 import { LlmService } from '../../llm/llm.service.js'
 import { ScriptService } from './script.service.js'
 
@@ -43,10 +44,7 @@ export class ScriptController {
   @ApiOperation({ summary: '生成剧本/分镜 prompt' })
   @ApiBody({ type: GenerateShotPromptDto })
   generateShotPrompt(@Body() body: GenerateShotPromptDto) {
-    return {
-      prompt: JSON.stringify(body),
-      promptRequestLogId: Date.now(),
-    }
+    return this.scriptService.createShotPromptLog(body)
   }
 
   @Get('api/text/v1/listScriptStyle')
@@ -79,28 +77,28 @@ export class ScriptController {
   @ApiOperation({ summary: '预览剧本' })
   @ApiQuery({ name: 'scriptId', example: 1, description: '剧本 ID' })
   previewScript(@Query('scriptId') scriptId: string) {
-    return `script preview: ${scriptId}`
+    return this.scriptService.previewScript(Number(scriptId))
   }
 
   @Post('api/text/v1/importScript/:projectId')
   @ApiOperation({ summary: '导入剧本' })
   @ApiParam({ name: 'projectId', example: 1, description: '项目 ID' })
   importScript(@Param('projectId') projectId: string) {
-    return [`project-${projectId}-imported-script`]
+    throw new AppException('feature-not-configured', '剧本导入需要接入文件解析后再启用')
   }
 
   @Delete('api/text/v1/deleteScript')
   @ApiOperation({ summary: '删除剧本' })
   @ApiBody({ type: DeleteScriptDto, required: false })
   deleteScript(@Body() body?: DeleteScriptDto) {
-    return true
+    return this.scriptService.deleteScripts(body?.scriptIdList || [])
   }
 
   @Put('api/text/v1/confirmScript')
   @ApiOperation({ summary: '确认剧本' })
   @ApiBody({ type: ConfirmScriptDto })
   confirmScript(@Body() body: ConfirmScriptDto) {
-    return true
+    return this.scriptService.confirmScript(body)
   }
 
   @Get('api/text/v1/downloadTemplate')
@@ -114,8 +112,9 @@ export class ScriptController {
   @Header('Content-Type', 'text/plain; charset=utf-8')
   @ApiOperation({ summary: '下载剧本' })
   @ApiQuery({ name: 'scriptId', example: 1, description: '剧本 ID' })
-  downloadScript(@Query('scriptId') scriptId: string, @Res() response: any) {
-    response.send(`script-${scriptId}`)
+  async downloadScript(@Query('scriptId') scriptId: string, @Res() response: any) {
+    const script = await this.scriptService.previewScript(Number(scriptId))
+    response.send(script.scriptText || '')
   }
 
   @Post('api/text/v1/ai/stream/sessionChat')
