@@ -3,6 +3,7 @@ import { MessageList, ScriptPageList } from '@/api/types/script'
 import { createModel } from '@rematch/core'
 import { RootModel } from '.'
 import * as api from '@/api/models/aiScript'
+import { SessionListItem } from '@/api/models/aiScript'
 import { RootState } from '..'
 import { get, set, uniqBy } from 'lodash-es'
 import { elementScrollIntoView, convertToMarkdown } from '@/utils'
@@ -25,6 +26,7 @@ interface AiScriptState {
     size: number
   }
   currentSessionId?: number
+  sessionList: SessionListItem[]
   currentProjectDetail: ProjectList
   messageListMap: {
     data: MessageList[]
@@ -50,6 +52,7 @@ export default createModel<RootModel>()({
       current: 1,
     },
     currentSessionId: 0,
+    sessionList: [],
     currentProjectDetail: {} as ProjectList,
     chatIng: false,
     chatIngText: '',
@@ -57,6 +60,17 @@ export default createModel<RootModel>()({
   reducers: {
     updateData(state, payload: Partial<AiScriptState>) {
       return Object.assign(state, payload)
+    },
+    switchSession(state, sessionId: number) {
+      state.currentSessionId = sessionId
+      state.chatIng = false
+      state.chatIngText = ''
+      state.messageListMap = {
+        data: [],
+        total: null,
+        size: state.messageListMap.size,
+        current: 1,
+      }
     },
     // 删除最后一项
     deleteLastMessage(state, payload: any) {
@@ -210,12 +224,25 @@ export default createModel<RootModel>()({
       })
       return data
     },
-    async getProjectDetail({ projectId }: { projectId: number }, state: RootState) {
+    async getSessionList({ projectId }: { projectId: number }) {
+      const sessionList = await api.getSessionList({ projectId })
+      dispatch.aiScript.updateData({
+        sessionList,
+      })
+      return sessionList
+    },
+    async createSession({ projectId }: { projectId: number }) {
+      const sessionId = await api.createChat({
+        projectId,
+      })
+      dispatch.aiScript.switchSession(sessionId)
+      await dispatch.aiScript.getSessionList({ projectId })
+      return sessionId
+    },
+    async getProjectDetail({ projectId }: { projectId: number }) {
       const { latestSessionId, project } = await getDetail(projectId)
-      console.log('zy getProjectDetail', latestSessionId, project)
       dispatch.aiScript.updateData({
         currentProjectDetail: project,
-        currentSessionId: latestSessionId || 0,
       })
       return latestSessionId
     },

@@ -4,6 +4,7 @@ import type { LlmService } from '../../llm/llm.service.js'
 import type { LlmMessage } from '../../llm/llm-provider.js'
 import type { PrismaService } from '../../prisma/prisma.service.js'
 import { withScriptMarkdownSystemPrompt } from '../script/script-markdown.js'
+import { buildSessionTitle, shouldReplaceSessionTitle } from '../script/script.service.js'
 
 const require = createRequire(import.meta.url)
 const sockjs = require('sockjs')
@@ -154,6 +155,7 @@ async function handleScriptChat(body: string, destination: string) {
     sessionId?: number
     requestId?: string
     sessionChatId?: number | string
+    promptRequestLogId?: number | string
   }
   const accountId = payload.accountId
   const sessionId = Number(payload.sessionId)
@@ -171,6 +173,7 @@ async function handleScriptChat(body: string, destination: string) {
         content: generation.userMessageContent,
       },
     })
+    await touchSessionAfterMessage(sessionId, generation.userMessageContent)
   }
 
   const replyDestination = `/user/queue/session/chat/reply/${accountId}`
@@ -194,8 +197,10 @@ async function handleScriptChat(body: string, destination: string) {
       sessionId,
       role: 'assistant',
       content,
+      promptRequestLogId: toOptionalNumber(payload.promptRequestLogId),
     },
   })
+  await touchSessionAfterMessage(sessionId)
 
   publish(completedDestination, {
     type: 'script.completed',
@@ -203,6 +208,7 @@ async function handleScriptChat(body: string, destination: string) {
     requestId,
     id: assistantMessage.id,
     sessionChatId: assistantMessage.id,
+    promptRequestLogId: assistantMessage.promptRequestLogId,
     sessionId,
     role: 'assistant',
     messageContent: content,
@@ -298,6 +304,24 @@ async function buildReplayGeneration(
   return { messages }
 }
 
+async function touchSessionAfterMessage(sessionId: number, userMessageContent?: string) {
+  if (!prismaService) return
+
+  const session = await (prismaService.session as any).findUnique({
+    where: { id: sessionId },
+  })
+  if (!session) return
+
+  const title = shouldReplaceSessionTitle(session.title) ? buildSessionTitle(userMessageContent) : session.title
+  await (prismaService.session as any).update({
+    where: { id: sessionId },
+    data: {
+      title,
+      lastMessageAt: new Date(),
+    },
+  })
+}
+
 function normalizeMessageRole(role: string): LlmMessage['role'] {
   if (role === 'assistant' || role === 'system' || role === 'user') return role
   if (role === 'gpt') return 'assistant'
@@ -355,4 +379,10 @@ function safeJsonParse(value: string): unknown {
   } catch {
     return value
   }
+}
+
+function toOptionalNumber(value: unknown) {
+  if (value === undefined || value === null || value === '') return undefined
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined
 }

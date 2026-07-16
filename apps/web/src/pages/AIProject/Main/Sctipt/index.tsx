@@ -1,6 +1,7 @@
 import Header from './Header'
 import ChatContent from './Chat/ChatContent'
 import ChatControl from './Chat/ChatControl'
+import SessionSidebar from './Chat/SessionSidebar'
 import { Layout, message } from 'antd'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -10,6 +11,7 @@ import { useDispatch } from 'react-redux'
 import { Dispatch } from '@/store'
 import useScriptSocket, { ScriptSocketPayload } from '@/hooks/useScriptSocket'
 import { v4 as uuidv4 } from 'uuid'
+import { Role } from '@/api/types/script'
 const { Sider, Content } = Layout
 const STREAM_FLUSH_INTERVAL = 50
 const contentStyle: React.CSSProperties = {
@@ -38,10 +40,40 @@ export default () => {
   const [streamScrollKey, setStreamScrollKey] = useState(0)
   const streamBufferRef = useRef('')
   const streamFlushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const streamActiveRef = useRef(false)
   const currentStreamRef = useRef<{
     sessionId?: number
     requestId?: string
   }>({})
+
+  const stopCurrentStream = useCallback(
+    (notice?: string, options?: { showInterruptedMessage?: boolean }) => {
+      const interruptedSessionId = currentStreamRef.current.sessionId
+      if (streamFlushTimerRef.current) {
+        clearTimeout(streamFlushTimerRef.current)
+        streamFlushTimerRef.current = null
+      }
+      streamBufferRef.current = ''
+      streamActiveRef.current = false
+      currentStreamRef.current = {}
+      setChatIngText('')
+      dispatch.aiScript.updateData({
+        chatIng: false,
+      })
+      if (options?.showInterruptedMessage && interruptedSessionId) {
+        dispatch.aiScript.addMessage({
+          id: uuidv4(),
+          sessionId: interruptedSessionId,
+          role: Role.Gpt,
+          messageType: 'interrupted',
+          messageContent: convertToMarkdown('本次输出已中断，请重新生成。'),
+          created: Date.now(),
+        })
+      }
+      if (notice) message.warning(notice)
+    },
+    [dispatch],
+  )
 
   const flushStreamBuffer = useCallback(() => {
     const nextContent = streamBufferRef.current
@@ -78,23 +110,18 @@ export default () => {
 
   const chatEndSocketCallback = useCallback((message: any) => {
     if (!isCurrentStreamMessage(message.payload)) return
-    if (streamFlushTimerRef.current) {
-      clearTimeout(streamFlushTimerRef.current)
-      streamFlushTimerRef.current = null
-    }
-    streamBufferRef.current = ''
-    setChatIngText('')
-    dispatch.aiScript.updateData({
-      chatIng: false,
-    })
+    stopCurrentStream()
     //  如果信息失败
     if (message.payload.isSuccess === true) {
       dispatch.aiScript.updateChatingMessage({
         ...message.payload,
         messageContent: convertToMarkdown(message.payload.messageContent || ''),
       })
+      dispatch.aiScript.getSessionList({
+        projectId: Number(id),
+      })
     }
-  }, [dispatch, isCurrentStreamMessage])
+  }, [dispatch, id, isCurrentStreamMessage, stopCurrentStream])
   const addScriptSuccess = useCallback((messageData: any) => {
     //刷新剧本列表
     const messageInfo = messageData.payload
@@ -116,11 +143,16 @@ export default () => {
     }
   }, [dispatch, id])
 
-  const { sendChat, resendMessage, continueOutput, connected } = useScriptSocket({
+  const { sendChat, resendMessage, connected } = useScriptSocket({
     onChunk: socketCallback,
     onCompleted: chatEndSocketCallback,
     onScriptAdded: addScriptSuccess,
   })
+
+  useEffect(() => {
+    if (connected || !streamActiveRef.current) return
+    stopCurrentStream('连接已断开，本次输出已中断，请重新生成', { showInterruptedMessage: true })
+  }, [connected, stopCurrentStream])
 
   const sendWithRequestId = useCallback(
     (sender: (params: ScriptSocketPayload) => boolean, params: ScriptSocketPayload) => {
@@ -132,10 +164,17 @@ export default () => {
       setChatIngText('')
       setStreamScrollKey(key => key + 1)
       streamBufferRef.current = ''
-      return sender({
+      const sent = sender({
         ...params,
         requestId,
       })
+      if (sent) {
+        streamActiveRef.current = true
+      } else {
+        streamActiveRef.current = false
+        currentStreamRef.current = {}
+      }
+      return sent
     },
     [],
   )
@@ -150,23 +189,24 @@ export default () => {
     [resendMessage, sendWithRequestId],
   )
 
-  const handleContinueOutput = useCallback(
-    (params: ScriptSocketPayload) => sendWithRequestId(continueOutput, params),
-    [continueOutput, sendWithRequestId],
-  )
+  const handleInterruptOutput = useCallback(() => {
+    stopCurrentStream('本次输出已中断，请重新生成', { showInterruptedMessage: true })
+  }, [stopCurrentStream])
 
   return (
     <Layout style={layoutStyle}>
       <Header />
       <Layout style={{ height: '100%' }}>
+        <Sider width={260} style={{ backgroundColor: '#fff' }}>
+          <SessionSidebar />
+        </Sider>
         <Content style={contentStyle}>
           <ChatContent
             chatIngText={chatIngText}
             streamScrollKey={streamScrollKey}
             onResend={handleResendMessage}
-            onContinue={handleContinueOutput}
           />
-          <ChatControl connected={connected} onSend={handleSendChat} />
+          <ChatControl connected={connected} onSend={handleSendChat} onInterrupt={handleInterruptOutput} />
         </Content>
         <Sider width={'24.4vw'} style={sliderStyle}>
           <RightPanel></RightPanel>

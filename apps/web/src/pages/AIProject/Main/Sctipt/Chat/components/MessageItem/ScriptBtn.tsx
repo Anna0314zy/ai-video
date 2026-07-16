@@ -12,10 +12,9 @@ import { ScriptSocketPayload } from '@/hooks/useScriptSocket'
 interface ScriptBtnProps {
   messageInfo: MessageList
   onResend: (params: ScriptSocketPayload) => boolean
-  onContinue: (params: ScriptSocketPayload) => boolean
 }
 
-const ScriptBtn = ({ messageInfo, onResend, onContinue }: ScriptBtnProps) => {
+const ScriptBtn = ({ messageInfo, onResend }: ScriptBtnProps) => {
   const dispatch = useDispatch<Dispatch>()
   const { id } = useParams() // 获取路由参数 userId
   const projectId = Number(id)
@@ -25,7 +24,7 @@ const ScriptBtn = ({ messageInfo, onResend, onContinue }: ScriptBtnProps) => {
       [key: string]: boolean
     }
   }>({})
-  const handleClick = async (key: 'add' | 'refresh' | 'again') => {
+  const handleClick = async (key: 'add' | 'refresh') => {
     setChatContentLoading((prev: any) => {
       return {
         ...prev,
@@ -38,7 +37,7 @@ const ScriptBtn = ({ messageInfo, onResend, onContinue }: ScriptBtnProps) => {
       if (key === 'add') {
         await handleAdd()
       } else {
-        await handleRefresh(key)
+        await handleRefresh()
       }
     } finally {
       setChatContentLoading((prev: any) => {
@@ -52,23 +51,39 @@ const ScriptBtn = ({ messageInfo, onResend, onContinue }: ScriptBtnProps) => {
     }
   }
   const handleAdd = async () => {
-    await api.saveScript({
+    const script = await api.saveScript({
       projectId,
       sessionId: sessionId!,
-      sessionChatId: messageInfo.id as number,
+      sessionChatId: messageInfo.id,
+      scriptText: messageInfo.messageContent,
     })
-    message.success('标记剧本中~请等待')
+    dispatch.aiScript.updateMessage({
+      data: {
+        ...messageInfo,
+        scriptId: script.scriptId,
+        scriptName: script.scriptName || script.name,
+      },
+    })
+    dispatch.aiScript.getScriptPageList({
+      projectId,
+    })
+    message.success('标记剧本成功')
   }
 
-  const handleRefresh = async (key: 'refresh' | 'again') => {
+  const handleRefresh = async () => {
+    const sessionChatId = Number(messageInfo.id)
+    if (!Number.isFinite(sessionChatId) || sessionChatId <= 0) {
+      message.warning('当前消息不能重新生成')
+      return
+    }
     dispatch.aiScript.updateData({
       chatIng: true,
     })
     const params: ScriptSocketPayload = {
       sessionId,
-      sessionChatId: messageInfo.id,
+      sessionChatId,
     }
-    const sent = key === 'again' ? onContinue(params) : onResend(params)
+    const sent = onResend(params)
     if (!sent) {
       dispatch.aiScript.updateData({
         chatIng: false,
@@ -77,7 +92,7 @@ const ScriptBtn = ({ messageInfo, onResend, onContinue }: ScriptBtnProps) => {
     }
   }
   const config: {
-    key: 'add' | 'refresh' | 'again'
+    key: 'add' | 'refresh'
     value: string
     icon: string
   }[] = [
@@ -90,11 +105,6 @@ const ScriptBtn = ({ messageInfo, onResend, onContinue }: ScriptBtnProps) => {
       key: 'refresh',
       value: '重新生成',
       icon: 'refresh',
-    },
-    {
-      key: 'again',
-      value: '继续输出',
-      icon: '',
     },
   ]
 
@@ -112,10 +122,14 @@ const ScriptBtn = ({ messageInfo, onResend, onContinue }: ScriptBtnProps) => {
         {showData.map(item => (
           <ActionBtn
             {...item}
-            onClick={() => handleClick(item.key as 'add')}
+            onClick={() => handleClick(item.key)}
             key={item.key}
             loading={chatContentLoading[messageInfo.id]?.[item.key]}
-            disabled={item.key === 'refresh' ? chatIng : chatContentLoading[messageInfo.id]?.[item.key]}></ActionBtn>
+            disabled={
+              item.key === 'refresh'
+                ? chatIng
+                : chatContentLoading[messageInfo.id]?.[item.key]
+            }></ActionBtn>
         ))}
       </Space>
     </div>

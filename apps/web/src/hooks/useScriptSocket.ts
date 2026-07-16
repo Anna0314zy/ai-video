@@ -4,7 +4,6 @@ import {
   SCRIPT_ADD_THOROUGH,
   SCRIPT_END_SUBSCRIBE_THOROUGH,
   SCRIPT_SEND_THOROUGH,
-  SCRIPT_SUBSCRIBE_AGAIN_THOROUGH,
   SCRIPT_SUBSCRIBE_RESEND_THOROUGH,
   SCRIPT_SUBSCRIBE_THOROUGH,
 } from '@/const/socket'
@@ -70,15 +69,9 @@ const useScriptSocket = ({ onChunk, onCompleted, onScriptAdded }: UseScriptSocke
     [sendWithAccount],
   )
 
-  const continueOutput = useCallback(
-    (payload: ScriptSocketPayload) => sendWithAccount(SCRIPT_SUBSCRIBE_AGAIN_THOROUGH, payload),
-    [sendWithAccount],
-  )
-
   return {
     sendChat,
     resendMessage,
-    continueOutput,
     connected,
     reconnecting,
     error,

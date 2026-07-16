@@ -144,6 +144,10 @@ export class SaveScriptDto {
   @IsNumber()
   sessionId?: number
 
+  @ApiPropertyOptional({ example: 1001, description: '需要标记为剧本的助手消息 ID' })
+  @IsOptional()
+  sessionChatId?: number | string
+
   @ApiPropertyOptional({ example: '太阳系科普剧本', description: '剧本名称' })
   @IsOptional()
   @IsString()
@@ -153,6 +157,36 @@ export class SaveScriptDto {
   @IsOptional()
   @IsString()
   scriptText?: string
+
+  @ApiPropertyOptional({ example: '剧情', description: '剧本类型' })
+  @IsOptional()
+  @IsString()
+  scriptType?: string
+
+  @ApiPropertyOptional({ example: '故事型', description: '剧本风格' })
+  @IsOptional()
+  @IsString()
+  scriptStyle?: string
+
+  @ApiPropertyOptional({ example: 120, description: '总时长，单位秒' })
+  @IsOptional()
+  @IsNumber()
+  duration?: number
+
+  @ApiPropertyOptional({ example: 14, description: '镜头数量' })
+  @IsOptional()
+  @IsNumber()
+  shotNum?: number
+
+  @ApiPropertyOptional({ example: '哪吒', description: '主角' })
+  @IsOptional()
+  @IsString()
+  characters?: string
+
+  @ApiPropertyOptional({ example: '哪吒脑海', description: '剧本主题或内容' })
+  @IsOptional()
+  @IsString()
+  scriptContent?: string
 }
 
 export class PageScriptDto extends PageDto {

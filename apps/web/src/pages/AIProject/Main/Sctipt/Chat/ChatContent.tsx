@@ -16,7 +16,6 @@ interface ChatContentProps {
   chatIngText: string
   streamScrollKey: number
   onResend: (params: ScriptSocketPayload) => boolean
-  onContinue: (params: ScriptSocketPayload) => boolean
 }
 
 const CHAT_HISTORY_PAGE_SIZE = 15
@@ -66,7 +65,7 @@ const VirtuosoItem = (props: React.HTMLAttributes<HTMLDivElement>) => (
   />
 )
 
-const ChatContent = ({ chatIngText, streamScrollKey, onResend, onContinue }: ChatContentProps) => {
+const ChatContent = ({ chatIngText, streamScrollKey, onResend }: ChatContentProps) => {
   const md = useMemo(() => createMarkdownRenderer(), [])
   const { messageListMap, currentSessionId, chatIng } = useSelector((state: RootState) => state.aiScript)
   const dispatch = useDispatch<Dispatch>()
@@ -249,7 +248,6 @@ const ChatContent = ({ chatIngText, streamScrollKey, onResend, onContinue }: Cha
                 key={String(item.id)}
                 messageInfo={item}
                 onResend={onResend}
-                onContinue={onContinue}
               />
             )
           }}

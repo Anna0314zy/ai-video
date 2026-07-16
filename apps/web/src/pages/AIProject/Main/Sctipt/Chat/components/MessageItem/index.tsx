@@ -12,12 +12,12 @@ interface IProps {
   messageInfo: MessageList
   md: any
   onResend: (params: ScriptSocketPayload) => boolean
-  onContinue: (params: ScriptSocketPayload) => boolean
 }
-const MessageItem = ({ messageInfo, md, onResend, onContinue }: IProps) => {
+const MessageItem = ({ messageInfo, md, onResend }: IProps) => {
   const renderedHtml = useMemo(() => {
     return md.render(normalizeMarkdownSource(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''))
   }, [md, messageInfo.messageContent])
+  const showScriptActions = messageInfo.role === Role.Gpt && messageInfo.messageType !== 'interrupted'
 
   if (!messageInfo.messageContent) return null
   return (
@@ -31,11 +31,10 @@ const MessageItem = ({ messageInfo, md, onResend, onContinue }: IProps) => {
             __html: renderedHtml,
           }}></div>
         {messageInfo.role === Role.user && <FileChat messageInfo={messageInfo}></FileChat>}
-        {messageInfo.role === Role.Gpt && (
+        {showScriptActions && (
           <ScriptBtn
             messageInfo={messageInfo}
             onResend={onResend}
-            onContinue={onContinue}
           />
         )}
       </Flex>

@@ -2,7 +2,6 @@ import { useEffect, useState, useRef, useMemo } from 'react'
 import Style from '../index.module.less'
 import ChatConfig from './components/ChatConfig'
 import { Flex, Button, Space, message } from 'antd'
-import IconWidget from '@/components/IconWidget'
 import { v4 as uuidv4 } from 'uuid'
 import ChatInput from '../../../components/ChatInput'
 import ChatUpload from './components/ChatUpload'
@@ -19,32 +18,15 @@ import { ScriptSocketPayload } from '@/hooks/useScriptSocket'
 interface ChatControlProps {
   connected: boolean
   onSend: (params: ScriptSocketPayload) => boolean
+  onInterrupt: () => void
 }
 
-const ChatControl = ({ connected, onSend }: ChatControlProps) => {
+const ChatControl = ({ connected, onSend, onInterrupt }: ChatControlProps) => {
   const { id } = useParams() // 获取路由参数 userId
   const projectId = Number(id)
   const subjectName = getQueryParam('subjectName') as string
   const dispatch = useDispatch<Dispatch>()
   const { currentSessionId: sessionId, chatIng } = useSelector((state: RootState) => state.aiScript)
-  const handleCreateChat = async () => {
-    const data = await api.createChat({
-      projectId: Number(id),
-    })
-    dispatch.aiScript.getProjectDetail({
-      projectId: Number(id),
-    })
-  }
-  const init = async () => {
-    const latestSessionId = await dispatch.aiScript.getProjectDetail({
-      projectId: Number(id),
-    })
-    if (!latestSessionId) handleCreateChat()
-  }
-
-  useEffect(() => {
-    init()
-  }, [])
   const [prompt, setPrompt] = useState<{
     text?: string
     fileId?: number
@@ -80,6 +62,10 @@ const ChatControl = ({ connected, onSend }: ChatControlProps) => {
     })
   }
   const handleSendMessage = async () => {
+    if (!sessionId) {
+      message.error('请先创建会话')
+      return
+    }
     if (!connected) {
       message.error('服务端连接失败')
       return
@@ -154,8 +140,8 @@ const ChatControl = ({ connected, onSend }: ChatControlProps) => {
   }
 
   const sendDisabled = useMemo(() => {
-    return !prompt?.text || chatIng
-  }, [prompt?.text, chatIng])
+    return !prompt?.text || !sessionId
+  }, [prompt?.text, sessionId])
   return (
     <div className={Style['chat-control']}>
       <Flex justify='space-between' wrap={false} align='center'>
@@ -167,14 +153,14 @@ const ChatControl = ({ connected, onSend }: ChatControlProps) => {
             </Button>
           </Space>
         </Flex>
-        <Flex justify='center' wrap={false} align='center' style={{ marginLeft: '10px' }} onClick={handleCreateChat}>
-          <IconWidget name='chatClear' />
-          <Button type='link' className='chat-create'>
-            新建对话
-          </Button>
-        </Flex>
       </Flex>
-      <ChatInput sendDisabled={sendDisabled} prompt={prompt} onChange={handleInputChange} onSend={handleInputSend}>
+      <ChatInput
+        sendDisabled={sendDisabled}
+        interrupting={chatIng}
+        prompt={prompt}
+        onChange={handleInputChange}
+        onSend={handleInputSend}
+        onInterrupt={onInterrupt}>
         <ChatUpload onSuccess={handleUploadSuccess}></ChatUpload>
         {prompt.fileName ? (
           <div

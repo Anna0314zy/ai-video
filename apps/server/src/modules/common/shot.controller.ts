@@ -3,6 +3,7 @@ import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swag
 import { randomUUID } from 'node:crypto'
 import { PackageBatchDto, SaveShotListDto } from '../../common/swagger-dto.js'
 import { PrismaService } from '../../prisma/prisma.service.js'
+import { AppException } from '../../common/app-exception.js'
 
 @ApiTags('分镜 Shot')
 @Controller('api/scriptShot/v1')
@@ -54,6 +55,26 @@ export class ShotController {
     return this.list(String(projectId))
   }
 
+  @Post('updateShot')
+  @ApiOperation({ summary: '更新单个分镜标题和内容' })
+  async updateShot(@Body() body: { projectId: number; shotId: number; shotName?: string; shotContent?: string }) {
+    const projectId = Number(body.projectId)
+    const shotId = Number(body.shotId)
+    await this.prisma.shot.updateMany({
+      where: { id: shotId, projectId },
+      data: {
+        title: body.shotName || `镜头${shotId}`,
+        content: body.shotContent || '',
+      },
+    })
+    const shot = await this.prisma.shot.findFirst({ where: { id: shotId, projectId } })
+    if (!shot) throw new AppException('not-found')
+    return {
+      ...mapShot(shot),
+      projectId,
+    }
+  }
+
   @Post('packageBatch')
   @ApiOperation({ summary: '批量打包分镜' })
   @ApiBody({ type: PackageBatchDto })
@@ -93,6 +114,11 @@ function mapShot(shot: any) {
     shotId: shot.id,
     shotName: shot.title,
     shotContent: shot.content,
+    sort: shot.sortOrder + 1,
+    status: 'uncompleted',
+    imageStatus: 'uncompleted',
+    videoStatus: 'uncompleted',
+    voiceStatus: 'uncompleted',
     created: shot.createdAt?.toISOString?.(),
     modified: shot.updatedAt?.toISOString?.(),
   }

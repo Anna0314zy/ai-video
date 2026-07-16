@@ -32,7 +32,12 @@ enum ShotStatus {
 // enum Status
 export interface ShotList {
   shotId: number
-  narration: string
+  shotName?: string
+  shotContent?: string
+  title?: string
+  content?: string
+  sortOrder?: number
+  narration?: string
   status: keyof typeof ShotStatus
   sort: number
   imageStatus?: keyof typeof ShotStatus

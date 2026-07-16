@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Styles from './index.module.less' // 用于样式
-import { LinkOutlined, SendOutlined } from '@ant-design/icons'
+import { LinkOutlined, SendOutlined, StopOutlined } from '@ant-design/icons'
 import { Input } from 'antd'
 const wrapperStyle: React.CSSProperties = {
   display: 'flex',
@@ -18,6 +18,8 @@ const ChatInput = ({
   onSend,
   children,
   sendDisabled,
+  interrupting,
+  onInterrupt,
 }: {
   prompt: {
     text?: string
@@ -28,7 +30,13 @@ const ChatInput = ({
   onSend: (val: string) => void
   children: React.ReactNode
   sendDisabled?: boolean
+  interrupting?: boolean
+  onInterrupt?: () => void
 }) => {
+  const handleInterrupt = () => {
+    if (!interrupting) return
+    onInterrupt?.()
+  }
   const handleSend = () => {
     if (sendDisabled) return
     if (prompt.text?.trim()) {
@@ -43,6 +51,7 @@ const ChatInput = ({
   const handleKeyDown = (event: { key: string; shiftKey: any; preventDefault: () => void }) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()
+      if (interrupting) return
       handleSend()
     }
   }
@@ -57,13 +66,25 @@ const ChatInput = ({
         style={{ overflowY: 'auto', backgroundColor: '#fff', borderColor: 'transparent' }}
         autoSize={{ minRows: 1, maxRows: 6 }}
       />
-      <SendOutlined
-        onClick={handleSend}
-        style={{
-          cursor: sendDisabled ? 'not-allowed' : 'pointer',
-          opacity: sendDisabled ? '0.25' : 1,
-        }}
-      />
+      {interrupting ? (
+        <StopOutlined
+          title='中断输出'
+          onClick={handleInterrupt}
+          style={{
+            cursor: 'pointer',
+            color: '#ff4d4f',
+          }}
+        />
+      ) : (
+        <SendOutlined
+          title='发送'
+          onClick={handleSend}
+          style={{
+            cursor: sendDisabled ? 'not-allowed' : 'pointer',
+            opacity: sendDisabled ? '0.25' : 1,
+          }}
+        />
+      )}
     </div>
   )
 }

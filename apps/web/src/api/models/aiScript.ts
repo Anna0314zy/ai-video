@@ -4,17 +4,26 @@ import api from '../index'
 import { ScriptPrompt, MessageList } from '../types/script'
 
 const http = import.meta.env.VITE_API_SERVER
-export const CHAT_URL = `${http}/api/text/v1/ai/stream/sessionChat`
-export const CHAT_URL_AGAIN = `${http}/api/text/v1/ai/stream/resendMessage`
 export const downloadTemplateUrl = `${http}/api/text/v1/downloadTemplate`
-export const chat = (params: { systemToken: string }) => {
-  return api.post(CHAT_URL, params)
-}
 
 // 新建会话
 
 export const createChat = (params: { projectId: number }) => {
   return api.post<number>(`${http}/api/session/create`, params)
+}
+
+export interface SessionListItem {
+  id: number
+  projectId: number
+  title: string
+  lastMessageAt?: string | null
+  createdAt: string
+  updatedAt: string
+  messageCount: number
+}
+
+export const getSessionList = (params: { projectId: number }) => {
+  return api.get<SessionListItem[]>(`${http}/api/session/list`, params)
 }
 // 获取会话的历史记录
 
@@ -65,7 +74,15 @@ export const fileUpload = (file: any) => {
 interface SaveScriptParams {
   projectId: number
   sessionId: number
-  sessionChatId: number
+  sessionChatId?: number | string
+  scriptText?: string
+  scriptName?: string
+  scriptType?: string
+  scriptStyle?: string
+  duration?: number
+  shotNum?: number
+  characters?: string
+  scriptContent?: string
 }
 //将对话内容保存为剧本及镜头
 export const saveScript = (params: SaveScriptParams) => {
@@ -78,13 +95,15 @@ export const getPageScript = (params: { projectId: number; current: number; size
 }
 //剧本预览
 export const previewScript = (params: { scriptId: number }) => {
-  return api.get<string>(`${http}/api/text/v1/previewScript`, params)
+  return api.get<ScriptPageList>(`${http}/api/text/v1/previewScript`, params)
 }
 //导入剧本
 export const uploadScript = (projectId: number, file: any) => {
-  return api.post<string[]>(
+  const formData = new FormData()
+  formData.append('file', file)
+  return api.post<ScriptPageList>(
     `${http}/api/text/v1/importScript/${projectId}`,
-    { file },
+    formData,
     {
       headers: {
         'Content-Type': 'multipart/form-data',

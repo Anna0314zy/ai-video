@@ -8,6 +8,25 @@ interface CurrentUser {
   id: number
 }
 
+type ScriptTemplateExt = 'md' | 'csv' | 'tsv'
+
+const SCRIPT_FIELD_LABELS = [
+  ['剧本标题', 'title'],
+  ['剧本正文', 'content'],
+  ['剧本类型', 'scriptType'],
+  ['剧本风格', 'scriptStyle'],
+  ['预计总时长（秒）', 'duration'],
+  ['期望镜头数量', 'shotNum'],
+  ['主要角色', 'characters'],
+  ['场景设定', 'sceneSetting'],
+  ['旁白要求', 'narrationRequirement'],
+  ['画面风格', 'visualStyle'],
+  ['禁用内容', 'negativePrompt'],
+  ['备注', 'remark'],
+] as const
+
+const SCRIPT_LABEL_TO_FIELD = new Map(SCRIPT_FIELD_LABELS.map(([label, key]) => [label, key]))
+
 @Injectable()
 export class ScriptService {
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
@@ -27,6 +46,43 @@ export class ScriptService {
       },
     })
     return session.id
+  }
+
+  async listSessions(params: { projectId: number }) {
+    const projectId = Number(params.projectId)
+    if (!Number.isFinite(projectId) || projectId <= 0) throw new AppException('validation')
+
+    const sessions = await (this.prisma.session as any).findMany({
+      where: { projectId },
+      orderBy: [{ lastMessageAt: 'desc' }, { updatedAt: 'desc' }, { id: 'desc' }],
+      include: {
+        _count: {
+          select: { messages: true },
+        },
+      },
+    })
+
+    return sessions.map(mapSession)
+  }
+
+  async touchSessionAfterMessage(sessionId: number, userMessageContent?: string) {
+    const id = Number(sessionId)
+    if (!Number.isFinite(id) || id <= 0) throw new AppException('validation')
+
+    const session = await (this.prisma.session as any).findUnique({
+      where: { id },
+    })
+    if (!session) throw new AppException('not-found')
+
+    const title = shouldReplaceSessionTitle(session.title) ? buildSessionTitle(userMessageContent) : session.title
+
+    await (this.prisma.session as any).update({
+      where: { id },
+      data: {
+        title,
+        lastMessageAt: new Date(),
+      },
+    })
   }
 
   async histories(params: { sessionId: number; current?: number; size?: number; beforeCreated?: number | string; beforeId?: number }) {
@@ -84,19 +140,64 @@ export class ScriptService {
     })
     if (!project) throw new AppException('not-found')
 
+    const sessionId = toOptionalNumber(params.sessionId)
+    let sourceMessageId = toOptionalNumber(params.sessionChatId)
+    let source = normalizeScriptSource(params.source)
+    let title = normalizeNonEmptyString(params.scriptName || params.title) || '未命名剧本'
+    let content = normalizeNonEmptyString(params.scriptText || params.content) || ''
+    let promptConfig: Record<string, unknown> = {}
+
+    if (sourceMessageId) {
+      const message = await this.prisma.sessionMessage.findFirst({
+        where: {
+          id: sourceMessageId,
+          ...(sessionId ? { sessionId } : {}),
+          role: 'assistant',
+        },
+      })
+      if (message) {
+        source = 'ai'
+        content = message.content
+        title = normalizeNonEmptyString(params.scriptName || params.title) || deriveScriptTitle(message.content)
+        promptConfig = await this.getPromptRequestConfig(message.promptRequestLogId)
+      } else if (content) {
+        sourceMessageId = undefined
+      } else {
+        throw new AppException('not-found', '未找到可标记为剧本的助手消息')
+      }
+    }
+
+    if (!content) throw new AppException('validation', '剧本正文不能为空')
+
     const script = await this.prisma.script.create({
       data: {
         projectId: project.id,
-        sessionId: toOptionalNumber(params.sessionId),
-        title: params.scriptName || params.title || '未命名剧本',
-        content: params.scriptText || params.content || '',
+        sessionId,
+        sourceMessageId,
+        title,
+        content,
+        source,
+        ...pickScriptCreateFields({
+          ...promptConfig,
+          ...params,
+        }),
       },
     })
     return mapScript(script)
   }
 
+  private async getPromptRequestConfig(promptRequestLogId?: number | null) {
+    const id = toOptionalNumber(promptRequestLogId)
+    if (!id) return {}
+
+    const task = await this.prisma.generationTask.findUnique({
+      where: { id },
+    })
+    return parseJsonObject(task?.request)
+  }
+
   async createShotPromptLog(body: any) {
-    const prompt = JSON.stringify(body)
+    const prompt = buildEditableScriptPrompt(body)
     const task = await this.prisma.generationTask.create({
       data: {
         taskId: `shot-prompt-${crypto.randomUUID()}`,
@@ -186,6 +287,32 @@ export class ScriptService {
     return mapScript(script)
   }
 
+  async importScript(projectId: number, fileName: string, rawContent: string | Buffer, user?: CurrentUser) {
+    const id = Number(projectId)
+    if (!Number.isFinite(id) || id <= 0) throw new AppException('validation')
+
+    const project = await this.prisma.project.findFirst({
+      where: {
+        id,
+        ...(user?.id ? { ownerId: user.id } : {}),
+      },
+    })
+    if (!project) throw new AppException('not-found')
+
+    const parsed = parseImportedScript(rawContent, fileName)
+    const script = await this.prisma.script.create({
+      data: {
+        projectId: project.id,
+        title: parsed.title,
+        content: parsed.content,
+        source: 'import',
+        ...pickScriptCreateFields(parsed),
+      },
+    })
+
+    return mapScript(script)
+  }
+
   async deleteScripts(scriptIdList: number[]) {
     const ids = scriptIdList.map(Number).filter(id => Number.isFinite(id) && id > 0)
     await this.prisma.script.deleteMany({ where: { id: { in: ids } } })
@@ -195,26 +322,132 @@ export class ScriptService {
   async confirmScript(params: { projectId: number; scriptId: number }) {
     const projectId = Number(params.projectId)
     const scriptId = Number(params.scriptId)
+    console.info('[ScriptService.confirmScript] start', { projectId, scriptId })
     const script = await this.prisma.script.findFirst({ where: { id: scriptId, projectId } })
     if (!script) throw new AppException('not-found')
-
-    const updated = await this.prisma.$transaction(async tx => {
-      await tx.script.updateMany({
-        where: { projectId },
-        data: { confirmed: false },
-      })
-      const confirmedScript = await tx.script.update({
-        where: { id: scriptId },
-        data: { confirmed: true },
-      })
-      await tx.project.update({
-        where: { id: projectId },
-        data: { state: 'ScriptConfirmed' },
-      })
-      return confirmedScript
+    const shotDrafts = buildShotDrafts(script)
+    console.info('[ScriptService.confirmScript] script loaded', {
+      projectId,
+      scriptId,
+      title: script.title,
+      contentLength: script.content?.length || 0,
+      requestedShotNum: script.shotNum,
+      shotDraftCount: shotDrafts.length,
     })
 
-    return mapScript(updated)
+    const result = await this.prisma
+      .$transaction(async tx => {
+        await tx.script.updateMany({
+          where: { projectId },
+          data: { confirmed: false },
+        })
+        const confirmedScript = await tx.script.update({
+          where: { id: scriptId },
+          data: { confirmed: true },
+        })
+        await tx.shot.deleteMany({ where: { projectId } })
+        for (const [index, shot] of shotDrafts.entries()) {
+          await tx.shot.create({
+            data: {
+              projectId,
+              title: shot.title,
+              content: shot.content,
+              sortOrder: index,
+            },
+          })
+        }
+        await tx.project.update({
+          where: { id: projectId },
+          data: { state: 'ScriptConfirmed', shotNum: shotDrafts.length },
+        })
+        return { script: confirmedScript, shotCount: shotDrafts.length }
+      })
+      .catch(error => {
+        console.error('[ScriptService.confirmScript] transaction failed', {
+          projectId,
+          scriptId,
+          shotDraftCount: shotDrafts.length,
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        })
+        throw error
+      })
+    console.info('[ScriptService.confirmScript] success', { projectId, scriptId, shotCount: result.shotCount })
+
+    return {
+      ...mapScript(result.script),
+      shotCount: result.shotCount,
+    }
+  }
+}
+
+export function buildScriptTemplate(ext: string = 'md') {
+  const normalizedExt = normalizeTemplateExt(ext)
+  if (normalizedExt === 'md') {
+    const content = [
+      '# 剧本标题',
+      '春晓古诗讲解剧本',
+      '',
+      '# 剧本正文',
+      '第一段：以清晨鸟鸣引入古诗《春晓》，带学生感受春天早晨的画面。',
+      '',
+      '# 剧本信息',
+      '- 剧本类型：讲解',
+      '- 剧本风格：故事型',
+      '- 预计总时长（秒）：60',
+      '- 期望镜头数量：6',
+      '- 主要角色：老师、学生',
+      '- 场景设定：春天清晨的教室与窗外花园',
+      '- 旁白要求：语言亲切，适合课堂导入',
+      '- 画面风格：明亮、温暖、儿童友好',
+      '- 禁用内容：暴力、恐怖、低俗内容',
+      '- 备注：可根据课堂节奏调整镜头数量',
+      '',
+    ].join('\n')
+    return {
+      fileName: '剧本模板.md',
+      contentType: 'text/markdown; charset=utf-8',
+      content,
+    }
+  }
+
+  const separator = normalizedExt === 'tsv' ? '\t' : ','
+  const headers = SCRIPT_FIELD_LABELS.map(([label]) => label)
+  const row = [
+    '春晓古诗讲解剧本',
+    '第一段：以清晨鸟鸣引入古诗《春晓》，带学生感受春天早晨的画面。',
+    '讲解',
+    '故事型',
+    '60',
+    '6',
+    '老师、学生',
+    '春天清晨的教室与窗外花园',
+    '语言亲切，适合课堂导入',
+    '明亮、温暖、儿童友好',
+    '暴力、恐怖、低俗内容',
+    '可根据课堂节奏调整镜头数量',
+  ]
+
+  return {
+    fileName: `剧本模板.${normalizedExt}`,
+    contentType: normalizedExt === 'tsv' ? 'text/tab-separated-values; charset=utf-8' : 'text/csv; charset=utf-8',
+    content: [headers, row].map(values => values.map(escapeDelimitedCell).join(separator)).join('\n'),
+  }
+}
+
+export function parseImportedScript(rawContent: string | Buffer, fileName = '剧本.md') {
+  const text = Buffer.isBuffer(rawContent) ? rawContent.toString('utf8') : String(rawContent || '')
+  const ext = normalizeTemplateExt(fileName.split('.').pop() || 'md')
+  const parsed = ext === 'md' ? parseMarkdownScript(text) : parseDelimitedScript(text, ext === 'tsv' ? '\t' : ',')
+  const title = normalizeNonEmptyString(parsed.title)
+  const content = normalizeNonEmptyString(parsed.content)
+  if (!title || !content) throw new AppException('validation', '导入剧本必须包含剧本标题和剧本正文')
+  return {
+    ...parsed,
+    title,
+    content,
+    duration: toOptionalNumber(parsed.duration),
+    shotNum: toOptionalNumber(parsed.shotNum),
   }
 }
 
@@ -230,16 +463,34 @@ function mapSessionMessage(message: any) {
   return {
     ...message,
     messageContent: message.content,
+    promptRequestLogId: message.promptRequestLogId,
     created: message.createdAt?.getTime?.() || message.created,
   }
 }
 
+function mapSession(session: any) {
+  return {
+    id: session.id,
+    projectId: session.projectId,
+    title: session.title || '新会话',
+    lastMessageAt: session.lastMessageAt?.toISOString?.() || null,
+    createdAt: session.createdAt?.toISOString?.() || session.createdAt,
+    updatedAt: session.updatedAt?.toISOString?.() || session.updatedAt,
+    messageCount: session._count?.messages || 0,
+  }
+}
+
 function mapScript(script: any) {
+  const modified = script.updatedAt?.toISOString?.() || script.createdAt?.toISOString?.() || script.modified
   return {
     ...script,
     scriptId: script.id,
     scriptName: script.title,
     scriptText: script.content,
+    name: script.title,
+    modified,
+    isFinal: script.confirmed ? 1 : 0,
+    scriptContent: script.content,
     created: script.createdAt?.toISOString?.() || script.created,
   }
 }
@@ -254,4 +505,243 @@ function toOptionalNumber(value: unknown) {
   if (value === undefined || value === null || value === '') return undefined
   const parsed = Number(value)
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined
+}
+
+function normalizeTemplateExt(ext?: string): ScriptTemplateExt {
+  const normalized = String(ext || 'md').toLowerCase()
+  if (normalized === 'csv' || normalized === 'tsv' || normalized === 'md') return normalized
+  return 'md'
+}
+
+function normalizeScriptSource(value: unknown) {
+  const source = String(value || 'manual')
+  if (source === 'ai' || source === 'import' || source === 'manual') return source
+  return 'manual'
+}
+
+function normalizeNonEmptyString(value: unknown) {
+  const text = String(value ?? '').trim()
+  return text || undefined
+}
+
+function deriveScriptTitle(content: string) {
+  const firstLine = String(content || '')
+    .split(/\r?\n/)
+    .map(line => line.replace(/^#+\s*/, '').trim())
+    .find(Boolean)
+  return (firstLine || '未命名剧本').slice(0, 40)
+}
+
+function pickScriptCreateFields(source: any) {
+  return {
+    scriptType: normalizeNonEmptyString(source.scriptType),
+    scriptStyle: normalizeNonEmptyString(source.scriptStyle),
+    duration: toOptionalNumber(source.duration),
+    shotNum: toOptionalNumber(source.shotNum),
+    characters: normalizeNonEmptyString(source.characters),
+    sceneSetting: normalizeNonEmptyString(source.sceneSetting),
+    narrationRequirement: normalizeNonEmptyString(source.narrationRequirement),
+    visualStyle: normalizeNonEmptyString(source.visualStyle),
+    negativePrompt: normalizeNonEmptyString(source.negativePrompt),
+    remark: normalizeNonEmptyString(source.remark),
+  }
+}
+
+function parseJsonObject(value: unknown): Record<string, unknown> {
+  if (!value) return {}
+  if (typeof value === 'object' && !Array.isArray(value)) return value as Record<string, unknown>
+  if (typeof value !== 'string') return {}
+  try {
+    const parsed = JSON.parse(value)
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {}
+  } catch {
+    return {}
+  }
+}
+
+function buildEditableScriptPrompt(source: any) {
+  const scriptType = normalizeNonEmptyString(source.scriptType)
+  const scriptStyle = normalizeNonEmptyString(source.scriptStyle)
+  const scriptContent = normalizeNonEmptyString(source.scriptContent || source.content || source.text)
+  const characters = normalizeNonEmptyString(source.characters)
+  const duration = toOptionalNumber(source.duration)
+  const shotNum = toOptionalNumber(source.shotNum)
+  const wordNum = toOptionalNumber(source.wordNum)
+
+  const opening =
+    scriptType && scriptStyle
+      ? `请生成一个${scriptType}类型、${scriptStyle}风格的剧本。`
+      : scriptType
+        ? `请生成一个${scriptType}类型的剧本。`
+        : scriptStyle
+          ? `请生成一个${scriptStyle}风格的剧本。`
+          : '请生成一个适合后续镜头设计的剧本。'
+
+  const details = [
+    scriptContent ? `主题：${scriptContent}` : undefined,
+    characters ? `主角：${characters}` : undefined,
+    duration ? `总时长：${duration} 秒` : undefined,
+    shotNum ? `镜头数量：${shotNum} 个` : undefined,
+    wordNum ? `目标字数：${wordNum} 字` : undefined,
+  ].filter(Boolean)
+
+  const requirements = [
+    '要求：',
+    '1. 剧本适合后续拆分为镜头设计。',
+    '2. 输出结构清晰，包含标题、正文和必要的场景描述。',
+    scriptStyle ? `3. 语言风格符合${scriptStyle}表达。` : '3. 语言表达自然，画面感明确。',
+  ]
+
+  return [opening, details.length ? details.join('\n') : '', requirements.join('\n')].filter(Boolean).join('\n\n')
+}
+
+function buildShotDrafts(script: any) {
+  const targetCount = toOptionalNumber(script.shotNum)
+  const parts = splitScriptIntoShotParts(script.content)
+  const count = targetCount || parts.length || 1
+  const safeCount = Math.max(1, Math.min(count, 60))
+  const groups = groupParts(parts.length ? parts : [normalizeNonEmptyString(script.content) || script.title || ''], safeCount)
+
+  return groups.map((group, index) => ({
+    title: `镜头${index + 1}`,
+    content: group.join('\n\n').trim() || `${script.title || '剧本'} - 镜头${index + 1}`,
+  }))
+}
+
+function splitScriptIntoShotParts(content: string) {
+  return String(content || '')
+    .replace(/\r\n/g, '\n')
+    .split(/\n{2,}/)
+    .map(part => part.replace(/^#{1,6}\s*/, '').trim())
+    .filter(Boolean)
+}
+
+function groupParts(parts: string[], targetCount: number) {
+  if (parts.length === targetCount) return parts.map(part => [part])
+  if (parts.length > targetCount) {
+    return Array.from({ length: targetCount }, (_, index) => {
+      const start = Math.floor((index * parts.length) / targetCount)
+      const end = Math.floor(((index + 1) * parts.length) / targetCount)
+      return parts.slice(start, Math.max(start + 1, end))
+    })
+  }
+
+  const groups = parts.map(part => [part])
+  while (groups.length < targetCount) groups.push([''])
+  return groups
+}
+
+function parseMarkdownScript(text: string) {
+  const result: Record<string, any> = {}
+  const sections = parseMarkdownSections(text)
+  result.title = sections['剧本标题'] || extractMarkdownMetaValue(text, '剧本标题')
+  result.content = sections['剧本正文'] || extractMarkdownMetaValue(text, '剧本正文')
+
+  for (const line of text.split(/\r?\n/)) {
+    const match = line.match(/^\s*[-*]?\s*([^：:]+)\s*[：:]\s*(.*?)\s*$/)
+    if (!match) continue
+    const field = SCRIPT_LABEL_TO_FIELD.get(match[1].trim() as any)
+    if (field) result[field] = match[2].trim()
+  }
+
+  return result
+}
+
+function parseMarkdownSections(text: string) {
+  const sections: Record<string, string> = {}
+  let currentTitle = ''
+  let buffer: string[] = []
+  const flush = () => {
+    if (currentTitle) sections[currentTitle] = buffer.join('\n').trim()
+  }
+
+  for (const line of text.split(/\r?\n/)) {
+    const heading = line.match(/^#{1,6}\s+(.+?)\s*$/)
+    if (heading) {
+      flush()
+      currentTitle = heading[1].trim()
+      buffer = []
+    } else if (currentTitle) {
+      buffer.push(line)
+    }
+  }
+  flush()
+  return sections
+}
+
+function extractMarkdownMetaValue(text: string, label: string) {
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const match = text.match(new RegExp(`${escaped}\\s*[：:]\\s*(.+)`))
+  return match?.[1]?.trim()
+}
+
+function parseDelimitedScript(text: string, separator: ',' | '\t') {
+  const rows = parseDelimitedRows(text, separator).filter(row => row.some(cell => cell.trim()))
+  if (rows.length < 2) return {}
+  const headers = rows[0].map(cell => cell.trim())
+  const values = rows[1]
+  const result: Record<string, any> = {}
+  headers.forEach((header, index) => {
+    const field = SCRIPT_LABEL_TO_FIELD.get(header as any)
+    if (field) result[field] = values[index]?.trim()
+  })
+  return result
+}
+
+function parseDelimitedRows(text: string, separator: ',' | '\t') {
+  const rows: string[][] = []
+  let row: string[] = []
+  let cell = ''
+  let quoted = false
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index]
+    const next = text[index + 1]
+
+    if (char === '"') {
+      if (quoted && next === '"') {
+        cell += '"'
+        index += 1
+      } else {
+        quoted = !quoted
+      }
+      continue
+    }
+
+    if (!quoted && char === separator) {
+      row.push(cell)
+      cell = ''
+      continue
+    }
+
+    if (!quoted && (char === '\n' || char === '\r')) {
+      if (char === '\r' && next === '\n') index += 1
+      row.push(cell)
+      rows.push(row)
+      row = []
+      cell = ''
+      continue
+    }
+
+    cell += char
+  }
+
+  row.push(cell)
+  rows.push(row)
+  return rows
+}
+
+function escapeDelimitedCell(value: string) {
+  if (!/[",\n\r\t]/.test(value)) return value
+  return `"${value.replace(/"/g, '""')}"`
+}
+
+export function buildSessionTitle(content?: string) {
+  const normalized = String(content || '').replace(/\s+/g, ' ').trim()
+  if (!normalized) return '新会话'
+  return normalized.slice(0, 20)
+}
+
+export function shouldReplaceSessionTitle(title?: string | null) {
+  return !title || title === '新会话'
 }

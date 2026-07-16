@@ -44,10 +44,12 @@ model Project {
 }
 
 model Session {
-  id        Int      @id @default(autoincrement())
-  projectId Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int       @id @default(autoincrement())
+  projectId     Int
+  title         String    @default("新会话")
+  lastMessageAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   project  Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
   messages SessionMessage[]
@@ -55,24 +57,37 @@ model Session {
 }
 
 model SessionMessage {
-  id        Int      @id @default(autoincrement())
-  sessionId Int
-  role      String
-  content   String
-  createdAt DateTime @default(now())
+  id                 Int      @id @default(autoincrement())
+  sessionId          Int
+  role               String
+  content            String
+  promptRequestLogId Int?
+  createdAt          DateTime @default(now())
 
   session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
 
 model Script {
-  id        Int      @id @default(autoincrement())
-  projectId Int
-  sessionId Int?
-  title     String   @default("未命名剧本")
-  content   String   @default("")
-  confirmed Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                   Int      @id @default(autoincrement())
+  projectId            Int
+  sessionId            Int?
+  sourceMessageId      Int?
+  title                String   @default("未命名剧本")
+  content              String   @default("")
+  source               String   @default("manual")
+  scriptType           String?
+  scriptStyle          String?
+  duration             Int?
+  shotNum              Int?
+  characters           String?
+  sceneSetting         String?
+  narrationRequirement String?
+  visualStyle          String?
+  negativePrompt       String?
+  remark               String?
+  confirmed            Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   project Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   session Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)

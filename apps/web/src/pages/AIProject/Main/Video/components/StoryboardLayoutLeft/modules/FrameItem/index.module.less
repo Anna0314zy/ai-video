@@ -1,9 +1,9 @@
 .storyboard-card {
   padding: 8px;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   // width: 170px;
-  height: 96px;
+  min-height: 154px;
   border-radius: 6px;
   cursor: pointer;
   // float: right;
@@ -17,6 +17,12 @@
       // text-align: right;
       color: #4b5162;
       width: 24px;
+      line-height: 20px;
+      flex-shrink: 0;
+    }
+    .storyboard-card-body {
+      min-width: 0;
+      flex: 1;
     }
     .storyboard-card-img {
       position: relative;
@@ -126,6 +132,27 @@
         // opacity: .4;
       }
     }
+    .storyboard-card-title {
+      margin-top: 6px;
+      color: #202432;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 18px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .storyboard-card-summary {
+      margin-top: 2px;
+      color: #6b7280;
+      font-size: 11px;
+      line-height: 16px;
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-break: break-word;
+    }
   }
   &[data-active='true'] {
     // transition: all 0.5s ease-in-out;
@@ -133,6 +160,13 @@
     :global {
       .storyboard-card-index {
         color: #fff !important;
+      }
+      .storyboard-card-title,
+      .storyboard-card-summary {
+        color: #fff;
+      }
+      .storyboard-card-summary {
+        opacity: 0.86;
       }
     }
   }

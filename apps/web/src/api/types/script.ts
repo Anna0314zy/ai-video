@@ -36,19 +36,27 @@ export interface MessageList {
   loading?: boolean // 标记为剧本中
   fromId?: number // ws 通知我的时候需要告诉用户发送记录的id 用于去重
   userSend?: boolean // 标识用户发出的那一条
+  promptRequestLogId?: number
 }
 export interface ScriptPageList {
   // 都写成可选
   projectId: number
   scriptId: number
-  source?: number
+  source?: 'ai' | 'import' | 'manual'
+  sourceMessageId?: number
   shotNum?: number
-  wordNum?: number
   duration?: number
   characters?: string
+  sceneSetting?: string
+  narrationRequirement?: string
+  visualStyle?: string
+  negativePrompt?: string
+  remark?: string
   scriptType?: string
   scriptStyle?: string
   scriptContent?: string
+  scriptName?: string
+  scriptText?: string
   modified: string
   isFinal?: number // 是否确认剧本
   name: string

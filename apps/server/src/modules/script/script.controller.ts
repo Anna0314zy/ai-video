@@ -1,4 +1,21 @@
-import { Body, Controller, Delete, Get, Header, Inject, Param, Post, Put, Query, Req, Res, Sse } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Header,
+  Inject,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+  Res,
+  Sse,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { Observable } from 'rxjs'
 import {
@@ -15,7 +32,7 @@ import {
 import { AppException } from '../../common/app-exception.js'
 import { LlmService } from '../../llm/llm.service.js'
 import type { LlmMessage } from '../../llm/llm-provider.js'
-import { ScriptService } from './script.service.js'
+import { buildScriptTemplate, ScriptService } from './script.service.js'
 import { withScriptMarkdownSystemPrompt } from './script-markdown.js'
 
 @ApiTags('剧本 Script')
@@ -33,6 +50,13 @@ export class ScriptController {
   @ApiBody({ type: CreateSessionDto })
   createChat(@Body('projectId') projectId: number, @Req() request: any) {
     return this.scriptService.createSession(projectId, request.user)
+  }
+
+  @Get('api/session/list')
+  @ApiOperation({ summary: '项目会话列表', description: '查询一个项目下的多个会话，用于前端会话侧栏。' })
+  @ApiQuery({ name: 'projectId', example: 1, description: '项目 ID' })
+  listSessions(@Query('projectId') projectId: string) {
+    return this.scriptService.listSessions({ projectId: Number(projectId) })
   }
 
   @Post('api/session/chat/getHistories')
@@ -85,29 +109,41 @@ export class ScriptController {
   @Post('api/text/v1/importScript/:projectId')
   @ApiOperation({ summary: '导入剧本' })
   @ApiParam({ name: 'projectId', example: 1, description: '项目 ID' })
-  importScript(@Param('projectId') projectId: string) {
-    throw new AppException('feature-not-configured', '剧本导入需要接入文件解析后再启用')
+  @UseInterceptors(FileInterceptor('file'))
+  importScript(@Param('projectId') projectId: string, @UploadedFile() file: any, @Body() body: any, @Req() request: any) {
+    const fileName = file?.originalname || body?.fileName || '剧本.md'
+    const content = file?.buffer || body?.content || body?.text || ''
+    if (!content) throw new AppException('validation', '请选择要导入的剧本文件')
+    return this.scriptService.importScript(Number(projectId), fileName, content, request.user)
   }
 
   @Delete('api/text/v1/deleteScript')
   @ApiOperation({ summary: '删除剧本' })
   @ApiBody({ type: DeleteScriptDto, required: false })
-  deleteScript(@Body() body?: DeleteScriptDto) {
-    return this.scriptService.deleteScripts(body?.scriptIdList || [])
+  deleteScript(@Body() body?: DeleteScriptDto, @Query('scriptId') scriptId?: string) {
+    const scriptIdList = body?.scriptIdList?.length ? body.scriptIdList : scriptId ? [Number(scriptId)] : []
+    return this.scriptService.deleteScripts(scriptIdList)
   }
 
   @Put('api/text/v1/confirmScript')
   @ApiOperation({ summary: '确认剧本' })
   @ApiBody({ type: ConfirmScriptDto })
-  confirmScript(@Body() body: ConfirmScriptDto) {
-    return this.scriptService.confirmScript(body)
+  confirmScript(@Body() body: Partial<ConfirmScriptDto> = {}, @Query('projectId') projectId?: string, @Query('scriptId') scriptId?: string) {
+    return this.scriptService.confirmScript({
+      ...body,
+      projectId: body?.projectId || Number(projectId),
+      scriptId: body?.scriptId || Number(scriptId),
+    })
   }
 
   @Get('api/text/v1/downloadTemplate')
   @Header('Content-Type', 'text/plain; charset=utf-8')
   @ApiOperation({ summary: '下载剧本模板', description: '无需传参。' })
-  downloadTemplate(@Res() response: any) {
-    response.send('剧本模板')
+  downloadTemplate(@Query('ext') ext: string, @Res() response: any) {
+    const template = buildScriptTemplate(ext)
+    response.setHeader('Content-Type', template.contentType)
+    response.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(template.fileName)}"`)
+    response.send(template.content)
   }
 
   @Get('api/text/v1/downloadScript')

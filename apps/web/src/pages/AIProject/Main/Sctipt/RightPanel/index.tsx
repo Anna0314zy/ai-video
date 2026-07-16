@@ -41,10 +41,10 @@ const RightPanel = () => {
     downloadFromServer(`${downloadTemplateUrl}?ext=${ext}`, `剧本模板.${ext}`)
   }, [])
   const downItems: MenuProps['items'] = [
-    {
-      key: '1',
-      label: <span onClick={e => handleDownloadTemplate(e, 'xlsx')}>xlsx</span>,
-    },
+    // {
+    //   key: '1',
+    //   label: <span onClick={e => handleDownloadTemplate(e, 'csv')}>csv</span>,
+    // },
     {
       key: '2',
       label: <span onClick={e => handleDownloadTemplate(e, 'md')}>md</span>,
@@ -84,7 +84,7 @@ const RightPanel = () => {
         <Dropdown menu={{ items: downItems }} placement='bottomLeft' arrow={{ pointAtCenter: true }}>
           <Button type='text'>下载模板</Button>
         </Dropdown>
-        <ChatUpload customRequest={handleCustomRequest} accept='.md, .xlsx, .docx'>
+        <ChatUpload customRequest={handleCustomRequest} accept='.md, .csv, .tsv'>
           <Button type='link'>导入剧本</Button>
         </ChatUpload>
       </Flex>
@@ -99,7 +99,7 @@ const RightPanel = () => {
           disabled={targetScript?.scriptId ? false : true}
           type='primary'
           style={{ width: '100%', margin: '10px 0 88px 0' }}>
-          确认剧本
+          确认并开始镜头设计
         </Button>
       ) : null}
     </Flex>

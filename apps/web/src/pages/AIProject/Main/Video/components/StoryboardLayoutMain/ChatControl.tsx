@@ -22,12 +22,13 @@ const ChatControl = () => {
   const currentShot = useMemo(() => {
     return shotList.find(v => v.shotId === currentShotId)
   }, [currentShotId, shotList])
+  const currentShotContent = currentShot?.shotContent || currentShot?.content || ''
 
   useEffect(() => {
     formRef.current?.form.setFieldsValue({
-      btnValue: currentShot?.midjourneyPrompt,
+      btnValue: currentShot?.midjourneyPrompt || currentShotContent,
     })
-  }, [currentShot?.midjourneyPrompt, currentSelectType])
+  }, [currentShot?.midjourneyPrompt, currentShotContent, currentSelectType])
   const projectId = Number(useParams().id)
   const formRef = useRef<any>()
   const [prompt, setPrompt] = useState<{
@@ -105,8 +106,8 @@ const ChatControl = () => {
       shotId: currentShotId,
     }
     if (currentSelectType === 'voice') {
-      base.text = currentShot?.narration
-      if (!currentShot?.narration) {
+      base.text = currentShot?.narration || currentShotContent
+      if (!base.text) {
         return message.error('旁白不能为空')
       }
       await formRef.current?.form.validateFields()

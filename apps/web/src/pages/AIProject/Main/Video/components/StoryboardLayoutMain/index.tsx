@@ -1,6 +1,7 @@
 import { Flex } from 'antd'
 import ChatContent from './ChatContent'
 import ChatControl from './ChatControl'
+import ShotOverview from './ShotOverview'
 const contentStyle: React.CSSProperties = {
   height: '100%',
   color: '#fff',
@@ -12,6 +13,7 @@ const contentStyle: React.CSSProperties = {
 export default () => {
   return (
     <Flex vertical={true} style={contentStyle} flex={1}>
+      <ShotOverview />
       <ChatContent />
       <ChatControl />
     </Flex>

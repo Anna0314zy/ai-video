@@ -29,7 +29,7 @@ export default (props: IMaterialItem) => {
     const res = await api.previewScript({
       scriptId: data.scriptId,
     })
-    previewRef.current?.open(res)
+    previewRef.current?.open(res.scriptText || '')
   }, [])
 
   const handleDel = useCallback(async () => {
@@ -70,9 +70,8 @@ export default (props: IMaterialItem) => {
   ]
   // 下载
   const handleDownload = useCallback((ext: string = 'md') => {
-    console.log('删除', data)
     const url = `${import.meta.env.VITE_API_SERVER}/api/text/v1/downloadScript?scriptId=${data.scriptId}&ext=${ext}`
-    downloadFromServer(url, `${data.scriptStyle}-${data.scriptId}.${ext}`)
+    downloadFromServer(url, `${data.scriptName || data.name || '剧本'}-${data.scriptId}.${ext}`)
   }, [])
 
   return (
