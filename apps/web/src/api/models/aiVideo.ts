@@ -152,7 +152,15 @@ export const saveShotList = (params: { projectId: number; shotInfoDtoList: Array
   return api.post<any>(`${http}/api/scriptShot/v1/saveShotList`, params)
 }
 
-export const updateShot = (params: { projectId: number; shotId: number; shotName?: string; shotContent?: string }) => {
+export const updateShot = (params: {
+  projectId: number
+  shotId: number
+  shotName?: string
+  shotContent?: string
+  visualPrompt?: string
+  videoPrompt?: string
+  narration?: string
+}) => {
   return api.post<ShotList>(`${http}/api/scriptShot/v1/updateShot`, params)
 }
 

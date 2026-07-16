@@ -471,6 +471,17 @@ test('ScriptService confirms a script and initializes editable shots', async () 
         projectId: 7,
         title: '镜头1',
         content: '哪吒脑海\n\n第一段：哪吒看见混沌的记忆。',
+        duration: undefined,
+        camera: '',
+        scene: '',
+        characters: '',
+        visualPrompt: '哪吒脑海\n\n第一段：哪吒看见混沌的记忆。',
+        videoPrompt: '',
+        narration: '',
+        status: 'uncompleted',
+        imageStatus: 'uncompleted',
+        videoStatus: 'uncompleted',
+        voiceStatus: 'uncompleted',
         sortOrder: 0,
       },
     },
@@ -482,6 +493,17 @@ test('ScriptService confirms a script and initializes editable shots', async () 
         projectId: 7,
         title: '镜头2',
         content: '第二段：他听见风火轮的声音。\n\n第三段：他冲出迷雾。',
+        duration: undefined,
+        camera: '',
+        scene: '',
+        characters: '',
+        visualPrompt: '第二段：他听见风火轮的声音。\n\n第三段：他冲出迷雾。',
+        videoPrompt: '',
+        narration: '',
+        status: 'uncompleted',
+        imageStatus: 'uncompleted',
+        videoStatus: 'uncompleted',
+        voiceStatus: 'uncompleted',
         sortOrder: 1,
       },
     },
@@ -493,6 +515,106 @@ test('ScriptService confirms a script and initializes editable shots', async () 
       data: { state: 'ScriptConfirmed', shotNum: 2 },
     },
   ])
+})
+
+test('ScriptService uses LLM structured shots for image generation fields', async () => {
+  const operations = []
+  const llmRequests = []
+  const service = new ScriptService(
+    {
+      script: {
+        findFirst: async () => ({
+          id: 13,
+          projectId: 7,
+          title: '哪吒脑海',
+          content: '哪吒站在海边，巨浪升起。',
+          shotNum: 1,
+          confirmed: false,
+        }),
+        updateMany: async () => {},
+      },
+      generationTask: {
+        create: async query => {
+          operations.push(['generationTask.create', query])
+          return { id: 31, ...query.data }
+        },
+        update: async query => {
+          operations.push(['generationTask.update', query])
+          return query.data
+        },
+      },
+      $transaction: async callback => {
+        const tx = {
+          script: {
+            updateMany: async query => operations.push(['script.updateMany', query]),
+            update: async query => ({
+              id: 13,
+              projectId: 7,
+              title: '哪吒脑海',
+              content: '哪吒站在海边，巨浪升起。',
+              confirmed: true,
+              createdAt: new Date('2026-07-16T08:00:00.000Z'),
+              updatedAt: new Date('2026-07-16T08:00:00.000Z'),
+            }),
+          },
+          shot: {
+            deleteMany: async query => operations.push(['shot.deleteMany', query]),
+            create: async query => {
+              operations.push(['shot.create', query])
+              return query.data
+            },
+          },
+          project: {
+            update: async query => operations.push(['project.update', query]),
+          },
+        }
+        return callback(tx)
+      },
+    },
+    {
+      completeChat: async messages => {
+        llmRequests.push(messages)
+        return JSON.stringify({
+          shots: [
+            {
+              title: '镜头1：海边巨浪',
+              content: '哪吒站在海边，巨浪从身后升起。',
+              duration: 5,
+              camera: '全景',
+              scene: '陈塘关海边',
+              characters: '哪吒',
+              visualPrompt: 'Chinese myth animation, Nezha standing by the sea, huge wave rising, cinematic wide shot',
+              videoPrompt: 'Camera slowly pushes toward Nezha as the wave rises behind him.',
+              narration: '海风骤起，哪吒望向翻涌的大海。',
+            },
+          ],
+        })
+      },
+    },
+  )
+
+  const result = await service.confirmScript({ projectId: 7, scriptId: 13 })
+  const shotCreate = operations.find(item => item[0] === 'shot.create')
+
+  assert.equal(result.shotCount, 1)
+  assert.ok(llmRequests[0][0].content.includes('专业影视分镜设计师'))
+  assert.deepEqual(shotCreate[1].data, {
+    projectId: 7,
+    title: '镜头1：海边巨浪',
+    content: '哪吒站在海边，巨浪从身后升起。',
+    duration: 5,
+    camera: '全景',
+    scene: '陈塘关海边',
+    characters: '哪吒',
+    visualPrompt: 'Chinese myth animation, Nezha standing by the sea, huge wave rising, cinematic wide shot',
+    videoPrompt: 'Camera slowly pushes toward Nezha as the wave rises behind him.',
+    narration: '海风骤起，哪吒望向翻涌的大海。',
+    status: 'uncompleted',
+    imageStatus: 'uncompleted',
+    videoStatus: 'uncompleted',
+    voiceStatus: 'uncompleted',
+    sortOrder: 0,
+  })
 })
 
 let failed = 0

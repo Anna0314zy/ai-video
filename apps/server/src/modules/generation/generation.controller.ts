@@ -3,11 +3,15 @@ import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swag
 import { AppException } from '../../common/app-exception.js'
 import { AudioTaskDto, ImagePromptDto, ImageToVideoTaskDto, TextToImageTaskDto, TextToVideoTaskDto } from '../../common/swagger-dto.js'
 import { GenerationService } from './generation.service.js'
+import { PrismaService } from '../../prisma/prisma.service.js'
 
 @ApiTags('生成 Generation')
 @Controller()
 export class GenerationController {
-  constructor(@Inject(GenerationService) private readonly generationService: GenerationService) {}
+  constructor(
+    @Inject(GenerationService) private readonly generationService: GenerationService,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+  ) {}
 
   @Get('api/prompt/v1/parseMJPrompt/btnList')
   @ApiOperation({ summary: '获取图片 prompt 按钮列表' })
@@ -40,8 +44,17 @@ export class GenerationController {
   @Post('api/prompt/v1/generateImage/parse')
   @ApiOperation({ summary: '生成图片 prompt' })
   @ApiBody({ type: ImagePromptDto })
-  generateImagePrompt(@Body() body: ImagePromptDto) {
-    throw new AppException('feature-not-configured', '图片 prompt 生成 provider 尚未配置')
+  async generateImagePrompt(@Body() body: ImagePromptDto) {
+    const shot = body.shotId ? await this.prisma.shot.findUnique({ where: { id: Number(body.shotId) } }) : null
+    const basePrompt = shot?.visualPrompt || shot?.content || ''
+    const optionValue = (body as any).button?.btnValue
+    const imageHint = body.imageUrl ? `参考图：${body.imageUrl}` : ''
+    const prompt = [basePrompt, optionValue && optionValue !== String(body.shotId) ? `补充要求：${optionValue}` : '', imageHint]
+      .filter(Boolean)
+      .join('\n')
+      .trim()
+    if (!prompt) throw new AppException('validation', '图片 prompt 不能为空')
+    return prompt
   }
 
   @Get('api/prompt/v1/translate')

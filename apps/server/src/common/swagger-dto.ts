@@ -268,9 +268,28 @@ export class ImageToVideoTaskDto {
 }
 
 export class ImagePromptDto {
-  @ApiProperty({ example: '可爱的卡通太阳系插画', description: '图片生成中文 prompt' })
+  @ApiPropertyOptional({ example: '可爱的卡通太阳系插画', description: '图片生成中文 prompt' })
+  @IsOptional()
   @IsString()
-  prompt!: string
+  prompt?: string
+
+  @ApiPropertyOptional({ example: 1, description: '分镜 ID' })
+  @IsOptional()
+  @IsNumber()
+  shotId?: number
+
+  @ApiPropertyOptional({ example: 'image/demo.png', description: '参考图片 URL 或对象 key' })
+  @IsOptional()
+  @IsString()
+  imageUrl?: string
+
+  @ApiPropertyOptional({ example: { btnName: '默认', btnValue: '电影感', btnType: 'style' }, description: '图片 prompt 选项' })
+  @IsOptional()
+  button?: {
+    btnName?: string
+    btnValue?: string
+    btnType?: string
+  }
 }
 
 export class AudioTaskDto {

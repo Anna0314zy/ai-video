@@ -61,9 +61,6 @@ export default (props: IStoryboardCard) => {
         <div className='storyboard-card-title' title={shotName}>
           {shotName}
         </div>
-        <div className='storyboard-card-summary' title={shotContent}>
-          {summary || '暂无镜头内容'}
-        </div>
       </div>
     </div>
   )

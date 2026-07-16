@@ -42,6 +42,17 @@ export class ShotController {
             projectId,
             title: shot.title || shot.shotName || shot.name || `分镜${index + 1}`,
             content: shot.content || shot.shotContent || shot.description || '',
+            duration: toOptionalNumber(shot.duration),
+            camera: shot.camera || '',
+            scene: shot.scene || '',
+            characters: shot.characters || '',
+            visualPrompt: shot.visualPrompt || shot.imagePrompt || shot.midjourneyPrompt || '',
+            videoPrompt: shot.videoPrompt || '',
+            narration: shot.narration || '',
+            status: shot.status || 'uncompleted',
+            imageStatus: shot.imageStatus || 'uncompleted',
+            videoStatus: shot.videoStatus || 'uncompleted',
+            voiceStatus: shot.voiceStatus || 'uncompleted',
             sortOrder: Number(shot.sortOrder ?? shot.orderNo ?? index),
           },
         })
@@ -57,7 +68,18 @@ export class ShotController {
 
   @Post('updateShot')
   @ApiOperation({ summary: '更新单个分镜标题和内容' })
-  async updateShot(@Body() body: { projectId: number; shotId: number; shotName?: string; shotContent?: string }) {
+  async updateShot(
+    @Body()
+    body: {
+      projectId: number
+      shotId: number
+      shotName?: string
+      shotContent?: string
+      visualPrompt?: string
+      videoPrompt?: string
+      narration?: string
+    },
+  ) {
     const projectId = Number(body.projectId)
     const shotId = Number(body.shotId)
     await this.prisma.shot.updateMany({
@@ -65,6 +87,9 @@ export class ShotController {
       data: {
         title: body.shotName || `镜头${shotId}`,
         content: body.shotContent || '',
+        visualPrompt: body.visualPrompt,
+        videoPrompt: body.videoPrompt,
+        narration: body.narration,
       },
     })
     const shot = await this.prisma.shot.findFirst({ where: { id: shotId, projectId } })
@@ -114,11 +139,20 @@ function mapShot(shot: any) {
     shotId: shot.id,
     shotName: shot.title,
     shotContent: shot.content,
+    duration: shot.duration,
+    camera: shot.camera,
+    scene: shot.scene,
+    characters: shot.characters,
+    visualPrompt: shot.visualPrompt,
+    imagePrompt: shot.visualPrompt,
+    midjourneyPrompt: shot.visualPrompt,
+    videoPrompt: shot.videoPrompt,
+    narration: shot.narration,
     sort: shot.sortOrder + 1,
-    status: 'uncompleted',
-    imageStatus: 'uncompleted',
-    videoStatus: 'uncompleted',
-    voiceStatus: 'uncompleted',
+    status: shot.status || 'uncompleted',
+    imageStatus: shot.imageStatus || 'uncompleted',
+    videoStatus: shot.videoStatus || 'uncompleted',
+    voiceStatus: shot.voiceStatus || 'uncompleted',
     created: shot.createdAt?.toISOString?.(),
     modified: shot.updatedAt?.toISOString?.(),
   }
@@ -149,4 +183,10 @@ function parseJson(value?: string | null) {
   } catch {
     return value
   }
+}
+
+function toOptionalNumber(value: unknown) {
+  if (value === undefined || value === null || value === '') return undefined
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined
 }

@@ -23,12 +23,13 @@ const ChatControl = () => {
     return shotList.find(v => v.shotId === currentShotId)
   }, [currentShotId, shotList])
   const currentShotContent = currentShot?.shotContent || currentShot?.content || ''
+  const currentVisualPrompt = currentShot?.visualPrompt || currentShot?.imagePrompt || currentShot?.midjourneyPrompt || ''
 
   useEffect(() => {
     formRef.current?.form.setFieldsValue({
-      btnValue: currentShot?.midjourneyPrompt || currentShotContent,
+      btnValue: currentVisualPrompt || currentShotContent,
     })
-  }, [currentShot?.midjourneyPrompt, currentShotContent, currentSelectType])
+  }, [currentShotContent, currentSelectType, currentVisualPrompt])
   const projectId = Number(useParams().id)
   const formRef = useRef<any>()
   const [prompt, setPrompt] = useState<{

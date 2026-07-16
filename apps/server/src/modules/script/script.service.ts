@@ -1,8 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Optional } from '@nestjs/common'
 import crypto from 'node:crypto'
 import { PrismaService } from '../../prisma/prisma.service.js'
 import { AppException } from '../../common/app-exception.js'
 import type { LlmMessage } from '../../llm/llm-provider.js'
+import { LlmService } from '../../llm/llm.service.js'
 
 interface CurrentUser {
   id: number
@@ -29,7 +30,10 @@ const SCRIPT_LABEL_TO_FIELD = new Map(SCRIPT_FIELD_LABELS.map(([label, key]) => 
 
 @Injectable()
 export class ScriptService {
-  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Optional() @Inject(LlmService) private readonly llmService?: Pick<LlmService, 'completeChat'>,
+  ) {}
 
   async createSession(projectId: number, user?: CurrentUser) {
     const project = await this.prisma.project.findFirst({
@@ -325,7 +329,7 @@ export class ScriptService {
     console.info('[ScriptService.confirmScript] start', { projectId, scriptId })
     const script = await this.prisma.script.findFirst({ where: { id: scriptId, projectId } })
     if (!script) throw new AppException('not-found')
-    const shotDrafts = buildShotDrafts(script)
+    const shotDrafts = await this.buildShotDraftsWithModel(script)
     console.info('[ScriptService.confirmScript] script loaded', {
       projectId,
       scriptId,
@@ -352,6 +356,17 @@ export class ScriptService {
               projectId,
               title: shot.title,
               content: shot.content,
+              duration: shot.duration,
+              camera: shot.camera,
+              scene: shot.scene,
+              characters: shot.characters,
+              visualPrompt: shot.visualPrompt,
+              videoPrompt: shot.videoPrompt,
+              narration: shot.narration,
+              status: shot.status,
+              imageStatus: shot.imageStatus,
+              videoStatus: shot.videoStatus,
+              voiceStatus: shot.voiceStatus,
               sortOrder: index,
             },
           })
@@ -377,6 +392,51 @@ export class ScriptService {
     return {
       ...mapScript(result.script),
       shotCount: result.shotCount,
+    }
+  }
+
+  private async buildShotDraftsWithModel(script: any) {
+    if (!this.llmService?.completeChat) return buildShotDrafts(script)
+    const task = await this.prisma.generationTask.create({
+      data: {
+        taskId: `shot-split-${crypto.randomUUID()}`,
+        provider: 'llm',
+        type: 'shot-split',
+        state: 'RUNNING',
+        request: JSON.stringify({
+          scriptId: script.id,
+          projectId: script.projectId,
+          title: script.title,
+          shotNum: script.shotNum,
+        }),
+      },
+    })
+    try {
+      const raw = await this.llmService.completeChat(buildShotSplitMessages(script), { temperature: 0.2 })
+      const shots = parseStructuredShots(raw, script)
+      await this.prisma.generationTask.update({
+        where: { id: task.id },
+        data: {
+          state: 'SUCCESS',
+          result: JSON.stringify({ raw, shots }),
+        },
+      })
+      return shots
+    } catch (error) {
+      console.error('[ScriptService.confirmScript] LLM shot split failed, fallback to rule split', {
+        scriptId: script.id,
+        message: error instanceof Error ? error.message : String(error),
+      })
+      await this.prisma.generationTask.update({
+        where: { id: task.id },
+        data: {
+          state: 'FAILED',
+          result: JSON.stringify({
+            message: error instanceof Error ? error.message : String(error),
+          }),
+        },
+      })
+      return buildShotDrafts(script)
     }
   }
 }
@@ -559,6 +619,16 @@ function parseJsonObject(value: unknown): Record<string, unknown> {
   }
 }
 
+function parseJsonValue(value: unknown): any {
+  if (!value) return {}
+  if (typeof value !== 'string') return value
+  try {
+    return JSON.parse(value)
+  } catch {
+    return {}
+  }
+}
+
 function buildEditableScriptPrompt(source: any) {
   const scriptType = normalizeNonEmptyString(source.scriptType)
   const scriptStyle = normalizeNonEmptyString(source.scriptStyle)
@@ -605,7 +675,98 @@ function buildShotDrafts(script: any) {
   return groups.map((group, index) => ({
     title: `镜头${index + 1}`,
     content: group.join('\n\n').trim() || `${script.title || '剧本'} - 镜头${index + 1}`,
+    duration: undefined,
+    camera: '',
+    scene: '',
+    characters: normalizeNonEmptyString(script.characters) || '',
+    visualPrompt: group.join('\n\n').trim() || `${script.title || '剧本'} - 镜头${index + 1}`,
+    videoPrompt: '',
+    narration: '',
+    status: 'uncompleted',
+    imageStatus: 'uncompleted',
+    videoStatus: 'uncompleted',
+    voiceStatus: 'uncompleted',
   }))
+}
+
+function buildShotSplitMessages(script: any): LlmMessage[] {
+  const shotNum = toOptionalNumber(script.shotNum)
+  return [
+    {
+      role: 'system',
+      content:
+        '你是专业影视分镜设计师。请把剧本拆成适合图片、视频、旁白生成的镜头结构。只输出合法 JSON，不要输出 Markdown，不要解释。',
+    },
+    {
+      role: 'user',
+      content: [
+        `剧本标题：${script.title || '未命名剧本'}`,
+        shotNum ? `期望镜头数量：${shotNum}` : '期望镜头数量：请按剧情自然拆分',
+        '',
+        '输出 JSON 格式：',
+        '{"shots":[{"title":"镜头标题","content":"镜头内容/动作描述","duration":5,"camera":"景别/镜头语言","scene":"场景","characters":"角色","visualPrompt":"给图片生成模型的英文或中英混合画面提示词","videoPrompt":"给视频生成模型的运动提示词","narration":"旁白文本"}]}',
+        '',
+        '要求：',
+        '1. visualPrompt 必须能直接作为图片生成模型入参，包含主体、场景、风格、构图、光线。',
+        '2. content 面向用户编辑，中文描述清楚镜头动作和画面。',
+        '3. narration 可为空，但不要编造与剧本无关的信息。',
+        '4. 不要把标题、总时长、分隔线、终幕说明单独拆成镜头。',
+        '5. 如果剧本已有编号镜头，优先按编号镜头解析。',
+        '',
+        '剧本正文：',
+        script.content || '',
+      ].join('\n'),
+    },
+  ]
+}
+
+function parseStructuredShots(raw: string, script: any) {
+  const parsed = parseJsonValue(extractJsonText(raw))
+  const sourceShots = Array.isArray(parsed.shots) ? parsed.shots : Array.isArray(parsed) ? parsed : []
+  const shots = sourceShots
+    .map((item: any, index: number) => normalizeStructuredShot(item, index, script))
+    .filter((shot: any) => shot.content || shot.visualPrompt)
+  if (!shots.length) throw new Error('LLM shot split returned empty shots')
+  return shots.slice(0, 80)
+}
+
+function normalizeStructuredShot(item: any, index: number, script: any) {
+  const content = normalizeNonEmptyString(item?.content || item?.shotContent || item?.description) || ''
+  const visualPrompt =
+    normalizeNonEmptyString(item?.visualPrompt || item?.imagePrompt || item?.midjourneyPrompt) ||
+    content ||
+    normalizeNonEmptyString(script.title) ||
+    ''
+  return {
+    title: normalizeNonEmptyString(item?.title || item?.shotName) || `镜头${index + 1}`,
+    content,
+    duration: toOptionalNumber(item?.duration),
+    camera: normalizeNonEmptyString(item?.camera || item?.cameraLanguage || item?.shotType) || '',
+    scene: normalizeNonEmptyString(item?.scene) || '',
+    characters: normalizeNonEmptyString(item?.characters) || normalizeNonEmptyString(script.characters) || '',
+    visualPrompt,
+    videoPrompt: normalizeNonEmptyString(item?.videoPrompt || item?.motionPrompt) || '',
+    narration: normalizeNonEmptyString(item?.narration || item?.voiceover) || '',
+    status: 'uncompleted',
+    imageStatus: 'uncompleted',
+    videoStatus: 'uncompleted',
+    voiceStatus: 'uncompleted',
+  }
+}
+
+function extractJsonText(raw: string) {
+  const text = String(raw || '').trim()
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i)
+  const candidate = fenced?.[1]?.trim() || text
+  const startObject = candidate.indexOf('{')
+  const startArray = candidate.indexOf('[')
+  const starts = [startObject, startArray].filter(index => index >= 0)
+  if (!starts.length) return candidate
+  const start = Math.min(...starts)
+  const endObject = candidate.lastIndexOf('}')
+  const endArray = candidate.lastIndexOf(']')
+  const end = Math.max(endObject, endArray)
+  return end >= start ? candidate.slice(start, end + 1) : candidate
 }
 
 function splitScriptIntoShotParts(content: string) {

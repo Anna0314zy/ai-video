@@ -14,4 +14,16 @@ export class LlmService {
   streamScript(messages: LlmMessage[]) {
     return this.provider.streamChat({ messages })
   }
+
+  async completeChat(messages: LlmMessage[], options?: { temperature?: number; model?: string }) {
+    let content = ''
+    for await (const chunk of this.provider.streamChat({
+      messages,
+      temperature: options?.temperature,
+      model: options?.model,
+    })) {
+      if (chunk.content) content += chunk.content
+    }
+    return content
+  }
 }

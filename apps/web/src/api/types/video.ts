@@ -38,6 +38,13 @@ export interface ShotList {
   content?: string
   sortOrder?: number
   narration?: string
+  duration?: number
+  camera?: string
+  scene?: string
+  characters?: string
+  visualPrompt?: string
+  imagePrompt?: string
+  videoPrompt?: string
   status: keyof typeof ShotStatus
   sort: number
   imageStatus?: keyof typeof ShotStatus

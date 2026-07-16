@@ -19,6 +19,7 @@ export default function ShotOverview() {
   const [form] = Form.useForm()
   const shotName = currentShot?.shotName || currentShot?.title || (currentShot ? `镜头${currentShot.sort || ''}` : '')
   const shotContent = currentShot?.shotContent || currentShot?.content || ''
+  const visualPrompt = currentShot?.visualPrompt || currentShot?.imagePrompt || currentShot?.midjourneyPrompt || ''
   const summary = String(shotContent).replace(/\s+/g, ' ').trim()
 
   useEffect(() => {
@@ -26,8 +27,11 @@ export default function ShotOverview() {
     form.setFieldsValue({
       shotName,
       shotContent,
+      visualPrompt,
+      videoPrompt: currentShot?.videoPrompt || '',
+      narration: currentShot?.narration || '',
     })
-  }, [form, open, shotContent, shotName])
+  }, [currentShot?.narration, currentShot?.videoPrompt, form, open, shotContent, shotName, visualPrompt])
 
   const handleSave = async () => {
     if (!currentShot) return
@@ -39,6 +43,9 @@ export default function ShotOverview() {
         shotId: currentShot.shotId,
         shotName: values.shotName,
         shotContent: values.shotContent,
+        visualPrompt: values.visualPrompt,
+        videoPrompt: values.videoPrompt,
+        narration: values.narration,
       })
       dispatch.aiVideo.updateData({
         shotList: shotList.map(item => (item.shotId === updated.shotId ? { ...item, ...updated } : item)),
@@ -102,6 +109,15 @@ export default function ShotOverview() {
           </Form.Item>
           <Form.Item name='shotContent' label='镜头内容' rules={[{ required: true, message: '请输入镜头内容' }]}>
             <TextArea rows={8} placeholder='请输入镜头内容' />
+          </Form.Item>
+          <Form.Item name='visualPrompt' label='图片提示词' rules={[{ required: true, message: '请输入图片提示词' }]}>
+            <TextArea rows={4} placeholder='用于生成图片的 prompt' />
+          </Form.Item>
+          <Form.Item name='videoPrompt' label='视频提示词'>
+            <TextArea rows={3} placeholder='用于生成视频运动效果的 prompt' />
+          </Form.Item>
+          <Form.Item name='narration' label='旁白文本'>
+            <TextArea rows={3} placeholder='用于生成旁白的文本' />
           </Form.Item>
         </Form>
       </Modal>

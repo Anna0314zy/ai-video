@@ -94,13 +94,24 @@ model Script {
 }
 
 model Shot {
-  id        Int      @id @default(autoincrement())
-  projectId Int
-  title     String?
-  content   String?
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  projectId    Int
+  title        String?
+  content      String?
+  duration     Int?
+  camera       String?
+  scene        String?
+  characters   String?
+  visualPrompt String?
+  videoPrompt  String?
+  narration    String?
+  status       String   @default("uncompleted")
+  imageStatus  String   @default("uncompleted")
+  videoStatus  String   @default("uncompleted")
+  voiceStatus  String   @default("uncompleted")
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
   resources Resource[]
