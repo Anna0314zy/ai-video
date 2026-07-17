@@ -126,9 +126,24 @@ export class ScriptController {
   }
 
   @Put('api/text/v1/confirmScript')
-  @ApiOperation({ summary: '确认剧本' })
+  @ApiOperation({ summary: '确认剧本并生成镜头（兼容旧接口）' })
   @ApiBody({ type: ConfirmScriptDto })
   confirmScript(@Body() body: Partial<ConfirmScriptDto> = {}, @Query('projectId') projectId?: string, @Query('scriptId') scriptId?: string) {
+    return this.scriptService.confirmScript({
+      ...body,
+      projectId: body?.projectId || Number(projectId),
+      scriptId: body?.scriptId || Number(scriptId),
+    })
+  }
+
+  @Put('api/text/v1/confirmScriptAndGenerateShots')
+  @ApiOperation({ summary: '确认剧本并生成镜头' })
+  @ApiBody({ type: ConfirmScriptDto })
+  confirmScriptAndGenerateShots(
+    @Body() body: Partial<ConfirmScriptDto> = {},
+    @Query('projectId') projectId?: string,
+    @Query('scriptId') scriptId?: string,
+  ) {
     return this.scriptService.confirmScript({
       ...body,
       projectId: body?.projectId || Number(projectId),

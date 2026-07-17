@@ -38,6 +38,7 @@ export interface ServerConfig {
     textToVideoProvider: string
     imageToVideoProvider?: string
     textToVideoBaseUrl: string
+    textToVideoApiStyle: string
     textToVideoApiKey?: string
     textToVideoModel: string
     textToVideoDuration: number
@@ -88,11 +89,11 @@ export function buildServerConfig(env: Env = process.env): ServerConfig {
     },
     storage: {
       provider: 'qiniu',
-      bucketName: env.QINIU_BUCKET_NAME || 'qiqi123456',
+      bucketName: env.QINIU_BUCKET_NAME || 'qiqi1234567',
       accessKey: required(env, 'QINIU_ACCESS_KEY'),
       secretKey: required(env, 'QINIU_SECRET_KEY'),
       publicDomain: env.QINIU_PUBLIC_DOMAIN || '',
-      uploadHost: env.QINIU_UPLOAD_HOST || 'https://upload.qiniup.com',
+      uploadHost: env.QINIU_UPLOAD_HOST || 'https://up-z1.qiniup.com',
       tokenExpiresSeconds: optionalNumber(env, 'QINIU_TOKEN_EXPIRES_SECONDS', 3600),
     },
     llm: {
@@ -116,7 +117,8 @@ export function buildServerConfig(env: Env = process.env): ServerConfig {
       textToVideoProvider: required(env, 'TEXT_TO_VIDEO_PROVIDER'),
       imageToVideoProvider: env.IMAGE_TO_VIDEO_PROVIDER,
       textToVideoBaseUrl: env.TEXT_TO_VIDEO_BASE_URL || env.KUAIPAO_BASE_URL || 'https://kuaipao.pro',
-      textToVideoApiKey: env.TEXT_TO_VIDEO_API_KEY || env.KUAIPAO_API_KEY,
+      textToVideoApiStyle: env.TEXT_TO_VIDEO_API_STYLE || env.KUAIPAO_VIDEO_API_STYLE || 'native',
+      textToVideoApiKey: env.TEXT_TO_VIDEO_API_KEY || env.KUAIPAO_API_KEY || env.TEXT_TO_IMAGE_API_KEY,
       textToVideoModel: env.TEXT_TO_VIDEO_MODEL || env.KUAIPAO_VIDEO_MODEL || 'seedance-2-0',
       textToVideoDuration: optionalNumber(env, 'TEXT_TO_VIDEO_DURATION', optionalNumber(env, 'KUAIPAO_VIDEO_DURATION', 5)),
       textToVideoRatio: env.TEXT_TO_VIDEO_RATIO || env.KUAIPAO_VIDEO_RATIO || '16:9',

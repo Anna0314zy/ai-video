@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Inject, Param, Post, Query } from '@nestjs/common'
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { randomUUID } from 'node:crypto'
-import { PackageBatchDto, SaveShotListDto } from '../../common/swagger-dto.js'
+import { PackageBatchDto, SaveShotListDto, UpdateShotDto } from '../../common/swagger-dto.js'
 import { PrismaService } from '../../prisma/prisma.service.js'
 import { AppException } from '../../common/app-exception.js'
 
@@ -18,6 +18,13 @@ export class ShotController {
     const shots = await this.prisma.shot.findMany({
       where: { projectId: projectIdNumber },
       orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
+      include: {
+        resources: {
+          where: { type: 'image', confirmed: true },
+          orderBy: { updatedAt: 'desc' },
+          take: 1,
+        },
+      },
     })
 
     return {
@@ -47,8 +54,12 @@ export class ShotController {
             scene: shot.scene || '',
             characters: shot.characters || '',
             visualPrompt: shot.visualPrompt || shot.imagePrompt || shot.midjourneyPrompt || '',
+            previewImage: shot.previewImage || shot.imageUrl || '',
             videoPrompt: shot.videoPrompt || '',
             narration: shot.narration || '',
+            soundEffects: shot.soundEffects || '',
+            backgroundMusic: shot.backgroundMusic || '',
+            soundEffectResourceIds: normalizeResourceIds(shot.soundEffectResourceIds),
             status: shot.status || 'uncompleted',
             imageStatus: shot.imageStatus || 'uncompleted',
             videoStatus: shot.videoStatus || 'uncompleted',
@@ -68,17 +79,9 @@ export class ShotController {
 
   @Post('updateShot')
   @ApiOperation({ summary: '更新单个分镜标题和内容' })
+  @ApiBody({ type: UpdateShotDto })
   async updateShot(
-    @Body()
-    body: {
-      projectId: number
-      shotId: number
-      shotName?: string
-      shotContent?: string
-      visualPrompt?: string
-      videoPrompt?: string
-      narration?: string
-    },
+    @Body() body: UpdateShotDto,
   ) {
     const projectId = Number(body.projectId)
     const shotId = Number(body.shotId)
@@ -88,11 +91,24 @@ export class ShotController {
         title: body.shotName || `镜头${shotId}`,
         content: body.shotContent || '',
         visualPrompt: body.visualPrompt,
+        previewImage: body.previewImage,
         videoPrompt: body.videoPrompt,
         narration: body.narration,
+        soundEffects: body.soundEffects,
+        backgroundMusic: body.backgroundMusic,
+        soundEffectResourceIds: normalizeResourceIds(body.soundEffectResourceIds),
       },
     })
-    const shot = await this.prisma.shot.findFirst({ where: { id: shotId, projectId } })
+    const shot = await this.prisma.shot.findFirst({
+      where: { id: shotId, projectId },
+      include: {
+        resources: {
+          where: { type: 'image', confirmed: true },
+          orderBy: { updatedAt: 'desc' },
+          take: 1,
+        },
+      },
+    })
     if (!shot) throw new AppException('not-found')
     return {
       ...mapShot(shot),
@@ -134,6 +150,14 @@ export class ShotController {
 }
 
 function mapShot(shot: any) {
+  const confirmedImage = Array.isArray(shot.resources)
+    ? shot.resources.find((resource: any) => {
+        const origin = resource.origin || resource.url || ''
+        return shot.previewImage && origin === shot.previewImage
+      })
+    : undefined
+  const previewImage = confirmedImage?.origin || confirmedImage?.url || ''
+  const imageStatus = confirmedImage ? 'completed' : 'uncompleted'
   return {
     ...shot,
     shotId: shot.id,
@@ -146,11 +170,16 @@ function mapShot(shot: any) {
     visualPrompt: shot.visualPrompt,
     imagePrompt: shot.visualPrompt,
     midjourneyPrompt: shot.visualPrompt,
+    previewImage,
+    imageUrl: previewImage,
     videoPrompt: shot.videoPrompt,
     narration: shot.narration,
+    soundEffects: shot.soundEffects,
+    backgroundMusic: shot.backgroundMusic,
+    soundEffectResourceIds: parseResourceIds(shot.soundEffectResourceIds),
     sort: shot.sortOrder + 1,
     status: shot.status || 'uncompleted',
-    imageStatus: shot.imageStatus || 'uncompleted',
+    imageStatus,
     videoStatus: shot.videoStatus || 'uncompleted',
     voiceStatus: shot.voiceStatus || 'uncompleted',
     created: shot.createdAt?.toISOString?.(),
@@ -189,4 +218,28 @@ function toOptionalNumber(value: unknown) {
   if (value === undefined || value === null || value === '') return undefined
   const parsed = Number(value)
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined
+}
+
+function normalizeResourceIds(value: unknown) {
+  if (Array.isArray(value)) return JSON.stringify(value.map(Number).filter(Number.isFinite))
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value)
+      if (Array.isArray(parsed)) return JSON.stringify(parsed.map(Number).filter(Number.isFinite))
+    } catch {
+      return value
+    }
+  }
+  return ''
+}
+
+function parseResourceIds(value: unknown) {
+  if (Array.isArray(value)) return value
+  if (!value) return []
+  try {
+    const parsed = JSON.parse(String(value))
+    return Array.isArray(parsed) ? parsed.map(Number).filter(Number.isFinite) : []
+  } catch {
+    return []
+  }
 }

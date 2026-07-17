@@ -54,11 +54,11 @@ http://localhost:4000/api-docs
 | `LLM_BASE_URL` | 大模型 OpenAI-compatible API 地址。 |
 | `LLM_API_KEY` | 大模型 API key，只允许放在服务端。 |
 | `LLM_SCRIPT_MODEL` | 剧本流式生成模型，示例值 `deepseek-chat`。 |
-| `QINIU_BUCKET_NAME` | 七牛云 bucket，当前默认 `qiqi123456`。 |
+| `QINIU_BUCKET_NAME` | 七牛云 bucket，当前默认 `qiqi1234567`。 |
 | `QINIU_ACCESS_KEY` | 七牛云 AccessKey，只允许放在服务端。 |
 | `QINIU_SECRET_KEY` | 七牛云 SecretKey，只允许放在服务端。 |
 | `QINIU_PUBLIC_DOMAIN` | 七牛云公开访问域名或 CDN 域名。 |
-| `QINIU_UPLOAD_HOST` | 七牛云上传域名，默认 `https://upload.qiniup.com`。 |
+| `QINIU_UPLOAD_HOST` | 七牛云上传域名，默认 `https://up-z1.qiniup.com`。 |
 | `TEXT_TO_VIDEO_PROVIDER` | 文生视频 provider，当前默认 `tencent`。 |
 | `TEXT_TO_IMAGE_PROVIDER` | 文生图 provider，未确认前可留空。 |
 | `IMAGE_TO_VIDEO_PROVIDER` | 图生视频 provider，未确认前可留空。 |
@@ -67,7 +67,7 @@ http://localhost:4000/api-docs
 
 服务端通过 `/api/qiniu/v1/upload-token` 签发七牛云 uploadToken，前端拿到 token 后直传七牛云。长期密钥只放在服务端 `.env`，不会返回给浏览器。
 
-本地默认 bucket 名称为 `qiqi123456`，你后续只需要在 `.env` 中补齐：
+本地默认 bucket 名称为 `qiqi1234567`，你后续只需要在 `.env` 中补齐：
 
 ```bash
 QINIU_ACCESS_KEY=

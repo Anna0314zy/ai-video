@@ -46,10 +46,11 @@ export class GenerationController {
   @ApiBody({ type: ImagePromptDto })
   async generateImagePrompt(@Body() body: ImagePromptDto) {
     const shot = body.shotId ? await this.prisma.shot.findUnique({ where: { id: Number(body.shotId) } }) : null
-    const basePrompt = shot?.visualPrompt || shot?.content || ''
-    const optionValue = (body as any).button?.btnValue
+    const manualPrompt = String((body as any).button?.btnValue || body.prompt || '').trim()
+    const basePrompt = manualPrompt || shot?.visualPrompt || shot?.content || ''
     const imageHint = body.imageUrl ? `参考图：${body.imageUrl}` : ''
-    const prompt = [basePrompt, optionValue && optionValue !== String(body.shotId) ? `补充要求：${optionValue}` : '', imageHint]
+    const configPrompt = formatImageConfigPrompt((body as any).imageConfig)
+    const prompt = [basePrompt, configPrompt, imageHint]
       .filter(Boolean)
       .join('\n')
       .trim()
@@ -60,8 +61,9 @@ export class GenerationController {
   @Get('api/prompt/v1/translate')
   @ApiOperation({ summary: 'Prompt 翻译' })
   @ApiQuery({ name: 'text', example: '一只纸飞机飞过教室', description: '待翻译文本' })
-  translate(@Query('text') text: string) {
-    throw new AppException('feature-not-configured', 'Prompt 翻译 provider 尚未配置')
+  async translate(@Query('text') text: string) {
+    if (!text?.trim()) throw new AppException('validation', '待翻译文本不能为空')
+    return this.generationService.translatePromptToEnglish(text, 'image')
   }
 
   @Get('api/tts/v1/languages')
@@ -113,4 +115,25 @@ export class GenerationController {
   getTask(@Query('taskId') taskId: string) {
     return this.generationService.getTask(taskId)
   }
+}
+
+function formatImageConfigPrompt(config?: Record<string, unknown>) {
+  if (!config) return ''
+  const parts = [
+    valueLine('画面主体', config.subject),
+    valueLine('构图/镜头', config.composition),
+    valueLine('视觉风格', config.style),
+    valueLine('光线/氛围', config.lighting),
+    valueLine('画幅比例', config.aspectRatio),
+    valueLine('质量要求', config.quality),
+    valueLine('色彩倾向', config.colorTone),
+    valueLine('人物一致性', config.characterConsistency),
+    valueLine('负向提示', config.negativePrompt),
+  ].filter(Boolean)
+  return parts.length ? `图片生成配置：${parts.join('；')}` : ''
+}
+
+function valueLine(label: string, value: unknown) {
+  const text = String(value || '').trim()
+  return text ? `${label}：${text}` : ''
 }

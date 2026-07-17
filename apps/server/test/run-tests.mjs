@@ -19,7 +19,7 @@ test('buildServerConfig loads DeepSeek script model from environment', () => {
     DATABASE_URL: 'file:./test.db',
     JWT_SECRET: 'test-secret',
     JWT_EXPIRES_SECONDS: '3600',
-    QINIU_BUCKET_NAME: 'qiqi123456',
+    QINIU_BUCKET_NAME: 'qiqi1234567',
     QINIU_ACCESS_KEY: 'access-key',
     QINIU_SECRET_KEY: 'secret-key',
     QINIU_PUBLIC_DOMAIN: 'https://cdn.example.com',
@@ -32,6 +32,7 @@ test('buildServerConfig loads DeepSeek script model from environment', () => {
     TEXT_TO_VIDEO_PROVIDER: 'kuaipao',
     TEXT_TO_VIDEO_BASE_URL: 'https://kuaipao.pro',
     TEXT_TO_VIDEO_API_KEY: 'video-key',
+    TEXT_TO_VIDEO_API_STYLE: 'native',
     TEXT_TO_VIDEO_MODEL: 'seedance-2-0',
     TEXT_TO_VIDEO_DURATION: '5',
     TEXT_TO_VIDEO_RATIO: '16:9',
@@ -50,11 +51,12 @@ test('buildServerConfig loads DeepSeek script model from environment', () => {
   assert.equal(config.auth.jwtExpiresSeconds, 3600)
   assert.equal(config.database.url, 'file:./test.db')
   assert.equal(config.storage.provider, 'qiniu')
-  assert.equal(config.storage.bucketName, 'qiqi123456')
+  assert.equal(config.storage.bucketName, 'qiqi1234567')
   assert.equal(config.llm.provider, 'deepseek')
   assert.equal(config.llm.scriptModel, 'deepseek-chat')
   assert.equal(config.generation.textToVideoProvider, 'kuaipao')
   assert.equal(config.generation.textToVideoBaseUrl, 'https://kuaipao.pro')
+  assert.equal(config.generation.textToVideoApiStyle, 'native')
   assert.equal(config.generation.textToVideoApiKey, 'video-key')
   assert.equal(config.generation.textToVideoModel, 'seedance-2-0')
   assert.equal(config.generation.textToVideoDuration, 5)
@@ -74,7 +76,7 @@ test('buildServerConfig fails when required LLM config is missing', () => {
     () =>
       buildServerConfig({
         JWT_SECRET: 'test-secret',
-        QINIU_BUCKET_NAME: 'qiqi123456',
+        QINIU_BUCKET_NAME: 'qiqi1234567',
         QINIU_ACCESS_KEY: 'access-key',
         QINIU_SECRET_KEY: 'secret-key',
       }),
@@ -158,6 +160,7 @@ test('GenerationService creates kuaipao text-to-video task with configured paylo
           textToVideoProvider: 'kuaipao',
           imageToVideoProvider: undefined,
           textToVideoBaseUrl: 'https://kuaipao.pro',
+          textToVideoApiStyle: 'native',
           textToVideoApiKey: 'video-key',
           textToVideoModel: 'seedance-2-0',
           textToVideoDuration: 5,
@@ -236,11 +239,123 @@ test('GenerationService creates kuaipao text-to-video task with configured paylo
   }
 })
 
+test('GenerationService creates kuaipao image-to-video task with image content', async () => {
+  const calls = []
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url, init })
+    return {
+      ok: true,
+      text: async () => JSON.stringify({ id: 'upstream-image-video-1', status: 'processing' }),
+    }
+  }
+
+  const createdTasks = []
+  const service = new GenerationService(
+    {
+      value: {
+        generation: {
+          textToVideoProvider: 'kuaipao',
+          imageToVideoProvider: 'kuaipao',
+          textToVideoBaseUrl: 'https://kuaipao.pro',
+          textToVideoApiStyle: 'native',
+          textToVideoApiKey: 'video-key',
+          textToVideoModel: 'seedance-2-0',
+          textToVideoDuration: 5,
+          textToVideoRatio: '16:9',
+          textToVideoTimeoutMs: 60000,
+        },
+      },
+    },
+    {
+      shot: {
+        findUnique: async query => {
+          assert.deepEqual(query.where, { id: 8 })
+          return {
+            id: 8,
+            duration: 5,
+            videoPrompt: 'Camera slowly moves forward.',
+            content: '哪吒在海边奔跑',
+          }
+        },
+        update: async query => query.data,
+      },
+      generationTask: {
+        create: async query => {
+          createdTasks.push(query.data)
+          return {
+            id: 28,
+            ...query.data,
+            createdAt: new Date('2026-07-16T08:00:00.000Z'),
+            updatedAt: new Date('2026-07-16T08:00:00.000Z'),
+          }
+        },
+        update: async query => ({
+          id: 28,
+          taskId: 'image-to-video-local',
+          provider: 'kuaipao',
+          type: 'image-to-video',
+          state: 'RUNNING',
+          request: createdTasks[0].request,
+          result: query.data.result,
+          createdAt: new Date('2026-07-16T08:00:00.000Z'),
+          updatedAt: new Date('2026-07-16T08:00:00.000Z'),
+        }),
+      },
+    },
+  )
+
+  try {
+    const task = await service.addImageToVideoTask({
+      shotId: 8,
+      imageUrl: 'http://tiawcjly5.hb-bkt.clouddn.com/mj-image/demo.jpg',
+      prompt: 'Camera slowly moves forward.',
+      duration: 5,
+      ratio: '16:9',
+    })
+
+    assert.equal(calls.length, 1)
+    assert.equal(calls[0].url, 'https://kuaipao.pro/api/v3/contents/generations/tasks')
+    assert.deepEqual(JSON.parse(calls[0].init.body), {
+      model: 'seedance-2-0',
+      content: [
+        {
+          type: 'image',
+          url: 'http://tiawcjly5.hb-bkt.clouddn.com/mj-image/demo.jpg',
+        },
+        {
+          type: 'text',
+          text: 'Camera slowly moves forward.',
+        },
+      ],
+      duration: 5,
+      ratio: '16:9',
+    })
+    assert.equal(task.taskType, 'image-to-video')
+    assert.equal(task.result.upstreamTaskId, 'upstream-image-video-1')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
 test('GenerationService creates kuaipao text-to-image task and saves image resource', async () => {
   const calls = []
   const originalFetch = globalThis.fetch
   globalThis.fetch = async (url, init) => {
     calls.push({ url, init })
+    if (url === 'https://cdn.example.com/image.png') {
+      return {
+        ok: true,
+        headers: { get: name => (String(name).toLowerCase() === 'content-type' ? 'image/png' : null) },
+        arrayBuffer: async () => new Uint8Array([1, 2, 3, 4]).buffer,
+      }
+    }
+    if (url === 'https://up-z1.qiniup.com') {
+      return {
+        ok: true,
+        text: async () => JSON.stringify({ key: 'mj-image/generated.png' }),
+      }
+    }
     return {
       ok: true,
       text: async () => JSON.stringify({ data: [{ url: 'https://cdn.example.com/image.png' }] }),
@@ -263,6 +378,13 @@ test('GenerationService creates kuaipao text-to-image task and saves image resou
           textToImageResponseFormat: 'url',
           textToImageWatermark: false,
           textToImageTimeoutMs: 60000,
+        },
+        storage: {
+          bucketName: 'qiqi1234567',
+          accessKey: 'qiniu-access-key',
+          secretKey: 'qiniu-secret-key',
+          uploadHost: 'https://up-z1.qiniup.com',
+          tokenExpiresSeconds: 3600,
         },
       },
     },
@@ -320,10 +442,13 @@ test('GenerationService creates kuaipao text-to-image task and saves image resou
 
   try {
     const task = await service.addTextToImageTask({ shotId: 5 })
-    assert.equal(calls.length, 1)
+    assert.equal(calls.length, 3)
     assert.equal(calls[0].url, 'https://kuaipao.pro/v1/images/generations')
     assert.equal(calls[0].init.method, 'POST')
     assert.equal(calls[0].init.headers.Authorization, 'Bearer image-key')
+    assert.equal(calls[1].url, 'https://cdn.example.com/image.png')
+    assert.equal(calls[2].url, 'https://up-z1.qiniup.com')
+    assert.equal(calls[2].init.method, 'POST')
     assert.deepEqual(JSON.parse(calls[0].init.body), {
       model: 'gpt-image-2',
       prompt: '现代 API 平台首页插图，白底，青蓝色块，干净留白',
@@ -333,17 +458,12 @@ test('GenerationService creates kuaipao text-to-image task and saves image resou
       response_format: 'url',
       watermark: false,
     })
-    assert.deepEqual(resources[0], {
-      shotId: 5,
-      type: 'image',
-      url: 'https://cdn.example.com/image.png',
-      origin: 'https://cdn.example.com/image.png',
-    })
+    assert.equal(resources.length, 0)
     assert.equal(task.type, 'image')
     assert.equal(task.taskType, 'text-to-image')
     assert.equal(task.taskState, 'Completed')
-    assert.equal(task.originUrl, 'https://cdn.example.com/image.png')
-    assert.equal(task.resourceId, 31)
+    assert.match(task.originUrl, /^mj-image\/.+\.png$/)
+    assert.equal(task.resourceId, undefined)
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -716,6 +836,9 @@ test('ScriptService confirms a script and initializes editable shots', async () 
         visualPrompt: '哪吒脑海\n\n第一段：哪吒看见混沌的记忆。',
         videoPrompt: '',
         narration: '',
+        soundEffects: '',
+        backgroundMusic: '',
+        soundEffectResourceIds: '',
         status: 'uncompleted',
         imageStatus: 'uncompleted',
         videoStatus: 'uncompleted',
@@ -738,6 +861,9 @@ test('ScriptService confirms a script and initializes editable shots', async () 
         visualPrompt: '第二段：他听见风火轮的声音。\n\n第三段：他冲出迷雾。',
         videoPrompt: '',
         narration: '',
+        soundEffects: '',
+        backgroundMusic: '',
+        soundEffectResourceIds: '',
         status: 'uncompleted',
         imageStatus: 'uncompleted',
         videoStatus: 'uncompleted',
@@ -847,6 +973,9 @@ test('ScriptService uses LLM structured shots for image generation fields', asyn
     visualPrompt: 'Chinese myth animation, Nezha standing by the sea, huge wave rising, cinematic wide shot',
     videoPrompt: 'Camera slowly pushes toward Nezha as the wave rises behind him.',
     narration: '海风骤起，哪吒望向翻涌的大海。',
+    soundEffects: '',
+    backgroundMusic: '',
+    soundEffectResourceIds: '',
     status: 'uncompleted',
     imageStatus: 'uncompleted',
     videoStatus: 'uncompleted',

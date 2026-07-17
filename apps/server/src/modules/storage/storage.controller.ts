@@ -16,7 +16,7 @@ export class StorageController {
 
   @Get('api/qiniu/v1/upload-token')
   @ApiOperation({ summary: '获取七牛云 uploadToken', description: '服务端用 .env 中的七牛云密钥签发临时上传 token。' })
-  @ApiQuery({ name: 'bucketName', required: false, example: 'qiqi123456', description: '七牛云 bucketName，不传使用服务端默认配置' })
+  @ApiQuery({ name: 'bucketName', required: false, example: 'qiqi1234567', description: '七牛云 bucketName，不传使用服务端默认配置' })
   uploadToken(@Query('bucketName') bucketName: string) {
     const storage = this.configService.value.storage
     if (!storage.accessKey || !storage.secretKey) {

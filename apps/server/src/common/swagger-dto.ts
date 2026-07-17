@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsArray, IsNumber, IsObject, IsOptional, IsString } from 'class-validator'
 
 export class LoginDto {
   @ApiProperty({ example: 'admin', description: '用户名' })
@@ -132,6 +132,41 @@ export class GenerateShotPromptDto {
   @IsOptional()
   @IsNumber()
   shotNum?: number
+
+  @ApiPropertyOptional({ example: 800, description: '脚本字数' })
+  @IsOptional()
+  @IsNumber()
+  wordNum?: number
+
+  @ApiPropertyOptional({ example: '哪吒，小哪吒', description: '主角/角色' })
+  @IsOptional()
+  @IsString()
+  characters?: string
+
+  @ApiPropertyOptional({ example: '东海边', description: '场景设定' })
+  @IsOptional()
+  @IsString()
+  sceneSetting?: string
+
+  @ApiPropertyOptional({ example: '童趣、简洁', description: '旁白要求' })
+  @IsOptional()
+  @IsString()
+  narrationRequirement?: string
+
+  @ApiPropertyOptional({ example: '写实电影感', description: '画面风格' })
+  @IsOptional()
+  @IsString()
+  visualStyle?: string
+
+  @ApiPropertyOptional({ example: '不要血腥暴力', description: '禁用内容' })
+  @IsOptional()
+  @IsString()
+  negativePrompt?: string
+
+  @ApiPropertyOptional({ example: '低龄儿童观看', description: '备注' })
+  @IsOptional()
+  @IsString()
+  remark?: string
 }
 
 export class SaveScriptDto {
@@ -187,6 +222,46 @@ export class SaveScriptDto {
   @IsOptional()
   @IsString()
   scriptContent?: string
+
+  @ApiPropertyOptional({ example: 'ai', description: '剧本来源：ai/import/manual' })
+  @IsOptional()
+  @IsString()
+  source?: string
+
+  @ApiPropertyOptional({ example: '未命名剧本', description: '兼容旧字段：剧本标题' })
+  @IsOptional()
+  @IsString()
+  title?: string
+
+  @ApiPropertyOptional({ example: '第一幕...', description: '兼容旧字段：剧本正文' })
+  @IsOptional()
+  @IsString()
+  content?: string
+
+  @ApiPropertyOptional({ example: '东海边', description: '场景设定' })
+  @IsOptional()
+  @IsString()
+  sceneSetting?: string
+
+  @ApiPropertyOptional({ example: '童趣、简洁', description: '旁白要求' })
+  @IsOptional()
+  @IsString()
+  narrationRequirement?: string
+
+  @ApiPropertyOptional({ example: '写实电影感', description: '画面风格' })
+  @IsOptional()
+  @IsString()
+  visualStyle?: string
+
+  @ApiPropertyOptional({ example: '不要血腥暴力', description: '禁用内容' })
+  @IsOptional()
+  @IsString()
+  negativePrompt?: string
+
+  @ApiPropertyOptional({ example: '低龄儿童观看', description: '备注' })
+  @IsOptional()
+  @IsString()
+  remark?: string
 }
 
 export class PageScriptDto extends PageDto {
@@ -264,17 +339,43 @@ export class TextToVideoTaskDto {
   @IsOptional()
   @IsString()
   ratio?: string
+
+  @ApiPropertyOptional({ example: '缓慢推进', description: '前端视频镜头运动配置' })
+  @IsOptional()
+  @IsString()
+  cameraMovement?: string
+
+  @ApiPropertyOptional({ example: '轻微', description: '前端视频运动强度配置' })
+  @IsOptional()
+  @IsString()
+  motionStrength?: string
 }
 
 export class TextToImageTaskDto {
-  @ApiProperty({ example: '卡通风格太阳系科普海报', description: '文生图 prompt' })
+  @ApiPropertyOptional({ example: '卡通风格太阳系科普海报', description: '文生图 prompt' })
+  @IsOptional()
   @IsString()
-  prompt!: string
+  prompt?: string
+
+  @ApiPropertyOptional({ example: '卡通风格太阳系科普海报', description: '兼容前端旧字段，等同 prompt' })
+  @IsOptional()
+  @IsString()
+  text?: string
 
   @ApiPropertyOptional({ example: 1, description: '分镜 ID' })
   @IsOptional()
   @IsNumber()
   shotId?: number
+
+  @ApiPropertyOptional({ example: 1, description: '项目 ID' })
+  @IsOptional()
+  @IsNumber()
+  projectId?: number
+
+  @ApiPropertyOptional({ example: { style: '写实电影感', aspectRatio: '16:9' }, description: '前端图片生成中文配置' })
+  @IsOptional()
+  @IsObject()
+  imageConfig?: Record<string, unknown>
 }
 
 export class ImageToVideoTaskDto {
@@ -307,6 +408,16 @@ export class ImageToVideoTaskDto {
   @IsOptional()
   @IsString()
   ratio?: string
+
+  @ApiPropertyOptional({ example: '缓慢推进', description: '前端图生视频镜头运动配置' })
+  @IsOptional()
+  @IsString()
+  cameraMovement?: string
+
+  @ApiPropertyOptional({ example: '轻微', description: '前端图生视频运动强度配置' })
+  @IsOptional()
+  @IsString()
+  motionStrength?: string
 }
 
 export class ImagePromptDto {
@@ -332,6 +443,11 @@ export class ImagePromptDto {
     btnValue?: string
     btnType?: string
   }
+
+  @ApiPropertyOptional({ example: { style: '写实电影感', aspectRatio: '16:9' }, description: '前端图片生成中文配置' })
+  @IsOptional()
+  @IsObject()
+  imageConfig?: Record<string, unknown>
 }
 
 export class AudioTaskDto {
@@ -341,7 +457,7 @@ export class AudioTaskDto {
 }
 
 export class QiniuUploadTokenQueryDto {
-  @ApiPropertyOptional({ example: 'qiqi123456', description: '七牛云 bucketName，不传使用服务端默认配置' })
+  @ApiPropertyOptional({ example: 'qiqi1234567', description: '七牛云 bucketName，不传使用服务端默认配置' })
   @IsOptional()
   @IsString()
   bucketName?: string
@@ -403,6 +519,80 @@ export class ResourceImportDto {
   @ApiProperty({ example: 'voice', description: '资源类型：image/video/voice' })
   @IsString()
   type!: string
+}
+
+export class ResourceConfirmDto {
+  @ApiProperty({ example: 1, description: '分镜 ID' })
+  @IsNumber()
+  shotId!: number
+
+  @ApiPropertyOptional({ example: 1, description: '需要确认的资源 ID' })
+  @IsOptional()
+  @IsNumber()
+  resourceId?: number
+
+  @ApiPropertyOptional({ example: 'image/demo.png', description: '直接确认导入资源时使用的七牛对象 key' })
+  @IsOptional()
+  @IsString()
+  originPath?: string
+
+  @ApiProperty({ example: 'image', description: '资源类型：image/video/voice' })
+  @IsString()
+  type!: string
+}
+
+export class UpdateShotDto {
+  @ApiProperty({ example: 1, description: '项目 ID' })
+  @IsNumber()
+  projectId!: number
+
+  @ApiProperty({ example: 1, description: '分镜 ID' })
+  @IsNumber()
+  shotId!: number
+
+  @ApiPropertyOptional({ example: '镜头1：海边奔跑', description: '镜头标题' })
+  @IsOptional()
+  @IsString()
+  shotName?: string
+
+  @ApiPropertyOptional({ example: '哪吒赤脚跑过沙滩。', description: '镜头内容' })
+  @IsOptional()
+  @IsString()
+  shotContent?: string
+
+  @ApiPropertyOptional({ example: 'A joyful child...', description: '图片提示词' })
+  @IsOptional()
+  @IsString()
+  visualPrompt?: string
+
+  @ApiPropertyOptional({ example: 'image/demo.png', description: '确认图片缩略图 key' })
+  @IsOptional()
+  @IsString()
+  previewImage?: string
+
+  @ApiPropertyOptional({ example: 'Camera slowly pushes in.', description: '视频提示词' })
+  @IsOptional()
+  @IsString()
+  videoPrompt?: string
+
+  @ApiPropertyOptional({ example: '哪吒在海边奔跑。', description: '旁白文本' })
+  @IsOptional()
+  @IsString()
+  narration?: string
+
+  @ApiPropertyOptional({ example: '海浪声，儿童笑声', description: '音效描述' })
+  @IsOptional()
+  @IsString()
+  soundEffects?: string
+
+  @ApiPropertyOptional({ example: '轻快童趣的国风配乐', description: '背景音乐描述' })
+  @IsOptional()
+  @IsString()
+  backgroundMusic?: string
+
+  @ApiPropertyOptional({ example: [1, 2], description: '素材库音效资源 ID 列表' })
+  @IsOptional()
+  soundEffectResourceIds?: number[] | string
 }
 
 export class ShotListQueryDto {

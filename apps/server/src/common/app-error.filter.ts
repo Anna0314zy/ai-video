@@ -1,4 +1,4 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common'
+import { ArgumentsHost, BadRequestException, Catch, ExceptionFilter } from '@nestjs/common'
 import { AppException } from './app-exception.js'
 import { mapErrorToResponse } from './app-error.js'
 
@@ -13,6 +13,16 @@ export class AppErrorFilter implements ExceptionFilter {
       return
     }
 
+    if (exception instanceof BadRequestException) {
+      response.status(200).json(
+        mapErrorToResponse({
+          kind: 'validation',
+          message: formatBadRequestMessage(exception.getResponse()),
+        }),
+      )
+      return
+    }
+
     console.error('[AppErrorFilter] unhandled exception', {
       method: request?.method,
       url: request?.url,
@@ -21,4 +31,13 @@ export class AppErrorFilter implements ExceptionFilter {
     })
     response.status(200).json(mapErrorToResponse({ kind: 'unknown' }))
   }
+}
+
+function formatBadRequestMessage(errorResponse: unknown) {
+  if (typeof errorResponse === 'string') return errorResponse
+  if (!errorResponse || typeof errorResponse !== 'object') return '请求参数错误'
+  const message = (errorResponse as { message?: unknown }).message
+  if (Array.isArray(message)) return message.join('；')
+  if (typeof message === 'string') return message
+  return '请求参数错误'
 }
