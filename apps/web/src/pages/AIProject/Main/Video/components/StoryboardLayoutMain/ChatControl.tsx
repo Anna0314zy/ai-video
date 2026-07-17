@@ -1,5 +1,5 @@
 import { Button, Flex, message, Image, Space } from 'antd'
-import { useState, useRef, useMemo, useCallback, useEffect } from 'react'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import AudioChatConfig from './AudioChatConfig'
 import VideoChatConfig from './VideoChatConfig'
 import ImageChatConfig from './ImageChatConfig'
@@ -18,18 +18,20 @@ const style: React.CSSProperties = {
 }
 const ChatControl = () => {
   const dispatch = useDispatch<Dispatch>()
-  const { currentSelectType, currentShotId, shotList } = useSelector((state: RootState) => state.aiVideo)
+  const { currentSelectType, currentShotId, shotList, selectedImage } = useSelector((state: RootState) => state.aiVideo)
   const currentShot = useMemo(() => {
     return shotList.find(v => v.shotId === currentShotId)
   }, [currentShotId, shotList])
   const currentShotContent = currentShot?.shotContent || currentShot?.content || ''
   const currentVisualPrompt = currentShot?.visualPrompt || currentShot?.imagePrompt || currentShot?.midjourneyPrompt || ''
+  const currentChinesePrompt = hasChinese(currentVisualPrompt) ? currentVisualPrompt : currentShotContent
 
   useEffect(() => {
     formRef.current?.form.setFieldsValue({
-      btnValue: currentVisualPrompt || currentShotContent,
+      subject: currentShot?.shotName || currentShot?.title || '',
+      btnValue: currentChinesePrompt,
     })
-  }, [currentShotContent, currentSelectType, currentVisualPrompt])
+  }, [currentShot?.shotName, currentShot?.title, currentChinesePrompt, currentSelectType])
   const projectId = Number(useParams().id)
   const formRef = useRef<any>()
   const [prompt, setPrompt] = useState<{
@@ -50,11 +52,13 @@ const ChatControl = () => {
   }
   const handleInputSend = async () => {
     if (!prompt?.text) return
+    const imageConfig = formRef.current?.form.getFieldsValue()
     await dispatch.aiVideo.addChatTask({
       data: {
         text: prompt.text,
         shotId: currentShotId,
         projectId: projectId!,
+        imageConfig,
       },
       type: EnumUploadType['IMAGE'],
     })
@@ -70,14 +74,11 @@ const ChatControl = () => {
   }
   const handleCreatePrompt = async () => {
     const params = formRef.current?.form.getFieldsValue()
-    const btnList = formRef.current.btnList
+    const manualPrompt = hasChinese(params.btnValue) ? params.btnValue : ''
     const res = await api.generateImagePrompt({
       shotId: currentShotId,
-      button: {
-        btnName: params.category,
-        btnValue: params.btnValue,
-        btnType: btnList.find((v: { btnName: string }) => v.btnName === params.category)?.btnType,
-      },
+      button: manualPrompt ? { btnName: '最终中文提示词', btnValue: manualPrompt, btnType: 'prompt' } : undefined,
+      imageConfig: params,
       imageUrl: prompt.fileUrl,
     })
     setPrompt(prev => ({
@@ -114,9 +115,12 @@ const ChatControl = () => {
       await formRef.current?.form.validateFields()
     }
     if (currentSelectType === 'video') {
-      base.conditionFactor = base.conditionFactor ? Number((base.conditionFactor / 100).toFixed(1)) : 0
-      base.motionBucketId = base.motionBucketId || 0
       await formRef.current?.form.validateFields()
+      const imageUrl = selectedImage?.originUrl || selectedImage?.originPath || selectedImage?.url
+      if (!imageUrl) {
+        return message.warning('请先在右侧图片资源中选择一张图片')
+      }
+      base.imageUrl = imageUrl
     }
 
     await dispatch.aiVideo.addChatTask({
@@ -124,27 +128,12 @@ const ChatControl = () => {
       type: currentSelectType,
     })
   }
-  const [loading, setLoading] = useState(false)
-  const handleTranslate = useCallback(async () => {
-    setLoading(true)
-    try {
-      const data = await api.translateToEnglish(formRef.current?.form.getFieldValue('btnValue'))
-      formRef.current?.form.setFieldsValue({
-        btnValue: data,
-      })
-    } finally {
-      setLoading(false)
-    }
-  }, [])
   return (
     <Flex vertical={true} style={style}>
       <Flex align='center'>
         <div>{chatContentConfig()}</div>
         {currentSelectType === EnumUploadType['IMAGE'] ? (
           <Space style={{ marginLeft: '10px' }}>
-            <Button type={'primary'} loading={loading} disabled={loading} onClick={handleTranslate}>
-              翻译
-            </Button>
             <Button type={'primary'} onClick={handleCreatePrompt}>
               应用
             </Button>
@@ -173,3 +162,7 @@ const ChatControl = () => {
   )
 }
 export default ChatControl
+
+function hasChinese(value?: string) {
+  return /[\u4e00-\u9fa5]/.test(value || '')
+}

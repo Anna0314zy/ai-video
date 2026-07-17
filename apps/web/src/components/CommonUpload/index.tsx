@@ -69,7 +69,7 @@ const CommonUpload = ({
           file,
           key: storageFullPath,
           token: credentialData.uploadToken,
-          uploadHost: credentialData.uploadHost || 'https://upload.qiniup.com',
+          uploadHost: credentialData.uploadHost || 'https://up-z1.qiniup.com',
           uploadOptions,
           onProgress,
         })

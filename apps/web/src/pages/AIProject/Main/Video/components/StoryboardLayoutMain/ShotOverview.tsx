@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal } from 'antd'
+import { Button, Form, Input, Modal, Select } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
@@ -16,6 +16,7 @@ export default function ShotOverview() {
   }, [currentShotId, shotList])
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [soundEffectOptions, setSoundEffectOptions] = useState<Array<{ label: string; value: number }>>([])
   const [form] = Form.useForm()
   const shotName = currentShot?.shotName || currentShot?.title || (currentShot ? `镜头${currentShot.sort || ''}` : '')
   const shotContent = currentShot?.shotContent || currentShot?.content || ''
@@ -30,8 +31,38 @@ export default function ShotOverview() {
       visualPrompt,
       videoPrompt: currentShot?.videoPrompt || '',
       narration: currentShot?.narration || '',
+      soundEffects: currentShot?.soundEffects || '',
+      backgroundMusic: currentShot?.backgroundMusic || '',
+      soundEffectResourceIds: currentShot?.soundEffectResourceIds || [],
     })
-  }, [currentShot?.narration, currentShot?.videoPrompt, form, open, shotContent, shotName, visualPrompt])
+  }, [
+    currentShot?.backgroundMusic,
+    currentShot?.narration,
+    currentShot?.soundEffectResourceIds,
+    currentShot?.soundEffects,
+    currentShot?.videoPrompt,
+    form,
+    open,
+    shotContent,
+    shotName,
+    visualPrompt,
+  ])
+
+  useEffect(() => {
+    if (!open) return
+    api
+      .getResourceList({ type: 'sound_effect', pageIndex: 1, pageSize: 200 })
+      .then(res => {
+        const records = Array.isArray(res?.records) ? res.records : []
+        setSoundEffectOptions(
+          records.map((item: any) => ({
+            label: item.name || item.resourceName || basename(item.originPath || item.origin || item.url || `音效${item.resourceId || item.id}`),
+            value: Number(item.resourceId || item.id),
+          })),
+        )
+      })
+      .catch(() => setSoundEffectOptions([]))
+  }, [open])
 
   const handleSave = async () => {
     if (!currentShot) return
@@ -46,6 +77,9 @@ export default function ShotOverview() {
         visualPrompt: values.visualPrompt,
         videoPrompt: values.videoPrompt,
         narration: values.narration,
+        soundEffects: values.soundEffects,
+        backgroundMusic: values.backgroundMusic,
+        soundEffectResourceIds: values.soundEffectResourceIds,
       })
       dispatch.aiVideo.updateData({
         shotList: shotList.map(item => (item.shotId === updated.shotId ? { ...item, ...updated } : item)),
@@ -119,8 +153,27 @@ export default function ShotOverview() {
           <Form.Item name='narration' label='旁白文本'>
             <TextArea rows={3} placeholder='用于生成旁白的文本' />
           </Form.Item>
+          <Form.Item name='soundEffects' label='音效描述'>
+            <TextArea rows={2} placeholder='例如：儿童笑声、海浪声、脚踩水花声' />
+          </Form.Item>
+          <Form.Item name='soundEffectResourceIds' label='素材库音效'>
+            <Select
+              mode='multiple'
+              allowClear
+              placeholder='从素材库选择音效'
+              options={soundEffectOptions}
+              optionFilterProp='label'
+            />
+          </Form.Item>
+          <Form.Item name='backgroundMusic' label='背景音乐描述'>
+            <TextArea rows={2} placeholder='例如：轻快、童趣、明亮的国风配乐' />
+          </Form.Item>
         </Form>
       </Modal>
     </>
   )
+}
+
+function basename(path: string) {
+  return String(path || '').split('/').pop() || path
 }

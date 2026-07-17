@@ -88,8 +88,10 @@ const ChatContent = () => {
       // VideoDesign
       for (const config of VideoDesign) {
         const name = config.label
-        const value = String(item[config.prop])
-        result += `${name}:${value} `
+        const value = item[config.prop] ?? item.request?.[config.prop]
+        if (value !== undefined && value !== null && value !== '') {
+          result += `${name}:${value} `
+        }
       }
     } else if (currentSelectType === 'voice') {
       // AudioDesign
@@ -118,9 +120,10 @@ const ChatContent = () => {
           endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
           // scrollableTarget={'scrollableDiv'}
           inverse={true}>
-          {get(messageListMap, `${currentSelectType}.${currentShotId}.data`, []).map((item: any) => {
+          {get(messageListMap, `${currentSelectType}.${currentShotId}.data`, []).map((item: any, index: number) => {
+            const messageKey = `${item.type || currentSelectType}-${item.shotId || currentShotId}-${item.historyId || item.taskId || index}`
             return (
-              <MessageLayout key={item.taskId} data={item}>
+              <MessageLayout key={messageKey} data={item}>
                 <Flex vertical={true}>
                   <div>
                     {/* shotId:{item.shotId}-historyId:{item.historyId} */}
@@ -135,10 +138,10 @@ const ChatContent = () => {
                   </div>
                   <MaterialState data={item} />
                   <Flex wrap={true} gap={10} style={{ marginTop: '10px' }} className='btns'>
-                    {item.options?.map((v: any) => {
+                    {item.options?.map((v: any, optionIndex: number) => {
                       return (
                         <ActionBtn
-                          key={v.label}
+                          key={`${messageKey}-${v.custom || v.label || optionIndex}`}
                           value={v.label}
                           onClick={() => imageBtnClick(item, v)}
                           disabled={loading[item.taskId]?.[v.custom]}

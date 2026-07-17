@@ -1,6 +1,6 @@
 {
-  "QINIU_BUCKET_NAME": "qiqi123456",
+  "QINIU_BUCKET_NAME": "qiqi1234567",
   "QINIU_ACCESS_KEY": "your-qiniu-access-key",
   "QINIU_SECRET_KEY": "your-qiniu-secret-key",
-  "QINIU_UPLOAD_HOST": "https://upload.qiniup.com"
+  "QINIU_UPLOAD_HOST": "https://up-z1.qiniup.com"
 }

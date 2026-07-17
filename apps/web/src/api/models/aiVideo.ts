@@ -2,7 +2,7 @@ import api from '../index'
 import { ChatMessageList, ResourceType, ShotList, Text2imageMessageOptions } from '@/api/types/video'
 
 import { PageList } from '@/api/models/project'
-import { Text2imageMessage, TaskState, AudioChatParams, AddImageTaskParams, AudioTaskParams } from '@/api/types/video'
+import { Text2imageMessage, TaskState, AudioChatParams, AddImageTaskParams, AudioTaskParams, VideoTaskParams } from '@/api/types/video'
 const http = import.meta.env.VITE_API_SERVER
 // 获取图片配置接口
 export const getImagePromptBtnList = (shotId: number) => {
@@ -56,18 +56,19 @@ export const postSaveImage = (params: { shotId: number }) => {
 // 生成图片时解析prompt
 export const generateImagePrompt = (params: {
   shotId: number
-  button: {
+  button?: {
     btnName: string
     btnValue: string
     btnType: string
   }
+  imageConfig?: Record<string, unknown>
   imageUrl?: string
 }) => {
   return api.post<string>(`${http}/api/prompt/v1/generateImage/parse`, params)
 }
 
 // 获取图片资源分页列表
-export const getResourceList = (params: { shotId: number; pageSize?: number; pageIndex?: number; type: string }) => {
+export const getResourceList = (params: { shotId?: number; pageSize?: number; pageIndex?: number; type: string }) => {
   return api.get<any>(`${http}/api/resource/v1/page`, params)
 }
 
@@ -83,6 +84,10 @@ export const addResource = (params: { historyId: number; type: ResourceType }) =
 // 重新生成
 export const reinstateTask = (taskId: string) => {
   return api.post<ChatMessageList>(`${http}/api/queue/v1/task/reinstateTask?taskId=${taskId}`)
+}
+
+export const getTaskDetail = (taskId: string) => {
+  return api.get<ChatMessageList>(`${http}/api/queue/v1/task/detail`, { taskId })
 }
 interface HistoryParams {
   shotId: number
@@ -114,7 +119,7 @@ export const getAudioHistories = (params: HistoryParams) => {
 }
 // 调svd服务生成视频
 
-export const addVideoTask = (params: { shotId: number }) => {
+export const addVideoTask = (params: VideoTaskParams) => {
   return api.post<ChatMessageList>(`${http}/api/image2video/v1/svd/generateVideo/addTask`, params)
 }
 
@@ -160,6 +165,9 @@ export const updateShot = (params: {
   visualPrompt?: string
   videoPrompt?: string
   narration?: string
+  soundEffects?: string
+  backgroundMusic?: string
+  soundEffectResourceIds?: number[]
 }) => {
   return api.post<ShotList>(`${http}/api/scriptShot/v1/updateShot`, params)
 }

@@ -64,7 +64,7 @@ envDir: 'env'
 | --- | --- |
 | `VITE_API_SERVER` | 后端 API 基础地址。 |
 | `VITE_SOCKET_BASE` | SockJS/STOMP 连接地址。 |
-| `VITE_QINIU_BUCKET_NAME` | 七牛云 Bucket，当前为 `qiqi123456`。 |
+| `VITE_QINIU_BUCKET_NAME` | 七牛云 Bucket，当前为 `qiqi1234567`。 |
 | `VITE_QINIU_PUBLIC_DOMAIN` | 七牛云公开访问域名或 CDN 域名。 |
 | `VITE_CDN_SERVER` | CDN 域名。 |
 | `VITE_STORAGE_QINIU_KEY` | session/local storage 中缓存七牛云 uploadToken 的数据键。 |

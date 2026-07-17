@@ -75,11 +75,17 @@ export function elementScrollIntoView(id: number | string) {
 export function getQiniuObjectUrl(key: string): string {
   if (!key) return ''
   if (/^https?:\/\//.test(key)) return key
-  const cdnServer = `${import.meta.env.VITE_QINIU_PUBLIC_DOMAIN || import.meta.env.VITE_CDN_SERVER || ''}`.replace(
-    /\/$/,
-    '',
-  )
+  const cdnServer = normalizeUrlOrigin(import.meta.env.VITE_QINIU_PUBLIC_DOMAIN || import.meta.env.VITE_CDN_SERVER)
   return cdnServer ? `${cdnServer}/${key.replace(/^\//, '')}` : key
+}
+
+function normalizeUrlOrigin(value: unknown) {
+  const raw = `${value || ''}`
+    .trim()
+    .replace(/^['"]|['"]$/g, '')
+    .replace(/\/$/, '')
+
+  return raw.replace(/^https?:\/\/(https?:\/\/)/, '$1')
 }
 
 export async function downloadQiniuObjectFile(key: string, filename: string): Promise<void> {

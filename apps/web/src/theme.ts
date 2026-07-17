@@ -2,8 +2,8 @@ import { ThemeConfig } from 'antd'
 
 export const theme: ThemeConfig = {
   token: {
-    colorPrimary: '#14141a',
-    colorInfo: '#14141a',
+    colorPrimary: '#165dff',
+    colorInfo: '#165dff',
     colorLink: '#165dff',
     colorBorder: '#d9d9d9',
   },
@@ -52,6 +52,9 @@ export const theme: ThemeConfig = {
       cellPaddingBlock: 12,
       headerBg: '#fff',
       colorBgContainer: 'transparent',
+      rowHoverBg: 'rgba(22, 93, 255, 0.04)',
+      rowSelectedBg: 'rgba(22, 93, 255, 0.08)',
+      rowSelectedHoverBg: 'rgba(22, 93, 255, 0.12)',
     },
     Layout: {
       bodyBg: 'rgb(242, 243, 247)',

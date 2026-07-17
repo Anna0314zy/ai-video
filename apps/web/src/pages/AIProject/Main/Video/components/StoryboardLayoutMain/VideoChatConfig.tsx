@@ -2,24 +2,26 @@ import { useImperativeHandle, forwardRef, useEffect } from 'react'
 import { VideoDesign } from '@/pages/AIProject/components/config'
 import { WidgetItem } from '@/pages/AIProject/components/WidgetInputItem'
 import { Flex, Form, Space } from 'antd'
-import type { FormProps } from 'antd'
 import { VideoChatParams } from '@/api/types/video'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
 const VideoChatConfig = (_: any, ref: any) => {
+  const { currentShotId, shotList } = useSelector((state: RootState) => state.aiVideo)
+  const currentShot = shotList.find(item => item.shotId === currentShotId)
   const [form] = Form.useForm()
   // 绑定ref对外引用
   useImperativeHandle(ref, () => ({
     form,
   }))
-  function generateRandom18DigitNumber() {
-    // 生成一个18位的随机数字
-    const randomNumber = (Math.random() * 1e18).toFixed(0)
-
-    // 确保结果是18位数，不足18位则前面填充0
-    return randomNumber.padEnd(18, '0')
-  }
   useEffect(() => {
-    form.setFieldsValue({ seed: generateRandom18DigitNumber(), fps: 6 })
-  }, [])
+    form.setFieldsValue({
+      prompt: currentShot?.videoPrompt || currentShot?.shotContent || currentShot?.content || '',
+      cameraMovement: '缓慢推进',
+      motionStrength: '轻微',
+      duration: currentShot?.duration || 5,
+      ratio: '16:9',
+    })
+  }, [currentShot?.content, currentShot?.duration, currentShot?.shotContent, currentShot?.videoPrompt, form])
   return (
     <Form form={form} name='basic' labelAlign='left' layout='vertical' initialValues={{}} autoComplete='off'>
       <Flex wrap={true}>

@@ -94,7 +94,7 @@ const RightPanel = () => {
           disabled={targetScript?.scriptId ? false : true}
           type='primary'
           style={{ width: '100%', margin: '10px 0 88px 0' }}>
-          确认并开始镜头设计
+          确认剧本并生成镜头
         </Button>
       ) : null}
     </Flex>

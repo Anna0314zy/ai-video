@@ -63,10 +63,10 @@ function loadQiniuConfig() {
   const localConfigPath = path.resolve(__dirname, 'qiniu.config.json')
   const localConfig = fs.existsSync(localConfigPath) ? require(localConfigPath) : {}
   return {
-    bucketName: process.env.QINIU_BUCKET_NAME || localConfig.QINIU_BUCKET_NAME || 'qiqi123456',
+    bucketName: process.env.QINIU_BUCKET_NAME || localConfig.QINIU_BUCKET_NAME || 'qiqi1234567',
     accessKey: process.env.QINIU_ACCESS_KEY || localConfig.QINIU_ACCESS_KEY,
     secretKey: process.env.QINIU_SECRET_KEY || localConfig.QINIU_SECRET_KEY,
-    uploadHost: process.env.QINIU_UPLOAD_HOST || localConfig.QINIU_UPLOAD_HOST || 'https://upload.qiniup.com',
+    uploadHost: process.env.QINIU_UPLOAD_HOST || localConfig.QINIU_UPLOAD_HOST || 'https://up-z1.qiniup.com',
   }
 }
 

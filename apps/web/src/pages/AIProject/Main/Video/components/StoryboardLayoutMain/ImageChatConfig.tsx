@@ -1,63 +1,30 @@
-import { useImperativeHandle, forwardRef, useEffect, useState, useMemo } from 'react'
+import { useImperativeHandle, forwardRef, useEffect } from 'react'
 import { ImageDesign, ImageConfig } from '@/pages/AIProject/components/config'
 import { WidgetItem } from '@/pages/AIProject/components/WidgetInputItem'
 import { Flex, Form, Space } from 'antd'
 import { ImageChatParams } from '@/api/types/video'
-import * as api from '@/api/models/aiVideo'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/store'
 const ImageChatConfig = (_: any, ref: any) => {
-  const { currentShotId } = useSelector((state: RootState) => state.aiVideo)
-
-  const [btnList, setBtnList] = useState<
-    {
-      btnType: string
-      btnName: string
-      btnValue?: string
-    }[]
-  >([])
-
-  const getImagePromptBtnList = async () => {
-    if (!currentShotId) return
-    const res = await api.getImagePromptBtnList(currentShotId)
-    setBtnList(res)
-  }
-  useEffect(() => {
-    getImagePromptBtnList()
-  }, [currentShotId])
-
   const [form] = Form.useForm()
   useImperativeHandle(ref, () => ({
     form,
-    btnList,
   }))
-  function generateRandom18DigitNumber() {
-    // 生成一个18位的随机数字
-    const randomNumber = (Math.random() * 1e18).toFixed(0)
-
-    // 确保结果是18位数，不足18位则前面填充0
-    return randomNumber.padEnd(18, '0')
-  }
   useEffect(() => {
-    form.setFieldsValue({ seed: generateRandom18DigitNumber(), fps: 6 })
-  }, [])
-
-  const config: ImageConfig[] = useMemo(() => {
-    return ImageDesign.map(v => {
-      if (v.prop === 'category') {
-        v.options = btnList.map(item => ({
-          label: item.btnName,
-          value: item.btnName,
-          type: item.btnType,
-        }))
-      }
-      return v
+    form.setFieldsValue({
+      composition: '中景',
+      style: '写实电影感',
+      lighting: '明亮自然光',
+      aspectRatio: '16:9',
+      quality: '高清',
+      colorTone: '自然',
+      negativePrompt: '不要文字、水印、模糊、低清晰度、畸形手',
     })
-  }, [btnList])
+  }, [form])
+
+  const config: ImageConfig[] = ImageDesign
   return (
     <Form form={form} name='basic' labelAlign='left' layout='vertical' initialValues={{}} autoComplete='off'>
       <Flex wrap={true}>
-        <Space style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <Space style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start' }}>
           {config.map(item => {
             return (
               <Form.Item<ImageChatParams> label={item.label} name={item.prop} key={item.prop}>

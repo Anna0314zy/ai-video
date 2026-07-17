@@ -114,7 +114,7 @@ export const uploadScript = (projectId: number, file: any) => {
 export const deleteScript = ({ projectId, scriptId }: { projectId: number; scriptId: number }) => {
   return api.del(`${http}/api/text/v1/deleteScript?scriptId=${scriptId}&projectId=${projectId}`)
 }
-//确认选择剧本
+// 确认剧本并生成镜头
 export const confirmScript = ({ projectId, scriptId }: { projectId: number; scriptId: number }) => {
-  return api.put(`${http}/api/text/v1/confirmScript?scriptId=${scriptId}&projectId=${projectId}`)
+  return api.put(`${http}/api/text/v1/confirmScriptAndGenerateShots?scriptId=${scriptId}&projectId=${projectId}`)
 }

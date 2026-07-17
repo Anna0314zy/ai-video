@@ -82,6 +82,7 @@ export default (props: IStoryboardVideo) => {
         if (currentSelectType === 'image') {
           dispatch.aiVideo.updateData({
             currentSelectType: 'video',
+            selectedImage: currentSelectType === 'image' ? selectedImage : {},
           })
         } else {
           const res: any = await api.getVideoDetail({ shotId: currentShotId })
@@ -91,6 +92,11 @@ export default (props: IStoryboardVideo) => {
           })
         }
 
+        dispatch.aiVideo.getResourceList({
+          shotId: currentShotId,
+          type: currentSelectType,
+          pageIndex: 1,
+        })
         dispatch.aiVideo.getShotListByProjectId(projectId)
       })
   }

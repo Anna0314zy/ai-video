@@ -38,6 +38,9 @@ export interface ShotList {
   content?: string
   sortOrder?: number
   narration?: string
+  soundEffects?: string
+  backgroundMusic?: string
+  soundEffectResourceIds?: number[]
   duration?: number
   camera?: string
   scene?: string
@@ -66,13 +69,24 @@ export interface AudioChatParams {
 }
 
 export interface VideoChatParams {
-  conditionFactor: string //条件因子 0 -1
-  fps: number //帧率，整数
-  motionBucketId: number //控制镜头，
-  seed: number //随机数字18位，整数
+  prompt?: string
+  cameraMovement?: string
+  motionStrength?: string
+  duration?: number
+  ratio?: string
+  imageUrl?: string
+  shotId: number
 }
 export interface ImageChatParams {
-  category: string
+  subject?: string
+  composition?: string
+  style?: string
+  lighting?: string
+  aspectRatio?: string
+  quality?: string
+  colorTone?: string
+  characterConsistency?: string
+  negativePrompt?: string
   btnValue: string
 }
 // / 获取文生图历史记录
@@ -117,6 +131,7 @@ export interface AddImageTaskParams {
   shotId: number
   text?: string
   projectId: number
+  imageConfig?: Partial<ImageChatParams>
   option?: Text2imageMessageOptions | string
   requestLogId?: number
 }

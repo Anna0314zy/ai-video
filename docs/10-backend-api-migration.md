@@ -113,7 +113,7 @@
 | --- | --- | --- |
 | `VITE_API_SERVER` | 新 NestJS 后端 HTTP 地址 | 待切换 |
 | `VITE_SOCKET_BASE` | 新 NestJS 后端 STOMP/SockJS 地址 | 待切换 |
-| `VITE_QINIU_BUCKET_NAME` | 前端上传使用的七牛云 bucket 名称，当前 `qiqi123456` | 已切换 |
+| `VITE_QINIU_BUCKET_NAME` | 前端上传使用的七牛云 bucket 名称，当前 `qiqi1234567` | 已切换 |
 | `VITE_QINIU_PUBLIC_DOMAIN` | 七牛云公开访问域名或 CDN 域名 | 已切换 |
 | `VITE_CDN_SERVER` | CDN 替换域名 | 保留 |
 | `VITE_STORAGE_QINIU_KEY` | uploadToken 缓存 key | 已切换 |
