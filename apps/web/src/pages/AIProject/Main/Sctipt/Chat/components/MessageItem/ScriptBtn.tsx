@@ -64,10 +64,22 @@ const ScriptBtn = ({ messageInfo, onResend }: ScriptBtnProps) => {
         scriptName: script.scriptName || script.name,
       },
     })
+    dispatch.aiScript.updateData({
+      selectedScriptId: Number(script.scriptId),
+      highlightedMessageId: messageInfo.id,
+    })
     dispatch.aiScript.getScriptPageList({
       projectId,
     })
     message.success('标记剧本成功')
+  }
+
+  const handleSelectScript = () => {
+    if (!messageInfo.scriptId) return
+    dispatch.aiScript.updateData({
+      selectedScriptId: Number(messageInfo.scriptId),
+      highlightedMessageId: messageInfo.id,
+    })
   }
 
   const handleRefresh = async () => {
@@ -115,8 +127,12 @@ const ScriptBtn = ({ messageInfo, onResend }: ScriptBtnProps) => {
     <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
       <Space>
         {messageInfo.scriptId ? (
-          <Tag style={{ color: '#FF7A2F' }} color='rgba(254, 126, 7, 0.1)' icon={<AntdIcon icon='script' />}>
-            {messageInfo.scriptName || '剧本'}
+          <Tag
+            style={{ color: '#FF7A2F', cursor: 'pointer' }}
+            color='rgba(254, 126, 7, 0.1)'
+            icon={<AntdIcon icon='script' />}
+            onClick={handleSelectScript}>
+            已标记：{messageInfo.scriptName || '剧本'}
           </Tag>
         ) : null}
         {showData.map(item => (

@@ -106,4 +106,11 @@ export class GenerationController {
   reinstateTask(@Query('taskId') taskId: string) {
     return this.generationService.reinstateTask(taskId)
   }
+
+  @Get('api/queue/v1/task/detail')
+  @ApiOperation({ summary: '查询任务详情，并同步上游任务状态' })
+  @ApiQuery({ name: 'taskId', example: 'task-001', description: '任务 ID' })
+  getTask(@Query('taskId') taskId: string) {
+    return this.generationService.getTask(taskId)
+  }
 }

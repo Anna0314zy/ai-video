@@ -10,7 +10,13 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { Divider, Skeleton } from 'antd'
 import { useParams } from 'react-router-dom'
 import IconWidget from '@/components/IconWidget'
-export default ({ handleChoose, activeObj }: { activeObj: any; handleChoose: (val: ScriptPageList) => void }) => {
+export default ({
+  handleChoose,
+  selectedScriptId,
+}: {
+  selectedScriptId?: number
+  handleChoose: (val: ScriptPageList) => void
+}) => {
   const { scriptPageListMap } = useSelector((state: RootState) => state.aiScript)
   const dispatch = useDispatch<Dispatch>()
   const { id } = useParams()
@@ -60,7 +66,7 @@ export default ({ handleChoose, activeObj }: { activeObj: any; handleChoose: (va
                   data={v}
                   onChange={handleChoose}
                   key={v.scriptId}
-                  actived={activeObj[v.scriptId]}
+                  actived={selectedScriptId === v.scriptId}
                 />
               )
             })}

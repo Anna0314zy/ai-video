@@ -240,9 +240,30 @@ export class ConfirmScriptDto {
 }
 
 export class TextToVideoTaskDto {
-  @ApiProperty({ example: '一只纸飞机飞过教室', description: '文生视频 prompt' })
+  @ApiPropertyOptional({ example: '一只纸飞机飞过教室', description: '文生视频 prompt' })
+  @IsOptional()
   @IsString()
-  prompt!: string
+  prompt?: string
+
+  @ApiPropertyOptional({ example: '一只纸飞机飞过教室', description: '兼容前端旧字段，等同 prompt' })
+  @IsOptional()
+  @IsString()
+  text?: string
+
+  @ApiPropertyOptional({ example: 1, description: '分镜 ID' })
+  @IsOptional()
+  @IsNumber()
+  shotId?: number
+
+  @ApiPropertyOptional({ example: 5, description: '视频时长，单位秒' })
+  @IsOptional()
+  @IsNumber()
+  duration?: number
+
+  @ApiPropertyOptional({ example: '16:9', description: '画幅比例' })
+  @IsOptional()
+  @IsString()
+  ratio?: string
 }
 
 export class TextToImageTaskDto {
@@ -257,14 +278,35 @@ export class TextToImageTaskDto {
 }
 
 export class ImageToVideoTaskDto {
-  @ApiProperty({ example: 'image/demo.png', description: '七牛云图片对象 key 或图片 URL' })
+  @ApiPropertyOptional({ example: 'image/demo.png', description: '七牛云图片对象 key 或图片 URL' })
+  @IsOptional()
   @IsString()
-  imageUrl!: string
+  imageUrl?: string
 
   @ApiPropertyOptional({ example: '镜头缓慢推进', description: '图生视频 prompt' })
   @IsOptional()
   @IsString()
   prompt?: string
+
+  @ApiPropertyOptional({ example: '镜头缓慢推进', description: '兼容前端旧字段，等同 prompt' })
+  @IsOptional()
+  @IsString()
+  text?: string
+
+  @ApiPropertyOptional({ example: 1, description: '分镜 ID' })
+  @IsOptional()
+  @IsNumber()
+  shotId?: number
+
+  @ApiPropertyOptional({ example: 5, description: '视频时长，单位秒' })
+  @IsOptional()
+  @IsNumber()
+  duration?: number
+
+  @ApiPropertyOptional({ example: '16:9', description: '画幅比例' })
+  @IsOptional()
+  @IsString()
+  ratio?: string
 }
 
 export class ImagePromptDto {

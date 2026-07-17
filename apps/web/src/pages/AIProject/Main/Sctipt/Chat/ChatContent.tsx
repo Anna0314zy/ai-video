@@ -67,7 +67,7 @@ const VirtuosoItem = (props: React.HTMLAttributes<HTMLDivElement>) => (
 
 const ChatContent = ({ chatIngText, streamScrollKey, onResend }: ChatContentProps) => {
   const md = useMemo(() => createMarkdownRenderer(), [])
-  const { messageListMap, currentSessionId, chatIng } = useSelector((state: RootState) => state.aiScript)
+  const { messageListMap, currentSessionId, chatIng, highlightedMessageId } = useSelector((state: RootState) => state.aiScript)
   const dispatch = useDispatch<Dispatch>()
   const virtuosoRef = useRef<VirtuosoHandle>(null)
   const isAtBottomRef = useRef(true)
@@ -178,6 +178,16 @@ const ChatContent = ({ chatIngText, streamScrollKey, onResend }: ChatContentProp
     }
   }, [chatIngText, displayMessages.length, autoscrollToBottomOnce])
   useEffect(() => {
+    if (!highlightedMessageId) return
+    const targetIndex = displayMessages.findIndex(item => String(item.id) === String(highlightedMessageId))
+    if (targetIndex < 0) return
+    virtuosoRef.current?.scrollToIndex({
+      index: firstLoadedIndex + targetIndex,
+      align: 'center',
+      behavior: 'smooth',
+    })
+  }, [displayMessages, firstLoadedIndex, highlightedMessageId])
+  useEffect(() => {
     if (!chatIng) autoFollowRef.current = false
   }, [chatIng])
   useEffect(() => {
@@ -248,6 +258,7 @@ const ChatContent = ({ chatIngText, streamScrollKey, onResend }: ChatContentProp
                 key={String(item.id)}
                 messageInfo={item}
                 onResend={onResend}
+                highlighted={String(item.id) === String(highlightedMessageId)}
               />
             )
           }}

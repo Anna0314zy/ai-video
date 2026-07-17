@@ -4,6 +4,7 @@ import { ok, fail } from '../dist/common/api-response.js'
 import { mapErrorToResponse } from '../dist/common/app-error.js'
 import { createLlmProvider } from '../dist/llm/llm-provider-factory.js'
 import { ScriptService, buildScriptTemplate, parseImportedScript } from '../dist/modules/script/script.service.js'
+import { GenerationService } from '../dist/modules/generation/generation.service.js'
 
 const tests = []
 
@@ -28,7 +29,20 @@ test('buildServerConfig loads DeepSeek script model from environment', () => {
     LLM_SCRIPT_MODEL: 'deepseek-chat',
     LLM_TIMEOUT_MS: '30000',
     LLM_RETRY_COUNT: '2',
-    TEXT_TO_VIDEO_PROVIDER: 'tencent',
+    TEXT_TO_VIDEO_PROVIDER: 'kuaipao',
+    TEXT_TO_VIDEO_BASE_URL: 'https://kuaipao.pro',
+    TEXT_TO_VIDEO_API_KEY: 'video-key',
+    TEXT_TO_VIDEO_MODEL: 'seedance-2-0',
+    TEXT_TO_VIDEO_DURATION: '5',
+    TEXT_TO_VIDEO_RATIO: '16:9',
+    TEXT_TO_IMAGE_PROVIDER: 'kuaipao',
+    TEXT_TO_IMAGE_BASE_URL: 'https://kuaipao.pro/v1',
+    TEXT_TO_IMAGE_API_KEY: 'image-key',
+    TEXT_TO_IMAGE_MODEL: 'gpt-image-2',
+    TEXT_TO_IMAGE_SIZE: '1536x1024',
+    TEXT_TO_IMAGE_QUALITY: 'auto',
+    TEXT_TO_IMAGE_RESPONSE_FORMAT: 'url',
+    TEXT_TO_IMAGE_WATERMARK: 'false',
   })
 
   assert.equal(config.port, 4100)
@@ -39,7 +53,20 @@ test('buildServerConfig loads DeepSeek script model from environment', () => {
   assert.equal(config.storage.bucketName, 'qiqi123456')
   assert.equal(config.llm.provider, 'deepseek')
   assert.equal(config.llm.scriptModel, 'deepseek-chat')
-  assert.equal(config.generation.textToVideoProvider, 'tencent')
+  assert.equal(config.generation.textToVideoProvider, 'kuaipao')
+  assert.equal(config.generation.textToVideoBaseUrl, 'https://kuaipao.pro')
+  assert.equal(config.generation.textToVideoApiKey, 'video-key')
+  assert.equal(config.generation.textToVideoModel, 'seedance-2-0')
+  assert.equal(config.generation.textToVideoDuration, 5)
+  assert.equal(config.generation.textToVideoRatio, '16:9')
+  assert.equal(config.generation.textToImageProvider, 'kuaipao')
+  assert.equal(config.generation.textToImageBaseUrl, 'https://kuaipao.pro/v1')
+  assert.equal(config.generation.textToImageApiKey, 'image-key')
+  assert.equal(config.generation.textToImageModel, 'gpt-image-2')
+  assert.equal(config.generation.textToImageSize, '1536x1024')
+  assert.equal(config.generation.textToImageQuality, 'auto')
+  assert.equal(config.generation.textToImageResponseFormat, 'url')
+  assert.equal(config.generation.textToImageWatermark, false)
 })
 
 test('buildServerConfig fails when required LLM config is missing', () => {
@@ -109,6 +136,217 @@ test('createLlmProvider rejects unsupported provider', () => {
       }),
     /Unsupported LLM provider: unknown/,
   )
+})
+
+test('GenerationService creates kuaipao text-to-video task with configured payload', async () => {
+  const calls = []
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url, init })
+    return {
+      ok: true,
+      text: async () => JSON.stringify({ data: { task_id: 'upstream-video-1', status: 'processing' } }),
+    }
+  }
+
+  const createdTasks = []
+  const updates = []
+  const service = new GenerationService(
+    {
+      value: {
+        generation: {
+          textToVideoProvider: 'kuaipao',
+          imageToVideoProvider: undefined,
+          textToVideoBaseUrl: 'https://kuaipao.pro',
+          textToVideoApiKey: 'video-key',
+          textToVideoModel: 'seedance-2-0',
+          textToVideoDuration: 5,
+          textToVideoRatio: '16:9',
+          textToVideoTimeoutMs: 60000,
+        },
+      },
+    },
+    {
+      shot: {
+        findUnique: async query => {
+          assert.deepEqual(query.where, { id: 3 })
+          return {
+            id: 3,
+            duration: 6,
+            videoPrompt: '镜头缓慢推进，电影感光影',
+            content: '橘猫在窗台上伸懒腰',
+          }
+        },
+        update: async query => {
+          updates.push(query)
+          return query.data
+        },
+      },
+      generationTask: {
+        create: async query => {
+          createdTasks.push(query.data)
+          return {
+            id: 21,
+            ...query.data,
+            createdAt: new Date('2026-07-16T08:00:00.000Z'),
+            updatedAt: new Date('2026-07-16T08:00:00.000Z'),
+          }
+        },
+        update: async query => {
+          updates.push(query)
+          return {
+            id: 21,
+            taskId: 'text-to-video-local',
+            provider: 'kuaipao',
+            type: 'text-to-video',
+            state: 'RUNNING',
+            request: createdTasks[0].request,
+            result: query.data.result,
+            createdAt: new Date('2026-07-16T08:00:00.000Z'),
+            updatedAt: new Date('2026-07-16T08:00:00.000Z'),
+          }
+        },
+      },
+    },
+  )
+
+  try {
+    const task = await service.addTextToVideoTask({ shotId: 3, text: '一只橘猫在阳光下的窗台上伸懒腰' })
+    assert.equal(calls.length, 1)
+    assert.equal(calls[0].url, 'https://kuaipao.pro/api/v3/contents/generations/tasks')
+    assert.equal(calls[0].init.method, 'POST')
+    assert.equal(calls[0].init.headers.Authorization, 'Bearer video-key')
+    assert.deepEqual(JSON.parse(calls[0].init.body), {
+      model: 'seedance-2-0',
+      content: [{ type: 'text', text: '一只橘猫在阳光下的窗台上伸懒腰' }],
+      duration: 6,
+      ratio: '16:9',
+    })
+    assert.equal(task.type, 'video')
+    assert.equal(task.taskType, 'text-to-video')
+    assert.equal(task.taskState, 'Processing')
+    assert.equal(task.shotId, 3)
+    assert.equal(task.result.upstreamTaskId, 'upstream-video-1')
+    assert.deepEqual(updates[0], {
+      where: { id: 3 },
+      data: { videoStatus: 'running' },
+    })
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('GenerationService creates kuaipao text-to-image task and saves image resource', async () => {
+  const calls = []
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url, init })
+    return {
+      ok: true,
+      text: async () => JSON.stringify({ data: [{ url: 'https://cdn.example.com/image.png' }] }),
+    }
+  }
+
+  const createdTasks = []
+  const updates = []
+  const resources = []
+  const service = new GenerationService(
+    {
+      value: {
+        generation: {
+          textToImageProvider: 'kuaipao',
+          textToImageBaseUrl: 'https://kuaipao.pro/v1',
+          textToImageApiKey: 'image-key',
+          textToImageModel: 'gpt-image-2',
+          textToImageSize: '1536x1024',
+          textToImageQuality: 'auto',
+          textToImageResponseFormat: 'url',
+          textToImageWatermark: false,
+          textToImageTimeoutMs: 60000,
+        },
+      },
+    },
+    {
+      shot: {
+        findUnique: async query => {
+          assert.deepEqual(query.where, { id: 5 })
+          return {
+            id: 5,
+            visualPrompt: '现代 API 平台首页插图，白底，青蓝色块，干净留白',
+            content: '现代 API 平台首页',
+          }
+        },
+        update: async query => {
+          updates.push(query)
+          return query.data
+        },
+      },
+      resource: {
+        create: async query => {
+          resources.push(query.data)
+          return {
+            id: 31,
+            ...query.data,
+          }
+        },
+      },
+      generationTask: {
+        create: async query => {
+          createdTasks.push(query.data)
+          return {
+            id: 22,
+            ...query.data,
+            createdAt: new Date('2026-07-16T08:00:00.000Z'),
+            updatedAt: new Date('2026-07-16T08:00:00.000Z'),
+          }
+        },
+        update: async query => {
+          updates.push(query)
+          return {
+            id: 22,
+            taskId: 'text-to-image-local',
+            provider: 'kuaipao',
+            type: 'text-to-image',
+            state: query.data.state || 'SUCCESS',
+            request: createdTasks[0].request,
+            result: query.data.result,
+            createdAt: new Date('2026-07-16T08:00:00.000Z'),
+            updatedAt: new Date('2026-07-16T08:00:00.000Z'),
+          }
+        },
+      },
+    },
+  )
+
+  try {
+    const task = await service.addTextToImageTask({ shotId: 5 })
+    assert.equal(calls.length, 1)
+    assert.equal(calls[0].url, 'https://kuaipao.pro/v1/images/generations')
+    assert.equal(calls[0].init.method, 'POST')
+    assert.equal(calls[0].init.headers.Authorization, 'Bearer image-key')
+    assert.deepEqual(JSON.parse(calls[0].init.body), {
+      model: 'gpt-image-2',
+      prompt: '现代 API 平台首页插图，白底，青蓝色块，干净留白',
+      n: 1,
+      size: '1536x1024',
+      quality: 'auto',
+      response_format: 'url',
+      watermark: false,
+    })
+    assert.deepEqual(resources[0], {
+      shotId: 5,
+      type: 'image',
+      url: 'https://cdn.example.com/image.png',
+      origin: 'https://cdn.example.com/image.png',
+    })
+    assert.equal(task.type, 'image')
+    assert.equal(task.taskType, 'text-to-image')
+    assert.equal(task.taskState, 'Completed')
+    assert.equal(task.originUrl, 'https://cdn.example.com/image.png')
+    assert.equal(task.resourceId, 31)
+  } finally {
+    globalThis.fetch = originalFetch
+  }
 })
 
 test('ScriptService lists project sessions with generated display metadata', async () => {

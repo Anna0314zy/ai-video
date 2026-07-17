@@ -27,8 +27,22 @@ export interface ServerConfig {
   }
   generation: {
     textToImageProvider?: string
+    textToImageBaseUrl: string
+    textToImageApiKey?: string
+    textToImageModel: string
+    textToImageSize: string
+    textToImageQuality: string
+    textToImageResponseFormat: string
+    textToImageWatermark: boolean
+    textToImageTimeoutMs: number
     textToVideoProvider: string
     imageToVideoProvider?: string
+    textToVideoBaseUrl: string
+    textToVideoApiKey?: string
+    textToVideoModel: string
+    textToVideoDuration: number
+    textToVideoRatio: string
+    textToVideoTimeoutMs: number
   }
 }
 
@@ -51,6 +65,14 @@ function optionalNumber(env: Env, key: string, fallback: number): number {
     throw new Error(`${key} must be a non-negative number`)
   }
   return parsed
+}
+
+function optionalBoolean(env: Env, key: string, fallback: boolean): boolean {
+  const raw = env[key]
+  if (!raw) return fallback
+  if (raw === 'true' || raw === '1') return true
+  if (raw === 'false' || raw === '0') return false
+  throw new Error(`${key} must be a boolean`)
 }
 
 export function buildServerConfig(env: Env = process.env): ServerConfig {
@@ -83,8 +105,22 @@ export function buildServerConfig(env: Env = process.env): ServerConfig {
     },
     generation: {
       textToImageProvider: env.TEXT_TO_IMAGE_PROVIDER,
+      textToImageBaseUrl: env.TEXT_TO_IMAGE_BASE_URL || env.KUAIPAO_IMAGE_BASE_URL || 'https://kuaipao.pro/v1',
+      textToImageApiKey: env.TEXT_TO_IMAGE_API_KEY || env.KUAIPAO_API_KEY,
+      textToImageModel: env.TEXT_TO_IMAGE_MODEL || env.KUAIPAO_IMAGE_MODEL || 'gpt-image-2',
+      textToImageSize: env.TEXT_TO_IMAGE_SIZE || env.KUAIPAO_IMAGE_SIZE || '1536x1024',
+      textToImageQuality: env.TEXT_TO_IMAGE_QUALITY || env.KUAIPAO_IMAGE_QUALITY || 'auto',
+      textToImageResponseFormat: env.TEXT_TO_IMAGE_RESPONSE_FORMAT || env.KUAIPAO_IMAGE_RESPONSE_FORMAT || 'url',
+      textToImageWatermark: optionalBoolean(env, 'TEXT_TO_IMAGE_WATERMARK', optionalBoolean(env, 'KUAIPAO_IMAGE_WATERMARK', false)),
+      textToImageTimeoutMs: optionalNumber(env, 'TEXT_TO_IMAGE_TIMEOUT_MS', 60_000),
       textToVideoProvider: required(env, 'TEXT_TO_VIDEO_PROVIDER'),
       imageToVideoProvider: env.IMAGE_TO_VIDEO_PROVIDER,
+      textToVideoBaseUrl: env.TEXT_TO_VIDEO_BASE_URL || env.KUAIPAO_BASE_URL || 'https://kuaipao.pro',
+      textToVideoApiKey: env.TEXT_TO_VIDEO_API_KEY || env.KUAIPAO_API_KEY,
+      textToVideoModel: env.TEXT_TO_VIDEO_MODEL || env.KUAIPAO_VIDEO_MODEL || 'seedance-2-0',
+      textToVideoDuration: optionalNumber(env, 'TEXT_TO_VIDEO_DURATION', optionalNumber(env, 'KUAIPAO_VIDEO_DURATION', 5)),
+      textToVideoRatio: env.TEXT_TO_VIDEO_RATIO || env.KUAIPAO_VIDEO_RATIO || '16:9',
+      textToVideoTimeoutMs: optionalNumber(env, 'TEXT_TO_VIDEO_TIMEOUT_MS', 60_000),
     },
   }
 }

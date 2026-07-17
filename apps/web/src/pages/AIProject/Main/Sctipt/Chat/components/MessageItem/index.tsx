@@ -12,8 +12,9 @@ interface IProps {
   messageInfo: MessageList
   md: any
   onResend: (params: ScriptSocketPayload) => boolean
+  highlighted?: boolean
 }
-const MessageItem = ({ messageInfo, md, onResend }: IProps) => {
+const MessageItem = ({ messageInfo, md, onResend, highlighted }: IProps) => {
   const renderedHtml = useMemo(() => {
     return md.render(normalizeMarkdownSource(typeof messageInfo.messageContent === 'string' ? messageInfo.messageContent : ''))
   }, [md, messageInfo.messageContent])
@@ -24,7 +25,9 @@ const MessageItem = ({ messageInfo, md, onResend }: IProps) => {
     <HeadLayout messageInfo={messageInfo}>
       <Flex
         vertical={true}
-        className={classNames(Style.content, Style['messageInfo-item-cont'], Style[messageInfo.role])}>
+        className={classNames(Style.content, Style['messageInfo-item-cont'], Style[messageInfo.role], {
+          [Style.highlighted]: highlighted,
+        })}>
         <div
           className={Style['message-content-inner']}
           dangerouslySetInnerHTML={{

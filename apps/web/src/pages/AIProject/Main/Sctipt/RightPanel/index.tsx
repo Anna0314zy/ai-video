@@ -1,5 +1,5 @@
 import { Flex, Button, Dropdown, message } from 'antd'
-import { useMemo, useCallback, useState, useRef, useEffect } from 'react'
+import { useMemo, useCallback, useState } from 'react'
 import ScriptText from './ScriptText'
 import * as api from '@/api/models/aiScript'
 import { downloadFromServer, Ext } from '@/utils'
@@ -17,23 +17,18 @@ const RightPanel = () => {
   const { id } = useParams() // 获取路由参数 userId
   const projectId = Number(id)
   const dispatch = useDispatch<Dispatch>()
-  const { scriptPageListMap } = useSelector((state: RootState) => state.aiScript)
+  const { scriptPageListMap, selectedScriptId } = useSelector((state: RootState) => state.aiScript)
   const [loading, setLoading] = useState(false)
-  const [activeObj, setActive] = useState<{ [k: string]: boolean }>({})
   const handleChoose = useCallback((val: ScriptPageList) => {
-    setActive(prev => ({
-      // 重置所有键为 false
-      ...Object.keys(prev).reduce((acc, k) => ({ ...acc, [k]: false }), {}),
-      // 将最新的键设置为 true
-      [val.scriptId]: true,
-    }))
-  }, [])
+    dispatch.aiScript.updateData({
+      selectedScriptId: val.scriptId,
+      highlightedMessageId: val.sourceMessageId,
+    })
+  }, [dispatch])
   //当前被选中的剧本
   const targetScript = useMemo(() => {
-    // 找到键值为 true 的键
-    const activeKey = Object.keys(activeObj).find(key => activeObj[key])
-    return scriptPageListMap?.data?.find(v => v.scriptId === Number(activeKey))
-  }, [scriptPageListMap, activeObj])
+    return scriptPageListMap?.data?.find(v => v.scriptId === selectedScriptId)
+  }, [scriptPageListMap, selectedScriptId])
 
   const handleDownloadTemplate = useCallback((event: any, ext: keyof typeof Ext) => {
     event.preventDefault() // 阻止默认行为，例如点击链接不会导航到 href
@@ -89,7 +84,7 @@ const RightPanel = () => {
         </ChatUpload>
       </Flex>
       <Flex className='content' vertical={true} wrap={true} gap={10} style={{ overflow: 'hidden' }} flex={1}>
-        <ScriptText handleChoose={handleChoose} activeObj={activeObj}></ScriptText>
+        <ScriptText handleChoose={handleChoose} selectedScriptId={selectedScriptId}></ScriptText>
       </Flex>
 
       {scriptPageListMap?.total ? (

@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { MoreOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { Flex, Button, Dropdown, message } from 'antd'
@@ -22,9 +22,18 @@ interface IMaterialItem {
 export default (props: IMaterialItem) => {
   const dispatch = useDispatch<Dispatch>()
   const { data, onChange } = props
+  const itemRef = useRef<HTMLDivElement>(null)
   const previewRef = useRef<{
     open: (val: string) => void
   }>(null)
+
+  useEffect(() => {
+    if (!props.actived) return
+    itemRef.current?.scrollIntoView({
+      block: 'nearest',
+      behavior: 'smooth',
+    })
+  }, [props.actived])
   const handlePreview = useCallback(async () => {
     const res = await api.previewScript({
       scriptId: data.scriptId,
@@ -77,6 +86,7 @@ export default (props: IMaterialItem) => {
   return (
     <>
       <Flex
+        ref={itemRef}
         className={classNames(Styles['material-item'], {
           [Styles.actived]: props.actived,
         })}

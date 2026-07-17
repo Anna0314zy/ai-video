@@ -18,6 +18,32 @@ const sortMessagesByCreated = (messages: MessageList[]) => {
   return [...messages].sort((a, b) => getMessageCreatedTime(a) - getMessageCreatedTime(b))
 }
 
+const linkMessagesWithScripts = (messages: MessageList[], scripts: ScriptPageList[]) => {
+  if (!scripts.length) return messages
+  const scriptBySourceMessageId = new Map(
+    scripts
+      .filter(script => script.sourceMessageId)
+      .map(script => [
+        String(script.sourceMessageId),
+        script,
+      ]),
+  )
+
+  return messages.map(message => {
+    const script = scriptBySourceMessageId.get(String(message.id))
+    if (!script) return message
+    return {
+      ...message,
+      scriptId: script.scriptId,
+      scriptName: script.scriptName || script.name,
+    }
+  })
+}
+
+const pickDefaultScript = (scripts: ScriptPageList[]) => {
+  return scripts.find(script => script.isFinal) || scripts[0]
+}
+
 interface AiScriptState {
   scriptPageListMap: {
     data: ScriptPageList[]
@@ -36,6 +62,8 @@ interface AiScriptState {
   }
   chatIng: boolean
   chatIngText: string
+  selectedScriptId?: number
+  highlightedMessageId?: number | string
 }
 export default createModel<RootModel>()({
   state: {
@@ -56,6 +84,8 @@ export default createModel<RootModel>()({
     currentProjectDetail: {} as ProjectList,
     chatIng: false,
     chatIngText: '',
+    selectedScriptId: undefined,
+    highlightedMessageId: undefined,
   } as AiScriptState,
   reducers: {
     updateData(state, payload: Partial<AiScriptState>) {
@@ -109,6 +139,7 @@ export default createModel<RootModel>()({
         return item
       })
       set(state, `messageListMap.data`, newData)
+      if (state.selectedScriptId === scriptId) state.selectedScriptId = undefined
     },
     updateMessage(
       state,
@@ -149,9 +180,10 @@ export default createModel<RootModel>()({
       const oldTotal = get(state, `messageListMap.total`)
       // 根据 scroll 参数决定是否合并新数据
       const newData = scroll ? sortMessagesByCreated(uniqBy([...records, ...old], 'id')) : sortMessagesByCreated(records)
+      const linkedMessages = linkMessagesWithScripts(newData, state.scriptPageListMap.data || [])
       // 使用 set 方法更新数据，Redux Toolkit 会处理不可变性
       set(state, `messageListMap`, {
-        data: newData,
+        data: linkedMessages,
         total: scroll ? oldTotal ?? data.total : data.total,
         size: data.size,
       })
@@ -169,12 +201,20 @@ export default createModel<RootModel>()({
       const old = get(state, `scriptPageListMap.data`, [])
       // 根据 scroll 参数决定是否合并新数据
       const newData = scroll ? uniqBy([...old, ...records], 'scriptId') : records
+      const linkedMessages = linkMessagesWithScripts(get(state, `messageListMap.data`, []) || [], newData)
+      const selectedStillExists = state.selectedScriptId && newData.some(script => script.scriptId === state.selectedScriptId)
+      const defaultScript = selectedStillExists ? undefined : pickDefaultScript(newData)
       // 使用 set 方法更新数据，Redux Toolkit 会处理不可变性
       set(state, `scriptPageListMap`, {
         data: newData,
         total: data.total,
         size: data.size,
       })
+      set(state, `messageListMap.data`, linkedMessages)
+      if (!selectedStillExists && defaultScript) {
+        state.selectedScriptId = defaultScript.scriptId
+        state.highlightedMessageId = defaultScript.sourceMessageId
+      }
     },
   },
   effects: dispatch => ({

@@ -52,6 +52,11 @@
 .messageInfo-item-cont {
   background-color: rgba(255, 255, 255, 0.65);
   padding: 5px 10px 10px 10px;
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+  &.highlighted {
+    background-color: #fff8e8;
+    box-shadow: inset 3px 0 0 #ff9f1a, 0 0 0 1px rgba(255, 159, 26, 0.25);
+  }
   pre {
     overflow-x: auto;
     margin: 8px 0;
